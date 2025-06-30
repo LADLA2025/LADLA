@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Styles pour les cercles d'ambiance */
+.light-circle {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: pulse 8s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Chaque cercle avec sa couleur et position - Couleurs de la charte */
+.circle1 {
+  background: radial-gradient(circle at center, rgba(255, 166, 0, 1) 0%, rgba(255, 166, 0, 0) 70%);
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.circle2 {
+  background: radial-gradient(circle at center, rgba(230, 149, 14, 0.9) 0%, rgba(230, 149, 14, 0) 70%);
+  bottom: 15%;
+  right: 25%;
+  animation-delay: 2s;
+}
+
+.circle3 {
+  background: radial-gradient(circle at center, rgba(255, 166, 0, 0.7) 0%, rgba(255, 166, 0, 0) 70%);
+  top: 50%;
+  left: 10%;
+  animation-delay: 4s;
+}
+
+.circle4 {
+  background: radial-gradient(circle at center, rgba(243, 243, 243, 0.6) 0%, rgba(243, 243, 243, 0) 70%);
+  top: 20%;
+  right: 10%;
+  animation-delay: 6s;
+}
+
+.circle5 {
+  background: radial-gradient(circle at center, rgba(255, 166, 0, 0.8) 0%, rgba(255, 166, 0, 0) 70%);
+  bottom: 30%;
+  left: 50%;
+  animation-delay: 1s;
+}
+
+.circle6 {
+  background: radial-gradient(circle at center, rgba(230, 149, 14, 0.7) 0%, rgba(230, 149, 14, 0) 70%);
+  top: 70%;
+  right: 40%;
+  animation-delay: 3s;
+}
+
+/* Animation pulse pour les cercles */
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.7; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 1; 
+  }
+}
+
+/* Responsive pour les cercles */
+@media (max-width: 768px) {
+  .light-circle {
+    width: 200px;
+    height: 200px;
+    filter: blur(60px);
+  }
+}
+
+@media (max-width: 480px) {
+  .light-circle {
+    width: 150px;
+    height: 150px;
+    filter: blur(40px);
+  }
+}
+
+/* Animation ping lente pour le bouton WhatsApp */
+@keyframes ping-slow {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
