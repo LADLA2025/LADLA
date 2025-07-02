@@ -68,6 +68,7 @@ class ReservationService {
       );
 
       if (!conflictCheck.success) {
+        console.error('Erreur vérification conflit:', conflictCheck.error);
         return {
           success: false,
           error: conflictCheck.error || 'Erreur lors de la vérification des conflits'
@@ -240,14 +241,22 @@ class ReservationService {
   // Vérifier les conflits de créneaux avec durée des formules
   static async checkTimeSlotConflict(date, heure, typeVoiture, formule, excludeId = null) {
     try {
-      // Récupérer la durée de la formule depuis la base
-      const formuleQuery = `
-        SELECT duree FROM formules_${typeVoiture.replace('-', '_')} 
-        WHERE nom = $1
-      `;
+      // Durée par défaut
+      let durationMinutes = 60; 
       
-      let durationMinutes = 60; // durée par défaut
+      // Récupérer la durée de la formule depuis la base avec gestion d'erreur améliorée
       try {
+        // Mapping des types de voitures vers les noms de tables
+        const tableMapping = {
+          'petite-citadine': 'formules_petite_citadine',
+          'citadine': 'formules_citadine',
+          'berline': 'formules_berline',
+          'suv': 'formules_suv'
+        };
+
+        const tableName = tableMapping[typeVoiture] || 'formules_citadine';
+        const formuleQuery = `SELECT duree FROM ${tableName} WHERE nom = $1`;
+        
         const formuleResult = await pool.query(formuleQuery, [formule]);
         if (formuleResult.rows.length > 0) {
           const duree = formuleResult.rows[0].duree;
@@ -261,7 +270,8 @@ class ReservationService {
           }
         }
       } catch (error) {
-        console.warn('Impossible de récupérer la durée de la formule, utilisation de 60 min par défaut');
+        console.warn('Impossible de récupérer la durée de la formule:', error.message);
+        console.warn('Utilisation de 60 min par défaut');
       }
 
       // Convertir l'heure en minutes
@@ -293,10 +303,16 @@ class ReservationService {
         // Récupérer la durée de la réservation existante
         let resDurationMinutes = 60;
         try {
-          const resFormuleQuery = `
-            SELECT duree FROM formules_${reservation.type_voiture.replace('-', '_')} 
-            WHERE nom = $1
-          `;
+          const resTableMapping = {
+            'petite-citadine': 'formules_petite_citadine',
+            'citadine': 'formules_citadine',
+            'berline': 'formules_berline',
+            'suv': 'formules_suv'
+          };
+
+          const resTableName = resTableMapping[reservation.type_voiture] || 'formules_citadine';
+          const resFormuleQuery = `SELECT duree FROM ${resTableName} WHERE nom = $1`;
+          
           const resFormuleResult = await pool.query(resFormuleQuery, [reservation.formule]);
           if (resFormuleResult.rows.length > 0) {
             const duree = resFormuleResult.rows[0].duree;
@@ -310,7 +326,7 @@ class ReservationService {
             }
           }
         } catch (error) {
-          // Ignorer l'erreur et utiliser 60 min par défaut
+          console.warn('Erreur récupération durée réservation existante:', error.message);
         }
         
         const resEndMinutes = resStartMinutes + resDurationMinutes;
