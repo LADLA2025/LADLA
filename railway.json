@@ -9,6 +9,7 @@
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "DATABASE_URL": "postgresql://postgres:uJQdeSmwaynFmYfRwlUgMJxNUuTVdmYr@caboose.proxy.rlwy.net:37504/railway"
   }
 } 
