@@ -2,11 +2,10 @@ const { Pool } = require('pg');
 
 // Configuration de la base de données (utilise la même config que le serveur principal)
 const pool = new Pool({
-  host: process.env.PGHOST || 'localhost',
-  port: process.env.PGPORT || 5432,
-  database: process.env.PGDATABASE || 'postgres',
-  user: process.env.PGUSER || 'postgres',
-  password: process.env.PGPASSWORD || '2002'
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.mmzywkqwiwdrdtkocrtj:Edward2002%40%40@aws-0-eu-west-3.pooler.supabase.com:5432/postgres',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Création de la table des réservations
