@@ -292,7 +292,7 @@ const PanelAdmin = () => {
         console.log(`🔄 Réinitialisation des statistiques pour ${selectedMonth}...`);
         
         // Ici vous pourriez ajouter un appel API pour supprimer les réservations du mois
-        // await fetch(`http://localhost:3000/api/reservations/reset/${selectedMonth}`, { method: 'DELETE' });
+        // await fetch(buildAPIUrl(`${API_ENDPOINTS.RESERVATIONS}/reset/${selectedMonth}`), { method: 'DELETE' });
         
         // Pour l'instant, on simule en remettant les données à zéro
         setDashboardData({
