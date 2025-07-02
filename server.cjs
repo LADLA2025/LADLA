@@ -28,14 +28,30 @@ app.use(express.json());
 // Configuration de la connexion PostgreSQL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  // Fallback pour développement local
-  host: process.env.PGHOST || 'localhost',
-  port: process.env.PGPORT || 5432,
-  database: process.env.PGDATABASE || 'postgres',
-  user: process.env.PGUSER || 'postgres',
-  password: process.env.PGPASSWORD || '2002'
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// Test de la connexion avec gestion d'erreur améliorée
+const testConnection = async () => {
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT NOW()');
+    client.release();
+    console.log('✅ Connexion à PostgreSQL réussie!', result.rows[0]);
+  } catch (err) {
+    console.error('❌ Erreur de connexion à PostgreSQL:', err.message);
+    console.error('Variables d\'environnement disponibles:', {
+      DATABASE_URL: process.env.DATABASE_URL ? 'Définie' : 'Non définie',
+      NODE_ENV: process.env.NODE_ENV
+    });
+    
+    // En production, l'application ne peut pas fonctionner sans BDD
+    if (process.env.NODE_ENV === 'production') {
+      console.error('💥 Impossible de continuer sans base de données en production');
+      process.exit(1);
+    }
+  }
+};
 
 // Création de la table loginAdmin si elle n'existe pas
 const createAdminTable = async () => {
@@ -59,10 +75,13 @@ const createAdminTable = async () => {
         'INSERT INTO loginAdmin (username, password) VALUES ($1, $2)',
         ['admin', hashedPassword]
       );
-      console.log('Admin par défaut créé avec succès');
+      console.log('✅ Admin par défaut créé avec succès');
+    } else {
+      console.log('✅ Admin existe déjà');
     }
   } catch (err) {
-    console.error('Erreur lors de la création de la table loginAdmin:', err);
+    console.error('❌ Erreur lors de la création de la table loginAdmin:', err.message);
+    throw err;
   }
 };
 
@@ -86,24 +105,25 @@ const suvService = new SuvService(pool);
 
 // Initialiser la base de données
 const initializeDatabase = async () => {
-  await createAdminTable();
-  await petiteCitadineService.createTable();
-  await citadineService.createTable();
-  await berlineService.createTable();
-  await suvService.createTable();
-  // await createReservationsTable(); // Table créée manuellement
+  try {
+    console.log('🔄 Initialisation de la base de données...');
+    await testConnection();
+    await createAdminTable();
+    await petiteCitadineService.createTable();
+    await citadineService.createTable();
+    await berlineService.createTable();
+    await suvService.createTable();
+    // await createReservationsTable(); // Table créée manuellement
+    console.log('✅ Base de données initialisée avec succès!');
+  } catch (err) {
+    console.error('❌ Erreur lors de l\'initialisation de la base de données:', err.message);
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
+  }
 };
 
 initializeDatabase();
-
-// Test de la connexion
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('Erreur de connexion à PostgreSQL:', err);
-  } else {
-    console.log('Connexion à PostgreSQL réussie!');
-  }
-});
 
 // Configuration des routes API modulaires AVANT les fichiers statiques
 app.use('/api/formules/petite-citadine', createPetiteCitadineRoutes(petiteCitadineService));
