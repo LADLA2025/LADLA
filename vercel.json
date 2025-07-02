@@ -1,8 +1,6 @@
 {
-  "version": 2,
   "routes": [
     { "src": "/api/(.*)", "dest": "/server.cjs" },
     { "src": "/(.*)", "dest": "/server.cjs" }
-  ],
-  "regions": ["fra1"]
+  ]
 } 
