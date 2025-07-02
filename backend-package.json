@@ -1,0 +1,24 @@
+{
+  "name": "ladl-backend",
+  "version": "1.0.0",
+  "description": "LADL Backend API",
+  "main": "server.cjs",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "nodemon server.cjs"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["api", "backend", "postgresql", "express"],
+  "author": "",
+  "license": "ISC"
+} 

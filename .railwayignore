@@ -12,4 +12,7 @@ vite.config.js
 eslint.config.js
 *.md
 deploy.sh
-.htaccess 
+.htaccess
+tailwind.config.js
+postcss.config.js
+package-lock.json 

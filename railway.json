@@ -9,7 +9,6 @@
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "NODE_ENV": "production",
-    "NIXPACKS_BUILD_CMD": "npm install --omit=dev"
+    "NODE_ENV": "production"
   }
 } 

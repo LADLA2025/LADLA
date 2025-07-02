@@ -1,0 +1,8 @@
+[phases.install]
+cmd = "npm ci --omit=dev --omit=optional"
+
+[phases.build]
+cmd = "echo 'Skip build phase for backend-only deployment'"
+
+[start]
+cmd = "node server.cjs" 

@@ -13,11 +13,13 @@
     "server": "nodemon server.cjs",
     "server:prod": "node server.cjs",
     "start": "node server.cjs",
+    "railway:start": "node server.cjs",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "pg": "^8.13.1"
   },
@@ -49,7 +51,11 @@
   },
   "description": "LADL - Location de voitures avec chauffeur",
   "main": "server.cjs",
-  "keywords": ["auto", "location", "chauffeur"],
+  "keywords": [
+    "auto",
+    "location",
+    "chauffeur"
+  ],
   "author": "",
   "license": "ISC"
 }
