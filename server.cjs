@@ -30,7 +30,10 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres.mmzywkqw
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false,
+    require: true 
+  } : false
 });
 
 // Test de la connexion avec gestion d'erreur améliorée
@@ -241,12 +244,21 @@ app.post('/api/admin/change-password', async (req, res) => {
   }
 });
 
-// Middleware pour servir les fichiers statiques (APRÈS les routes API)
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Route pour la page d'accueil (SPA)
+// Route de santé pour vérifier que l'API fonctionne
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.json({ 
+    message: 'LADL Backend API', 
+    status: 'running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Route 404 pour les endpoints non trouvés
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    error: 'Endpoint non trouvé',
+    path: req.originalUrl 
+  });
 });
 
 // Démarrage du serveur
