@@ -130,12 +130,17 @@ const initializeDatabase = async () => {
 
 initializeDatabase();
 
-// Configuration des routes API modulaires AVANT les fichiers statiques
-app.use('/api/formules/petite-citadine', createPetiteCitadineRoutes(petiteCitadineService));
-app.use('/api/formules/citadine', createCitadineRoutes(citadineService));
-app.use('/api/formules/berline', createBerlineRoutes(berlineService));
-app.use('/api/formules/suv', createSuvRoutes(suvService));
-app.use('/api/reservations', reservationRoutes);
+// Configuration des routes API modulaires
+try {
+  app.use('/api/formules/petite-citadine', createPetiteCitadineRoutes(petiteCitadineService));
+  app.use('/api/formules/citadine', createCitadineRoutes(citadineService));
+  app.use('/api/formules/berline', createBerlineRoutes(berlineService));
+  app.use('/api/formules/suv', createSuvRoutes(suvService));
+  app.use('/api/reservations', reservationRoutes);
+  console.log('✅ Routes API configurées avec succès');
+} catch (err) {
+  console.error('❌ Erreur lors de la configuration des routes:', err.message);
+}
 
 // Route pour la connexion admin
 app.post('/api/admin/login', async (req, res) => {
@@ -254,10 +259,11 @@ app.get('/', (req, res) => {
 });
 
 // Route 404 pour les endpoints non trouvés
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ 
     error: 'Endpoint non trouvé',
-    path: req.originalUrl 
+    path: req.originalUrl,
+    method: req.method
   });
 });
 
