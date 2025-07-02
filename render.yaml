@@ -3,7 +3,8 @@ services:
     name: ladl-backend
     env: node
     buildCommand: npm install
-    startCommand: node server.cjs
+    startCommand: node ./server.cjs
+    rootDir: .
     plan: free
     envVars:
       - key: NODE_ENV
