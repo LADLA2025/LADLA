@@ -101,13 +101,16 @@ const createCitadineRoutes = require('./server/routes/citadineRoutes.cjs');
 const createBerlineRoutes = require('./server/routes/berlineRoutes.cjs');
 const createSuvRoutes = require('./server/routes/suvRoutes.cjs');
 const reservationRoutes = require('./server/routes/reservationRoutes.cjs');
-const { createReservationsTable } = require('./server/reservationService.cjs');
+const { ReservationTableService, initPool } = require('./server/reservationTableService.cjs');
 
 // Initialiser les services
 const petiteCitadineService = new PetiteCitadineService(pool);
 const citadineService = new CitadineService(pool);
 const berlineService = new BerlineService(pool);
 const suvService = new SuvService(pool);
+
+// Initialiser le pool pour le service de réservation
+initPool(pool);
 
 // Initialiser la base de données
 const initializeDatabase = async () => {
@@ -119,7 +122,7 @@ const initializeDatabase = async () => {
     await citadineService.createTable();
     await berlineService.createTable();
     await suvService.createTable();
-    // await createReservationsTable(); // Table créée manuellement
+    await ReservationTableService.createTable();
     console.log('✅ Base de données initialisée avec succès!');
   } catch (err) {
     console.error('❌ Erreur lors de l\'initialisation de la base de données:', err.message);
