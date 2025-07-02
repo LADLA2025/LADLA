@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { buildAPIUrl, API_ENDPOINTS } from '../../config/api.js';
+import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import FormuleSelectionModal from '../components/FormuleSelectionModal';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildAPIUrl, API_ENDPOINTS } from '../../config/api.js';
+import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import { motion } from 'framer-motion';
 
 const Settings = () => {
