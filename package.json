@@ -7,13 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "build:frontend": "vite build",
+    "vercel-build": "npm run build:frontend",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "nodemon server.cjs",
     "server:prod": "node server.cjs",
     "start": "node server.cjs",
-    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
-    "vercel-build": "echo 'Build step for Vercel backend'"
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.17",

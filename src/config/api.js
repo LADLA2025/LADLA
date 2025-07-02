@@ -1,9 +1,9 @@
 // Configuration des URLs d'API selon l'environnement
 const getAPIBaseURL = () => {
-  // En production, utilise l'URL de ton API déployée sur Vercel
+  // En production, utilise l'URL de ton API déployée
   if (import.meta.env.PROD) {
-    // ⚠️ REMPLACE CETTE URL PAR TON URL VERCEL UNE FOIS DÉPLOYÉE
-    return import.meta.env.VITE_API_URL || 'https://ton-app-vercel.vercel.app';
+    // ⚠️ REMPLACE CETTE URL PAR TON URL DE PRODUCTION
+    return import.meta.env.VITE_API_URL || 'http://localhost:3000';
   }
   
   // En développement, utilise localhost

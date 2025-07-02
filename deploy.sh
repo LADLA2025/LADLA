@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script de déploiement automatique pour LADL
-# Usage: ./deploy.sh [frontend|backend|all]
+# Script de déploiement pour LADL
+# Usage: ./deploy.sh [frontend|all]
 
 set -e  # Arrêter le script en cas d'erreur
 
@@ -54,9 +54,9 @@ build_frontend() {
     if [ ! -f ".env.production" ]; then
         print_warning ".env.production non trouvé. Création d'un fichier exemple..."
         cat > .env.production << EOF
-VITE_API_URL=https://ton-url-vercel.vercel.app
+VITE_API_URL=http://localhost:3000
 EOF
-        print_warning "⚠️ N'oubliez pas de mettre à jour VITE_API_URL dans .env.production"
+        print_warning "⚠️ N'oubliez pas de mettre à jour VITE_API_URL dans .env.production avec l'URL de votre backend"
     fi
     
     # Build du frontend
@@ -78,53 +78,47 @@ EOF
         print_success "Frontend construit avec succès!"
     fi
     
-    print_message "📁 Fichiers prêts pour Hostinger dans le dossier 'dist/'"
+    print_message "📁 Fichiers prêts pour déploiement dans le dossier 'dist/'"
 }
 
-# Fonction pour préparer le backend
-prepare_backend() {
-    print_message "🔧 Préparation du backend pour Vercel..."
+# Fonction pour démarrer le serveur local
+start_server() {
+    print_message "🚀 Démarrage du serveur backend local..."
     
-    # Vérifier que vercel.json existe
-    if [ ! -f "vercel.json" ]; then
-        print_error "vercel.json non trouvé. Le backend n'est pas configuré pour Vercel."
-        exit 1
-    fi
-    
-    # Vérifier les dépendances backend
+    # Vérifier les dépendances
     if ! npm list express &> /dev/null; then
-        print_error "Dépendances backend manquantes. Exécutez 'npm install'"
-        exit 1
+        print_warning "Installation des dépendances..."
+        npm install
     fi
     
-    print_success "Backend prêt pour Vercel ✓"
-    print_message "📝 N'oubliez pas de configurer les variables d'environnement sur Vercel:"
-    echo "   - NODE_ENV=production"
-    echo "   - DATABASE_URL=votre_url_postgresql"
-    echo "   - ALLOWED_ORIGINS=https://votre-domaine-hostinger.com"
+    print_success "✓ Serveur prêt à démarrer avec: npm run server:prod"
+    print_message "Le serveur sera disponible sur http://localhost:3000"
 }
 
 # Fonction pour afficher les instructions post-déploiement
 show_instructions() {
     print_message "📋 Instructions de déploiement:"
     echo ""
-    echo "🎯 HOSTINGER (Frontend):"
+    echo "🎯 FRONTEND (Hostinger):"
     echo "   1. Connectez-vous à votre cPanel Hostinger"
     echo "   2. Ouvrez le File Manager"
     echo "   3. Naviguez vers public_html/"
     echo "   4. Supprimez les anciens fichiers"
     echo "   5. Uploadez TOUT le contenu du dossier 'dist/'"
-    echo "   6. Vérifiez que index.html et .htaccess sont à la racine"
+    echo "   6. Vérifiez que index.html est à la racine"
     echo ""
-    echo "🚀 VERCEL (Backend):"
-    echo "   1. Connectez votre repo GitHub à Vercel"
-    echo "   2. Configurez les variables d'environnement"
-    echo "   3. Déployez automatiquement"
-    echo "   4. Notez l'URL Vercel pour mettre à jour .env.production"
+    echo "🚀 BACKEND (Local/VPS):"
+    echo "   1. Copiez votre projet sur votre serveur"
+    echo "   2. Installez les dépendances: npm install"
+    echo "   3. Configurez les variables d'environnement dans .env:"
+    echo "      - NODE_ENV=production"
+    echo "      - DATABASE_URL=votre_url_postgresql"
+    echo "      - ALLOWED_ORIGINS=https://votre-domaine-hostinger.com"
+    echo "   4. Démarrez le serveur: npm run server:prod"
     echo ""
     echo "🗄️ BASE DE DONNÉES:"
-    echo "   1. Créez une base PostgreSQL sur Neon.tech, Supabase, ou Railway"
-    echo "   2. Copiez l'URL de connexion dans les variables Vercel"
+    echo "   1. Créez une base PostgreSQL sur Railway, Neon, ou Supabase"
+    echo "   2. Copiez l'URL de connexion dans DATABASE_URL"
     echo "   3. Les tables seront créées automatiquement au premier démarrage"
     echo ""
 }
@@ -132,13 +126,13 @@ show_instructions() {
 # Fonction pour nettoyer les fichiers temporaires
 cleanup() {
     print_message "🧹 Nettoyage..."
-    # Ici on pourrait nettoyer des fichiers temporaires si nécessaire
+    # Nettoyer les fichiers temporaires si nécessaire
     print_success "Nettoyage terminé ✓"
 }
 
 # Fonction principale
 main() {
-    local command=${1:-"all"}
+    local command=${1:-"frontend"}
     
     print_message "🚀 Démarrage du déploiement LADL - Mode: $command"
     echo ""
@@ -150,12 +144,12 @@ main() {
             build_frontend
             ;;
         "backend")
-            prepare_backend
+            start_server
             ;;
         "all")
             build_frontend
             echo ""
-            prepare_backend
+            start_server
             ;;
         *)
             print_error "Commande inconnue: $command"
