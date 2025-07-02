@@ -2,8 +2,8 @@
 const getAPIBaseURL = () => {
   // En production, utilise l'URL de ton API déployée
   if (import.meta.env.PROD) {
-    // ⚠️ REMPLACE CETTE URL PAR TON URL DE PRODUCTION
-    return import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    // URL de production Render
+    return import.meta.env.VITE_API_URL || 'https://client1-2-zs9g.onrender.com';
   }
   
   // En développement, utilise localhost

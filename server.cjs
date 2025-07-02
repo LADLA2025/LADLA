@@ -14,7 +14,9 @@ const corsOptions = {
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
     'https://client1-e9y2w5web-tatianas-projects-18e3f24f.vercel.app', // Votre URL Vercel
-    /\.vercel\.app$/ // Tous les domaines Vercel
+    'https://darkgray-horse-917532.hostingersite.com', // Votre URL Hostinger
+    /\.vercel\.app$/, // Tous les domaines Vercel
+    /\.hostingersite\.com$/ // Tous les domaines Hostinger
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
