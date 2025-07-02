@@ -6,8 +6,9 @@ import 'boxicons'
 import AOS from 'aos';
 import mainVideo from './video/0624.mp4';
 import cercle1Video from './video/cercle1.mp4';
-import cercle2Video from './video/cercle2.mp4';
+
 import cercle3Video from './video/cercle3.mp4';
+import cercle4Video from './video/cercle4.mp4';
 import petiteCitadineImg from './IMG/petitecitadine.png';
 import citadineImg from './IMG/citadine.png';
 import berlineImg from './IMG/berline.png';
@@ -131,15 +132,20 @@ function App() {
                équipé et moderne
              </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-start md:justify-center items-start md:items-center">
-               <button className="bg-[#FFA600] hover:bg-[#E6950E] text-white px-8 py-3 rounded-full transition-colors flex items-center gap-3">
-                 <i className='bx bxl-whatsapp text-3xl'></i>
-                 Nos services
-               </button>
-               <div className="flex items-center gap-">
-                 <a href="#" className=" p-3 rounded-full hover:bg-white/30 transition-colors">
+               <a 
+                 href="https://wa.me/33625138033?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="bg-gradient-to-r from-[#FFA600] to-orange-600 hover:from-[#E6950E] hover:to-orange-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 font-medium group"
+               >
+                 <i className='bx bxl-whatsapp text-2xl'></i>
+                 <span>WhatsApp</span>
+               </a>
+               <div className="flex items-center gap-2">
+                 <a href="https://instagram.com/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
                    <i className='bx bxl-instagram text-3xl'></i>
                  </a>
-                 <a href="#" className=" p-3 rounded-full hover:bg-white/30 transition-colors">
+                 <a href="https://facebook.com/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
                    <i className='bx bxl-facebook text-4xl'></i>
                  </a>
                </div>
@@ -166,7 +172,7 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             {/* Petite Citadine */}
             <Link to="/voitures/petite-citadine" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] to-[#FFA600] flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">PETITE CITADINE</span>
                 </div>
@@ -183,7 +189,7 @@ function App() {
 
             {/* Citadine */}
             <Link to="/voitures/citadine" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] to-[#FFA600] flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">CITADINE</span>
                 </div>
@@ -200,7 +206,7 @@ function App() {
 
             {/* Berline */}
             <Link to="/voitures/berline" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] to-[#FFA600] flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">BERLINE</span>
                 </div>
@@ -217,7 +223,7 @@ function App() {
 
             {/* SUV 4x4 */}
             <Link to="/voitures/suv" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] to-[#FFA600] flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">SUV 4X4</span>
                 </div>
@@ -235,14 +241,14 @@ function App() {
 
           <div className="text-center">
             <p className="text-gray-600 mb-6">
-              Choisir parmi des dizaines Nettoyage prix en centre, sur 
-              rendez-vous
+              Choisissez parmi nos nombreux services de nettoyage automobile, 
+              en centre ou sur rendez-vous
             </p>
-            <Link to="/voitures" className="relative inline-block">
-              <button className="bg-gradient-to-r from-transparent font-bold via-[#FFA600] to-transparent hover:from-transparent hover:via-[#E6950E] hover:to-transparent text-white px-8 py-3 rounded-xl transition-colors relative z-10 border border-4 border-[#FFA600]/30">
-                Découvrir plus
+            <Link to="/tarifs" className="relative inline-block">
+              <button className="bg-gradient-to-r from-transparent font-bold via-[#FFA600] to-transparent hover:from-transparent hover:via-orange-600 hover:to-transparent text-white px-8 py-3 rounded-xl transition-colors relative z-10 border border-4 border-[#FFA600]/30">
+                Découvrir nos tarifs
               </button>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FFA600] to-[#E6950E] rounded-full blur-md opacity-40 transform scale-y-[-1] translate-y-8"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FFA600] to-orange-600 rounded-full blur-md opacity-40 transform scale-y-[-1] translate-y-8"></div>
             </Link>
           </div>
         </div>
@@ -290,9 +296,10 @@ function App() {
                   <i className='bx bx-car text-white text-3xl'></i>
                 </div>
                 <div className="text-white">
-                  <h3 className="text-3xl font-bold mb-3">Lavage Extérieur Premium</h3>
+                  <h3 className="text-3xl font-bold mb-3">Nettoyage Intérieur  </h3>
                   <p className="text-gray-200 mb-4 leading-relaxed">
-                    Découvrez notre service de lavage extérieur complet avec produits premium et finition impeccable pour votre véhicule.
+                   
+                    Service professionnel de nettoyage intérieur avec aspiration, nettoyage des sièges et désinfection complète.
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -331,7 +338,7 @@ function App() {
                      controls={false}
                      className="w-full h-full object-cover"
                    >
-                     <source src={cercle2Video} type="video/mp4" />
+                     <source src={cercle4Video} type="video/mp4" />
                    </video>
                    <div className="absolute inset-0 bg-black/40"></div>
                  </div>
@@ -343,9 +350,10 @@ function App() {
                      <i className='bx bx-home text-white text-2xl'></i>
                    </div>
                    <div className="text-white">
-                     <h4 className="font-bold text-lg mb-2">Nettoyage Intérieur</h4>
+                     <h4 className="font-bold text-lg mb-2">Lavage Extérieur Premium   </h4>
                      <p className="text-gray-200 text-xs leading-relaxed">
-                       Service professionnel de nettoyage intérieur avec aspiration, nettoyage des sièges et désinfection complète.
+                     Découvrez notre service de lavage extérieur complet avec produits premium et finition impeccable pour votre véhicule.
+                     
                      </p>
                    </div>
                  </div>
@@ -767,24 +775,24 @@ function App() {
         </div>
       </section>
       {/* Section bas avec engagement */}
-      <div data-aos="fade-up" data-aos-delay="400" className="mt-16 bg-gray-50 rounded-3xl p-8 text-center">
-        <h4 className="text-2xl font-bold text-gray-800 mb-4">Notre Engagement Qualité</h4>
-        <p className="text-gray-600 text-lg max-w-4xl mx-auto mb-6">
+      <div data-aos="fade-up" data-aos-delay="400" className="mt-16 bg-gradient-to-r from-[#FFA600] to-orange-600  p-8 text-center">
+        <h4 className="text-2xl font-bold text-white mb-4">Notre Engagement Qualité</h4>
+        <p className="text-white/90 text-lg max-w-4xl mx-auto mb-6">
           Chez Les AS de L'Auto, chaque véhicule est traité avec le même soin et la même attention aux détails. 
           Nous nous engageons à utiliser uniquement des produits écologiques et des techniques respectueuses de votre véhicule et de l'environnement.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <div className="bg-white px-6 py-3 rounded-full shadow-md flex items-center gap-2">
-            <i className='bx bx-shield text-[#FFA600]'></i>
-            <span className="font-semibold text-gray-700">Garantie Satisfait ou Remboursé</span>
+          <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-white transition-colors">
+            <i className='bx bx-shield text-orange-600'></i>
+            <span className="font-semibold text-gray-800">Garantie Satisfait ou Remboursé</span>
           </div>
-          <div className="bg-white px-6 py-3 rounded-full shadow-md flex items-center gap-2">
-            <i className='bx bx-recycle text-green-500'></i>
-            <span className="font-semibold text-gray-700">Produits Écologiques</span>
+          <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-white transition-colors">
+            <i className='bx bx-recycle text-green-600'></i>
+            <span className="font-semibold text-gray-800">Produits Écologiques</span>
           </div>
-          <div className="bg-white px-6 py-3 rounded-full shadow-md flex items-center gap-2">
-            <i className='bx bx-time text-blue-500'></i>
-            <span className="font-semibold text-gray-700">Service Rapide</span>
+          <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-white transition-colors">
+            <i className='bx bx-time text-blue-600'></i>
+            <span className="font-semibold text-gray-800">Service Rapide</span>
           </div>
         </div>
       </div>

@@ -8,18 +8,53 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuration CORS pour la production
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Domaines autorisés
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      // ⚠️ REMPLACE PAR TON DOMAINE HOSTINGER
+      'https://ton-domaine-hostinger.com',
+      // Ajoute d'autres domaines si nécessaire
+    ];
+    
+    // En développement, autorise toutes les origines
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // En production, vérifie les domaines autorisés
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Non autorisé par CORS'));
+    }
+  },
+  credentials: true
+};
+
 // Middleware pour parser le JSON et CORS
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Configuration de la connexion PostgreSQL
-const pool = new Pool({
-  host: process.env.PGHOST || 'localhost',
-  port: process.env.PGPORT || 5432,
-  database: process.env.PGDATABASE || 'postgres',
-  user: process.env.PGUSER || 'postgres',
-  password: process.env.PGPASSWORD
-});
+const pool = new Pool(
+  // Si DATABASE_URL est définie (production), l'utiliser
+  process.env.DATABASE_URL ? {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  } : 
+  // Sinon, utiliser la configuration locale
+  {
+    host: process.env.PGHOST || 'localhost',
+    port: process.env.PGPORT || 5432,
+    database: process.env.PGDATABASE || 'postgres',
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || '2002'
+  }
+);
 
 // Création de la table loginAdmin si elle n'existe pas
 const createAdminTable = async () => {
@@ -50,8 +85,35 @@ const createAdminTable = async () => {
   }
 };
 
+// Import des services
+const PetiteCitadineService = require('./server/petiteCitadineService.cjs');
+const CitadineService = require('./server/citadineService.cjs');
+const BerlineService = require('./server/berlineService.cjs');
+const SuvService = require('./server/suvService.cjs');
+const createPetiteCitadineRoutes = require('./server/routes/petiteCitadineRoutes.cjs');
+const createCitadineRoutes = require('./server/routes/citadineRoutes.cjs');
+const createBerlineRoutes = require('./server/routes/berlineRoutes.cjs');
+const createSuvRoutes = require('./server/routes/suvRoutes.cjs');
+const reservationRoutes = require('./server/routes/reservationRoutes.cjs');
+const { createReservationsTable } = require('./server/reservationService.cjs');
+
+// Initialiser les services
+const petiteCitadineService = new PetiteCitadineService(pool);
+const citadineService = new CitadineService(pool);
+const berlineService = new BerlineService(pool);
+const suvService = new SuvService(pool);
+
 // Initialiser la base de données
-createAdminTable();
+const initializeDatabase = async () => {
+  await createAdminTable();
+  await petiteCitadineService.createTable();
+  await citadineService.createTable();
+  await berlineService.createTable();
+  await suvService.createTable();
+  // await createReservationsTable(); // Table créée manuellement
+};
+
+initializeDatabase();
 
 // Test de la connexion
 pool.query('SELECT NOW()', (err, res) => {
@@ -62,23 +124,12 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// Middleware pour servir les fichiers statiques
-app.use(express.static(path.join(__dirname, 'dist')));
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-// Exemple de route utilisant PostgreSQL
-app.get('/api/test', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ time: result.rows[0].now });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
-});
+// Configuration des routes API modulaires AVANT les fichiers statiques
+app.use('/api/formules/petite-citadine', createPetiteCitadineRoutes(petiteCitadineService));
+app.use('/api/formules/citadine', createCitadineRoutes(citadineService));
+app.use('/api/formules/berline', createBerlineRoutes(berlineService));
+app.use('/api/formules/suv', createSuvRoutes(suvService));
+app.use('/api/reservations', reservationRoutes);
 
 // Route pour la connexion admin
 app.post('/api/admin/login', async (req, res) => {
@@ -107,6 +158,92 @@ app.post('/api/admin/login', async (req, res) => {
     console.error('Erreur lors de la connexion:', err);
     res.status(500).json({ error: 'Erreur serveur' });
   }
+});
+
+// Route pour changer le mot de passe admin
+app.post('/api/admin/change-password', async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    console.log('🔐 Tentative de changement de mot de passe admin'); // Debug log
+    
+    // Validation des données d'entrée
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Mot de passe actuel et nouveau mot de passe requis' 
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Le nouveau mot de passe doit contenir au moins 6 caractères' 
+      });
+    }
+    
+    // Récupérer l'admin actuel
+    const result = await pool.query('SELECT * FROM loginAdmin WHERE username = $1', ['admin']);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Administrateur non trouvé' 
+      });
+    }
+    
+    const admin = result.rows[0];
+    
+    // Vérifier l'ancien mot de passe
+    const validCurrentPassword = await bcrypt.compare(currentPassword, admin.password);
+    
+    if (!validCurrentPassword) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Mot de passe actuel incorrect' 
+      });
+    }
+    
+    // Vérifier que le nouveau mot de passe est différent de l'ancien
+    const samePassword = await bcrypt.compare(newPassword, admin.password);
+    if (samePassword) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Le nouveau mot de passe doit être différent de l\'ancien' 
+      });
+    }
+    
+    // Hasher le nouveau mot de passe
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Mettre à jour le mot de passe dans la base de données
+    await pool.query(
+      'UPDATE loginAdmin SET password = $1 WHERE username = $2',
+      [hashedNewPassword, 'admin']
+    );
+    
+    console.log('✅ Mot de passe admin modifié avec succès');
+    
+    res.json({ 
+      success: true, 
+      message: 'Mot de passe modifié avec succès' 
+    });
+    
+  } catch (err) {
+    console.error('❌ Erreur lors du changement de mot de passe:', err);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Erreur serveur lors du changement de mot de passe' 
+    });
+  }
+});
+
+// Middleware pour servir les fichiers statiques (APRÈS les routes API)
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Route pour la page d'accueil (SPA)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // Démarrage du serveur

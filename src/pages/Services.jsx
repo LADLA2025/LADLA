@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import cercle1Video from '../video/cercle1.mp4';
-import cercle2Video from '../video/cercle2.mp4';
-import cercle3Video from '../video/cercle3.mp4';
+import cercle1Video from '../video/cercle5.mp4';
+import cercle2Video from '../video/cercle6.mp4';
+import cercle3Video from '../video/cercle7.mp4';
 
 function Services() {
   const containerVariants = {

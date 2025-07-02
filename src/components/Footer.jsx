@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../IMG/logo.jpg';
 
 function Footer() {
@@ -45,13 +46,54 @@ function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm opacity-60">
-          <div className="flex space-x-6 mb-4 md:mb-0">
-            <a href="#" className="hover:text-[#FFA600]">Mentions légales</a>
-            <a href="#" className="hover:text-[#FFA600]">CGV - Politique de confidentialité</a>
-            <a href="#" className="hover:text-[#FFA600]">Cookies</a>
-            <a href="#" className="hover:text-[#FFA600]">Politique confidentialité</a>
-            <a href="#" className="hover:text-[#FFA600]">Toutes nos produits</a>
+        <div className="border-t border-gray-800 mt-8 pt-8 text-sm opacity-60">
+          {/* Liens légaux - responsive */}
+          <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:flex-wrap md:gap-x-6 md:gap-y-2 mb-6 md:mb-4">
+            <Link to="/mentions-legales" className="hover:text-[#FFA600] transition-colors">
+              Mentions légales
+            </Link>
+            <Link to="/cgv-politique" className="hover:text-[#FFA600] transition-colors">
+              CGV - Politique de confidentialité
+            </Link>
+            <button 
+              onClick={() => {
+                // Supprimer le consentement pour faire réapparaître la bannière
+                localStorage.removeItem('cookie-consent');
+                // Recharger la page pour réinitialiser le composant
+                window.location.reload();
+              }}
+              className="text-left hover:text-[#FFA600] transition-colors focus:outline-none focus:text-[#FFA600]"
+            >
+              Gérer les cookies
+            </button>
+            <Link to="/contact" className="hover:text-[#FFA600] transition-colors">
+              Contact
+            </Link>
+            <Link to="/services" className="hover:text-[#FFA600] transition-colors">
+              Nos services
+            </Link>
+          </div>
+          
+          {/* Crédit développeur */}
+          <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-800 pt-4">
+            <div className="mb-3 md:mb-0">
+              <p className="text-sm md:text-base opacity-90 font-medium">
+                © 2024 LES AS DE L'AUTO
+              </p>
+            </div>
+            <div className="text-sm md:text-base opacity-80">
+              <p>
+                Application créée par{' '}
+                <a 
+                  href="https://rebu1ld.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-[#FFA600] hover:text-[#FF9500] transition-colors font-semibold"
+                >
+                  @rebu1ld.com
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>

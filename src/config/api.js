@@ -1,0 +1,36 @@
+// Configuration des URLs d'API selon l'environnement
+const getAPIBaseURL = () => {
+  // En production, utilise l'URL de ton API déployée sur Vercel
+  if (import.meta.env.PROD) {
+    // ⚠️ REMPLACE CETTE URL PAR TON URL VERCEL UNE FOIS DÉPLOYÉE
+    return import.meta.env.VITE_API_URL || 'https://ton-app-vercel.vercel.app';
+  }
+  
+  // En développement, utilise localhost
+  return 'http://localhost:3000';
+};
+
+export const API_BASE_URL = getAPIBaseURL();
+
+// Helper pour construire des URLs d'API
+export const buildAPIUrl = (endpoint) => {
+  return `${API_BASE_URL}/api${endpoint}`;
+};
+
+// URLs d'API spécifiques
+export const API_ENDPOINTS = {
+  // Authentification
+  LOGIN: '/admin/login',
+  CHANGE_PASSWORD: '/admin/change-password',
+  
+  // Formules véhicules
+  PETITE_CITADINE: '/formules/petite-citadine',
+  CITADINE: '/formules/citadine',
+  BERLINE: '/formules/berline',
+  SUV: '/formules/suv',
+  
+  // Réservations
+  RESERVATIONS: '/reservations',
+  RESERVATIONS_BY_DATE: '/reservations/date',
+  RESERVATIONS_BY_WEEK: '/reservations/semaine',
+}; 

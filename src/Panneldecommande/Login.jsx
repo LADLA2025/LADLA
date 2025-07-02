@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildAPIUrl, API_ENDPOINTS } from '../../config/api.js';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -17,7 +18,7 @@ function Login() {
 
     try {
       console.log('Tentative de connexion...');
-      const response = await fetch('http://localhost:3000/api/admin/login', {
+      const response = await fetch(buildAPIUrl(API_ENDPOINTS.LOGIN), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

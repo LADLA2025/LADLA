@@ -6,6 +6,8 @@ import Contact from "./pages/Contact";
 import Garage from "./pages/Garage";
 import Services from "./pages/Services";
 import Tarifs from "./pages/Tarifs";
+import MentionsLegales from "./pages/MentionsLegales";
+import CGVPolitique from "./pages/CGVPolitique";
 
 // Import des pages voitures
 import VoituresRoot from "./PAGE_voiture/VoituresRoot";
@@ -17,6 +19,7 @@ import SUV from "./PAGE_voiture/SUV";
 // Import du panneau d'administration
 import PanelAdmin from "./Panneldecommande/PanelAdmin";
 import Login from "./Panneldecommande/Login";
+import Reservation from "./Panneldecommande/Reservation";
 import AdminServices from "./Panneldecommande/Services1";
 import AdminPetiteCitadine from "./Panneldecommande/service/PetiteCitadine";
 import AdminCitadine from "./Panneldecommande/service/Citadine";
@@ -39,6 +42,9 @@ function Root() {
             <Route path="/garage" element={<Garage />} />
             <Route path="/services" element={<Services />} />
             <Route path="/tarifs" element={<Tarifs />} />
+            <Route path="/reservation" element={<Reservation />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="/cgv-politique" element={<CGVPolitique />} />
             
             {/* Routes des voitures */}
             <Route path="/voitures" element={<VoituresRoot />} />

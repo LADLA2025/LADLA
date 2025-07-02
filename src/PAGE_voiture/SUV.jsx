@@ -1,91 +1,318 @@
-import React from 'react';
-import suvImg from '../IMG/suv 4x4.png';
+import React, { useState, useEffect } from 'react';
+import { buildAPIUrl, API_ENDPOINTS } from '../../config/api.js';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import FormuleSelectionModal from '../components/FormuleSelectionModal';
 
 function SUV() {
+  const [formules, setFormules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFormule, setSelectedFormule] = useState(null);
+  const [additionalFormules, setAdditionalFormules] = useState([]);
+
+  // Charger les formules au chargement du composant
+  useEffect(() => {
+    fetchFormules();
+  }, []);
+
+  // Fonction pour récupérer les formules
+  const fetchFormules = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(buildAPIUrl(API_ENDPOINTS.SUV));
+      if (!response.ok) throw new Error('Erreur lors de la récupération des formules');
+      const data = await response.json();
+      setFormules(data);
+      setError('');
+    } catch (error) {
+      console.error('Erreur:', error);
+      setError('Impossible de charger les formules. Veuillez réessayer plus tard.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fonction pour ouvrir le modal de sélection
+  const openReservationModal = (formule) => {
+    setSelectedFormule(formule);
+    setAdditionalFormules([]);
+    setShowModal(true);
+  };
+
+  // Fonction pour fermer le modal
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedFormule(null);
+    setAdditionalFormules([]);
+  };
+
+  // Fonction pour ajouter/retirer une formule supplémentaire
+  const toggleAdditionalFormule = (formule) => {
+    setAdditionalFormules(prev => {
+      const isAlreadySelected = prev.find(f => f.id === formule.id);
+      if (isAlreadySelected) {
+        return prev.filter(f => f.id !== formule.id);
+      } else {
+        return [...prev, formule];
+      }
+    });
+  };
+
+  // Fonction pour procéder à la réservation
+  const proceedToReservation = () => {
+    const allFormules = [selectedFormule, ...additionalFormules];
+    const formulesParam = allFormules.map(f => f.nom).join(',');
+    const totalPrice = allFormules.reduce((sum, f) => sum + parseFloat(f.prix), 0);
+    
+    const params = new URLSearchParams({
+      formule: formulesParam,
+      type: 'suv',
+      prix_total: totalPrice.toFixed(2)
+    });
+    
+    window.location.href = `/reservation?${params.toString()}`;
+  };
+
+  // Fonction pour réserver directement sans formules supplémentaires
+  const reserveDirectly = (formule) => {
+    const params = new URLSearchParams({
+      formule: formule.nom,
+      type: 'suv'
+    });
+    
+    window.location.href = `/reservation?${params.toString()}`;
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen pt-24">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          SUV / 4x4
-        </h1>
+    <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+      {/* Cercles d'ambiance */}
+      <div className="light-circle circle1"></div>
+      <div className="light-circle circle2"></div>
+      <div className="light-circle circle3"></div>
+      <div className="light-circle circle4"></div>
+      <div className="light-circle circle5"></div>
+      <div className="light-circle circle6"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Image de la voiture */}
-          <div className="relative group">
-            <img 
-              src={suvImg} 
-              alt="SUV / 4x4" 
-              className="rounded-2xl shadow-lg w-full hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-xl font-bold">Exemple de SUV</span>
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header avec titre et navigation */}
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FFA600] to-orange-500">
+            Formules SUV / 4x4
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Découvrez nos formules spécialement conçues pour les SUV et 4x4
+          </p>
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-gray-700 hover:text-[#FFA600]"
+          >
+            <i className="bx bx-arrow-back text-lg"></i>
+            Retour à l'accueil
+          </Link>
+        </motion.div>
+
+        {/* Gestion des états de chargement et d'erreur */}
+        {loading && (
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFA600]"></div>
+            <p className="text-gray-600 mt-4">Chargement des formules...</p>
+          </motion.div>
+        )}
+
+        {error && (
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 max-w-md mx-auto">
+              <i className="bx bx-error-circle text-red-400 text-4xl mb-4"></i>
+              <p className="text-red-600">{error}</p>
+              <motion.button 
+                onClick={fetchFormules}
+                className="mt-4 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Réessayer
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
+        )}
 
-          {/* Informations et tarifs */}
-          <div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <i className='bx bx-car text-[#FFA600]'></i>
-                Caractéristiques
-              </h2>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <i className='bx bx-check text-[#FFA600]'></i>
-                  <span>Grande taille</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className='bx bx-check text-[#FFA600]'></i>
-                  <span>Position surélevée</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className='bx bx-check text-[#FFA600]'></i>
-                  <span>Espace maximal</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className='bx bx-check text-[#FFA600]'></i>
-                  <span>Robustesse</span>
-                </li>
-              </ul>
-            </div>
+        {/* Affichage des formules */}
+        {!loading && !error && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {formules.length === 0 ? (
+              <motion.div 
+                className="text-center py-12"
+                variants={itemVariants}
+              >
+                <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+                  <i className="bx bx-info-circle text-gray-400 text-4xl mb-4"></i>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Aucune formule disponible</h3>
+                  <p className="text-gray-600">
+                    Les formules pour SUV / 4x4 ne sont pas encore configurées.
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {formules.map((formule, index) => (
+                  <motion.div 
+                    key={formule.id} 
+                    className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105 relative group h-full flex flex-col"
+                    variants={itemVariants}
+                    custom={index}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Header de la carte - Hauteur fixe */}
+                    <div className="p-6 bg-gradient-to-r from-[#FFA600] to-orange-500 flex-shrink-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                          <i className={`${formule.icone} text-2xl text-[#FFA600]`}></i>
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
+                          <p className="text-orange-100 text-sm">{formule.duree}</p>
+                        </div>
+                      </div>
+                    </div>
 
-            {/* Tarifs spécifiques */}
-            <div className="bg-gray-100 rounded-2xl p-6">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <i className='bx bx-euro text-[#FFA600]'></i>
-                Tarifs Adaptés
-              </h2>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span>Lavage Extérieur</span>
-                  <span className="font-bold">40€</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Lavage Intérieur</span>
-                  <span className="font-bold">45€</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Forfait Complet</span>
-                  <span className="font-bold">80€</span>
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>Option traitement cuir</span>
-                  <span>+20€</span>
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>Nettoyage 7 places</span>
-                  <span>+15€</span>
-                </div>
-                <Link to="/admin" className="block">
-                  <button className="w-full bg-[#FFA600] text-white py-3 rounded-lg hover:bg-[#FF8C00] transition-colors mt-4">
-                    Réserver un lavage
-                  </button>
+                    {/* Contenu de la carte - Prend l'espace restant */}
+                    <div className="p-6 relative flex flex-col flex-grow">
+                      {/* Services inclus - Espace variable */}
+                      <div className="mb-6 flex-grow">
+                        <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                          <i className="bx bx-list-check text-[#FFA600]"></i>
+                          Services inclus
+                        </h3>
+                        <ul className="space-y-2 min-h-[120px]">
+                          {formule.services.map((service, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm">
+                              <i className="bx bx-check text-[#FFA600] flex-shrink-0 mt-0.5"></i>
+                              <span className="text-gray-600 leading-relaxed">{service}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Prix - Hauteur fixe */}
+                      <div className="bg-gradient-to-r from-[#FFA600]/10 to-orange-500/10 rounded-xl p-4 text-center border border-[#FFA600]/20 mb-6 flex-shrink-0">
+                        <div className="text-3xl font-bold text-[#FFA600] mb-1">
+                          {formule.prix}€
+                        </div>
+                        <p className="text-sm text-gray-500">Prix de la formule</p>
+                      </div>
+
+                      {/* Bouton de réservation - Toujours en bas */}
+                      <div className="mt-auto">
+                        <motion.button
+                          onClick={() => openReservationModal(formule)}
+                          className="w-full px-4 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <i className="bx bx-calendar-plus mr-2"></i>
+                          Réserver cette formule
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Section d'information supplémentaire */}
+        {!loading && !error && formules.length > 0 && (
+          <motion.div 
+            className="mt-16 bg-white rounded-3xl shadow-lg p-8 relative overflow-hidden group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative text-center">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                Besoin d'aide pour choisir ?
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Nos experts sont là pour vous conseiller et vous aider à choisir la formule 
+                la plus adaptée à votre SUV ou 4x4. N'hésitez pas à nous contacter !
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/reservation"
+                  className="px-6 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:shadow-lg transition-shadow inline-flex items-center justify-center gap-2 font-medium"
+                >
+                  <i className="bx bx-calendar-plus"></i>
+                  Faire une réservation
+                </Link>
+                <Link
+                  to="/contact"
+                  className="px-6 py-3 bg-transparent border-2 border-[#FFA600] text-[#FFA600] rounded-xl hover:bg-[#FFA600] hover:text-white transition-colors inline-flex items-center justify-center gap-2 font-medium"
+                >
+                  <i className="bx bx-phone"></i>
+                  Nous contacter
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        )}
+
+        {/* Modal de sélection de formules supplémentaires */}
+        <FormuleSelectionModal
+          showModal={showModal}
+          onCloseModal={closeModal}
+          selectedFormule={selectedFormule}
+          formules={formules}
+          additionalFormules={additionalFormules}
+          onToggleAdditionalFormule={toggleAdditionalFormule}
+          onProceedToReservation={proceedToReservation}
+          onReserveDirectly={reserveDirectly}
+          vehicleType="suv"
+        />
       </div>
     </div>
   );
