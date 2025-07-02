@@ -11,11 +11,14 @@ const initPool = (poolInstance) => {
 class ReservationTableService {
   
   static async createTable() {
+    const client = await pool.connect();
     try {
       console.log('🔄 Vérification/création de la table reservations...');
       
+      await client.query('BEGIN');
+
       // Créer la table principale
-      await pool.query(`
+      await client.query(`
         CREATE TABLE IF NOT EXISTS reservations (
           id SERIAL PRIMARY KEY,
           prenom VARCHAR(100) NOT NULL,
@@ -37,73 +40,56 @@ class ReservationTableService {
         )
       `);
 
-      // Créer les index pour améliorer les performances
-      await pool.query(`
-        CREATE INDEX IF NOT EXISTS idx_reservations_date_rdv 
-        ON reservations(date_rdv)
-      `);
-
-      await pool.query(`
-        CREATE INDEX IF NOT EXISTS idx_reservations_status 
-        ON reservations(status)
-      `);
-
-      await pool.query(`
-        CREATE INDEX IF NOT EXISTS idx_reservations_email 
-        ON reservations(email)
-      `);
-
-      await pool.query(`
-        CREATE INDEX IF NOT EXISTS idx_reservations_type_voiture 
-        ON reservations(type_voiture)
+      // Créer les index pour améliorer les performances (en une seule fois)
+      await client.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_reservations_date_rdv') THEN
+            CREATE INDEX idx_reservations_date_rdv ON reservations(date_rdv);
+          END IF;
+          
+          IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_reservations_status') THEN
+            CREATE INDEX idx_reservations_status ON reservations(status);
+          END IF;
+          
+          IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_reservations_email') THEN
+            CREATE INDEX idx_reservations_email ON reservations(email);
+          END IF;
+          
+          IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_reservations_type_voiture') THEN
+            CREATE INDEX idx_reservations_type_voiture ON reservations(type_voiture);
+          END IF;
+        END
+        $$;
       `);
 
       // Ajouter une contrainte pour vérifier le statut (si elle n'existe pas déjà)
-      try {
-        await pool.query(`
-          ALTER TABLE reservations 
-          ADD CONSTRAINT check_status 
-          CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed'))
-        `);
-      } catch (error) {
-        // La contrainte existe déjà, pas d'erreur
-        if (!error.message.includes('already exists')) {
-          console.warn('⚠️ Avertissement contrainte statut:', error.message);
-        }
-      }
+      await client.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM information_schema.table_constraints 
+            WHERE constraint_name = 'check_status' 
+            AND table_name = 'reservations'
+          ) THEN
+            ALTER TABLE reservations 
+            ADD CONSTRAINT check_status 
+            CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed'));
+          END IF;
+        END
+        $$;
+      `);
 
-      // Ajouter les commentaires sur la table et les colonnes
-      try {
-        await pool.query(`
-          COMMENT ON TABLE reservations IS 'Table des réservations de services de lavage de véhicules'
-        `);
-        
-        await pool.query(`
-          COMMENT ON COLUMN reservations.prix IS 'Prix en euros de la formule choisie'
-        `);
-        
-        await pool.query(`
-          COMMENT ON COLUMN reservations.date_rdv IS 'Date du rendez-vous'
-        `);
-        
-        await pool.query(`
-          COMMENT ON COLUMN reservations.heure_rdv IS 'Heure du rendez-vous au format HH:MM'
-        `);
-        
-        await pool.query(`
-          COMMENT ON COLUMN reservations.status IS 'Statut: pending, confirmed, cancelled, completed'
-        `);
-      } catch (error) {
-        // Les commentaires peuvent échouer selon les permissions, mais ce n'est pas critique
-        console.warn('⚠️ Impossible d\'ajouter les commentaires (permissions)');
-      }
-
+      await client.query('COMMIT');
       console.log('✅ Table reservations créée/vérifiée avec succès');
       return { success: true };
 
     } catch (error) {
-      console.error('❌ Erreur lors de la création de la table reservations:', error);
+      await client.query('ROLLBACK');
+      console.error('❌ Erreur lors de la création de la table reservations:', error.message);
       throw error;
+    } finally {
+      client.release();
     }
   }
 
