@@ -11,24 +11,31 @@ const PORT = process.env.PORT || 3000;
 // Configuration CORS pour la production
 const corsOptions = {
   origin: function (origin, callback) {
-    // Domaines autorisés
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      // ⚠️ REMPLACE PAR TON DOMAINE HOSTINGER
-      'https://ton-domaine-hostinger.com',
-      // Ajoute d'autres domaines si nécessaire
-    ];
+    // Récupérer les domaines autorisés depuis les variables d'environnement
+    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+    const allowedOrigins = allowedOriginsEnv ? 
+      allowedOriginsEnv.split(',').map(domain => domain.trim()) : 
+      [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://darkgray-horse-917532.hostingersite.com'
+      ];
+    
+    console.log('🔍 CORS - Origin demandée:', origin);
+    console.log('🔍 CORS - Domaines autorisés:', allowedOrigins);
     
     // En développement, autorise toutes les origines
     if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ CORS - Mode développement, autorisation accordée');
       return callback(null, true);
     }
     
     // En production, vérifie les domaines autorisés
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      console.log('✅ CORS - Origine autorisée');
       callback(null, true);
     } else {
+      console.log('❌ CORS - Origine refusée');
       callback(new Error('Non autorisé par CORS'));
     }
   },
@@ -105,12 +112,19 @@ const suvService = new SuvService(pool);
 
 // Initialiser la base de données
 const initializeDatabase = async () => {
-  await createAdminTable();
-  await petiteCitadineService.createTable();
-  await citadineService.createTable();
-  await berlineService.createTable();
-  await suvService.createTable();
-  // await createReservationsTable(); // Table créée manuellement
+  try {
+    console.log('🔄 Initialisation de la base de données...');
+    await createAdminTable();
+    await petiteCitadineService.createTable();
+    await citadineService.createTable();
+    await berlineService.createTable();
+    await suvService.createTable();
+    // await createReservationsTable(); // Table créée manuellement
+    console.log('✅ Base de données initialisée avec succès');
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'initialisation de la base de données:', error);
+    // Ne pas faire planter l'app, juste logger l'erreur
+  }
 };
 
 initializeDatabase();
@@ -244,6 +258,24 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Route pour la page d'accueil (SPA)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Gestion des erreurs non gérées
+process.on('uncaughtException', (error) => {
+  console.error('❌ Erreur non gérée:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Promesse rejetée non gérée:', reason);
+});
+
+// Middleware de gestion d'erreur global
+app.use((error, req, res, next) => {
+  console.error('❌ Erreur serveur:', error);
+  res.status(500).json({ 
+    error: 'Erreur interne du serveur',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Une erreur est survenue'
+  });
 });
 
 // Démarrage du serveur
