@@ -197,3 +197,56 @@ curl http://votre-serveur:3000/api/reservations
 - **Frontend** : https://votre-domaine-hostinger.com
 - **Backend** : http://votre-serveur-backend.com:3000
 - **Database** : PostgreSQL sur Railway/Neon/Supabase 
+
+## Configuration Railway (Backend)
+
+### 1. Variables d'environnement requises
+
+Dans Railway, configurez ces variables d'environnement :
+
+```
+DATABASE_URL=postgresql://postgres:vhascDFPdoLpaOCIpLuqNZOyloDrQJVR@yamanote.proxy.rlwy.net:31387/railway
+NODE_ENV=production
+PORT=8080
+```
+
+### 2. Fichiers de configuration
+
+- `nixpacks.toml` : Configuration de build pour Railway
+- `railway.json` : Configuration du service Railway
+- `.railwayignore` : Fichiers à ignorer lors du déploiement
+- `backend-package.json` : Dépendances minimales pour le backend
+
+### 3. Structure de déploiement
+
+- **Backend** : Déployé sur Railway avec PostgreSQL
+- **Frontend** : Déployé sur Vercel
+
+### 4. URL de production
+
+Une fois déployé, votre backend sera accessible à une URL similaire à :
+`https://votre-projet.up.railway.app`
+
+## Configuration Vercel (Frontend)
+
+### Variables d'environnement Vercel
+
+```
+VITE_API_URL=https://votre-projet.up.railway.app
+```
+
+---
+
+## Commandes utiles
+
+### Déploiement Railway
+```bash
+git add .
+git commit -m "Deploy to Railway"
+git push
+```
+
+### Test local
+```bash
+npm run dev
+``` 
