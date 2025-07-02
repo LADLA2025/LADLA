@@ -1,23 +1,13 @@
 {
   "version": 2,
-  "name": "ladl-backend",
   "functions": {
     "server.cjs": {
-      "runtime": "@vercel/node@20.x"
+      "runtime": "nodejs20.x"
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/server.cjs"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/server.cjs"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server.cjs" },
+    { "src": "/(.*)", "dest": "/server.cjs" }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "regions": ["fra1"]
 } 
