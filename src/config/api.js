@@ -34,4 +34,16 @@ export const API_ENDPOINTS = {
   RESERVATIONS_BY_DATE: '/reservations/date',
   RESERVATIONS_BY_WEEK: '/reservations/semaine',
   DELETE_RESERVATIONS_BY_MONTH: '/reservations/month',
+  
+  // Newsletter
+  NEWSLETTER: '/newsletter',
+  NEWSLETTER_STATS: '/newsletter/stats',
+  NEWSLETTER_EXPORT: '/newsletter/export/active',
+  
+  // Contact
+  CONTACT: '/contact',
+  CONTACT_STATS: '/contact/stats',
+  CONTACT_UNREAD: '/contact/unread',
+  CONTACT_BULK_READ: '/contact/bulk/read',
+  CONTACT_BULK_DELETE: '/contact/bulk',
 }; 

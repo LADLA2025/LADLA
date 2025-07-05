@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import Services1 from './Services1';
 import Calendar from './Calendar';
 import Settings from './Settings';
+import Newsletter from './Newsletter';
+import ContactMessages from './ContactMessages';
 
 const PanelAdmin = () => {
   const [selectedSection, setSelectedSection] = useState('dashboard');
@@ -1136,6 +1138,10 @@ const PanelAdmin = () => {
         return <Calendar />;
       case 'services':
         return <Services1 />;
+      case 'newsletter':
+        return <Newsletter />;
+      case 'contact':
+        return <ContactMessages />;
       case 'settings':
         return <Settings />;
       default:
@@ -1206,6 +1212,32 @@ const PanelAdmin = () => {
               >
                 <i className='bx bx-car text-xl'></i>
                 Services
+              </button>
+
+              <button 
+                onClick={() => {
+                  setSelectedSection('newsletter');
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full px-6 py-3 flex items-center gap-3 rounded-lg transition-colors duration-200 ${
+                  selectedSection === 'newsletter' ? 'bg-[#FFA600] text-white' : 'text-gray-600 hover:bg-orange-50'
+                }`}
+              >
+                <i className='bx bx-envelope text-xl'></i>
+                Newsletter
+              </button>
+
+              <button 
+                onClick={() => {
+                  setSelectedSection('contact');
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full px-6 py-3 flex items-center gap-3 rounded-lg transition-colors duration-200 ${
+                  selectedSection === 'contact' ? 'bg-[#FFA600] text-white' : 'text-gray-600 hover:bg-orange-50'
+                }`}
+              >
+                <i className='bx bx-message text-xl'></i>
+                Messages
               </button>
 
               <button 

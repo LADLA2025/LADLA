@@ -1,8 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import logo from '../IMG/logo.jpg';
 
 function Footer() {
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState('');
+
+  // Gérer l'inscription à la newsletter
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!newsletterEmail) {
+      setSubscribeMessage('Veuillez entrer votre email');
+      return;
+    }
+
+    try {
+      setIsSubscribing(true);
+      setSubscribeMessage('');
+
+      const response = await fetch(buildAPIUrl(API_ENDPOINTS.NEWSLETTER), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: newsletterEmail,
+          source: 'website'
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubscribeMessage('Merci ! Vous êtes maintenant abonné à notre newsletter.');
+        setNewsletterEmail('');
+      } else {
+        setSubscribeMessage('Erreur : ' + result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'inscription:', error);
+      setSubscribeMessage('Erreur lors de l\'inscription. Veuillez réessayer.');
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   return (
     <footer className="bg-black text-white py-22">
       <div className="container mx-auto px-4">
@@ -33,16 +78,38 @@ function Footer() {
             <p className="text-sm opacity-80 mb-4">
               Recevez nos dernières actualités et nos promotions en cours
             </p>
-            <div className="flex">
-              <input 
-                type="email" 
-                placeholder="Entrez votre mail" 
-                className="flex-1 px-4 py-2 bg-white text-black border border-gray-700 rounded-l focus:outline-none focus:border-[#FFA600]"
-              />
-              <button className="bg-[#FFA600] hover:bg-[#E6950E] px-6 py-2 rounded-r transition-colors">
-                S'abonner
-              </button>
-            </div>
+            <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+              <div className="flex">
+                <input 
+                  type="email" 
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Entrez votre mail" 
+                  className="flex-1 px-4 py-2 bg-white text-black border border-gray-700 rounded-l focus:outline-none focus:border-[#FFA600]"
+                  required
+                />
+                <button 
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="bg-[#FFA600] hover:bg-[#E6950E] px-6 py-2 rounded-r transition-colors disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubscribing ? (
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  ) : (
+                    'S\'abonner'
+                  )}
+                </button>
+              </div>
+              {subscribeMessage && (
+                <div className={`text-xs p-2 rounded ${
+                  subscribeMessage.includes('Merci') 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {subscribeMessage}
+                </div>
+              )}
+            </form>
           </div>
         </div>
         

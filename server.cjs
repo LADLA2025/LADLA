@@ -102,6 +102,8 @@ const createCitadineRoutes = require('./server/routes/citadineRoutes.cjs');
 const createBerlineRoutes = require('./server/routes/berlineRoutes.cjs');
 const createSuvRoutes = require('./server/routes/suvRoutes.cjs');
 const reservationRoutes = require('./server/routes/reservationRoutes.cjs');
+const newsletterRoutes = require('./server/routes/newsletterRoutes.cjs');
+const contactRoutes = require('./server/routes/contactRoutes.cjs');
 const { ReservationTableService, initPool } = require('./server/reservationTableService.cjs');
 
 // Initialiser les services
@@ -142,6 +144,8 @@ try {
   app.use('/api/formules/berline', createBerlineRoutes(berlineService));
   app.use('/api/formules/suv', createSuvRoutes(suvService));
   app.use('/api/reservations', reservationRoutes);
+  app.use('/api/newsletter', newsletterRoutes);
+  app.use('/api/contact', contactRoutes);
   console.log('✅ Routes API configurées avec succès');
 } catch (err) {
   console.error('❌ Erreur lors de la configuration des routes:', err.message);
