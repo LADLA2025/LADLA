@@ -8,14 +8,16 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration CORS pour autoriser Hostinger et Render
+// Configuration CORS pour autoriser le nouveau domaine
 const corsOptions = {
   origin: [
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
-    'https://greenyellow-rat-105874.hostingersite.com', // Votre domaine Hostinger
-    /\.hostingersite\.com$/, // Tous les domaines Hostinger
-    /\.onrender\.com$/ // Tous les domaines Render
+    'https://lesasdelauto06.fr', // Nouveau domaine principal
+    'https://www.lesasdelauto06.fr', // Version avec www
+    /\.lesasdelauto06\.fr$/, // Tous les sous-domaines
+    /\.hostingersite\.com$/, // Domaines Hostinger (backup)
+    /\.onrender\.com$/ // Domaines Render (backup)
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
