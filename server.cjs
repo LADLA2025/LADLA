@@ -13,8 +13,9 @@ const corsOptions = {
   origin: [
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
-    'https://darkgray-horse-917532.hostingersite.com', // Votre URL Hostinger
-    /\.hostingersite\.com$/ // Tous les domaines Hostinger
+    'https://lesasdelauto06.fr', // Votre domaine principal
+    'https://www.lesasdelauto06.fr', // Avec www
+    /\.lesasdelauto06\.fr$/ // Tous les sous-domaines
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
