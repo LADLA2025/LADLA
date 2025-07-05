@@ -14,7 +14,6 @@ const corsOptions = {
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
     'https://greenyellow-rat-105874.hostingersite.com', // Votre domaine Hostinger
-    'https://ladl-frontend.onrender.com', // Frontend Render (si déployé)
     /\.hostingersite\.com$/, // Tous les domaines Hostinger
     /\.onrender\.com$/ // Tous les domaines Render
   ],
