@@ -8,6 +8,9 @@ import Calendar from './Calendar';
 import Settings from './Settings';
 import Newsletter from './Newsletter';
 import ContactMessages from './ContactMessages';
+import SessionInfo from '../components/SessionInfo';
+import SessionRestoreNotification from '../components/SessionRestoreNotification';
+import useSessionActivity from '../hooks/useSessionActivity';
 
 const PanelAdmin = () => {
   const [selectedSection, setSelectedSection] = useState('dashboard');
@@ -32,6 +35,9 @@ const PanelAdmin = () => {
   const [monthlyHistory, setMonthlyHistory] = useState([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // Activer le suivi d'activité pour prolonger automatiquement la session
+  useSessionActivity();
 
   // Fonction pour calculer les dates de la semaine (même logique que le calendrier)
   const getWeekDates = (date) => {
@@ -557,7 +563,13 @@ const PanelAdmin = () => {
                   <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
                     Tableau de Bord
                   </h1>
-                  <p className="text-gray-600">Vue d'ensemble de votre activité</p>
+                  <div className="flex items-center gap-4">
+                    <p className="text-gray-600">Vue d'ensemble de votre activité</p>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 rounded-full">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-green-700 text-sm font-medium">Session active</span>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Contrôles du dashboard */}
@@ -1151,6 +1163,9 @@ const PanelAdmin = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 relative">
+      {/* Notification de session restaurée */}
+      <SessionRestoreNotification />
+      
       {/* Bouton Menu Hamburger - visible seulement sur mobile */}
       <button 
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -1262,6 +1277,9 @@ const PanelAdmin = () => {
               </button>
             </nav>
           </div>
+          
+          {/* Informations de session */}
+          <SessionInfo />
         </aside>
 
         {/* Overlay sombre pour mobile */}
