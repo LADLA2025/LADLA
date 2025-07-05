@@ -54,10 +54,9 @@ const Calendar = () => {
       if (result.success) {
         // Transformer les données pour correspondre au format attendu
         const formattedReservations = result.data.map(reservation => {
-          // Extraire juste la partie date de la chaîne ISO et ajouter un jour pour corriger le décalage UTC
+          // Extraire la date et corriger le décalage UTC
           const dateString = reservation.date_rdv.split('T')[0];
-          const date = new Date(dateString + 'T12:00:00'); // Utilise midi pour éviter les problèmes de timezone
-          date.setDate(date.getDate() + 1); // Ajouter un jour pour corriger le décalage
+          const date = new Date(dateString + 'T12:00:00'); // Utiliser midi pour éviter les problèmes de timezone
           const formattedDate = date.toISOString().split('T')[0];
           
           return {
@@ -85,6 +84,11 @@ const Calendar = () => {
         // Calculer les dates de la semaine pour le debug
         const weekDatesForDebug = getWeekDates(date);
         console.log('🗓️ Dates de la semaine:', weekDatesForDebug.map(d => d.toISOString().split('T')[0]));
+        
+        // Debug détaillé pour chaque réservation
+        formattedReservations.forEach(res => {
+          console.log(`🔍 Réservation: ${res.client} - Date: ${res.date} - Heure: ${res.time} - Type: ${res.vehicle}`);
+        });
       } else {
         throw new Error(result.error || 'Erreur lors de la récupération des réservations');
       }
@@ -335,10 +339,10 @@ const Calendar = () => {
     const dateStr = formatDate(date);
     const reservation = realReservations.find(res => res.date === dateStr && res.time === timeSlot);
     
-    // Debug : afficher les tentatives de matching
-    if (realReservations.length > 0 && !reservation) {
+    // Debug : afficher les tentatives de matching (seulement pour les créneaux avec réservations potentielles)
+    if (realReservations.length > 0 && !reservation && realReservations.some(r => r.date === dateStr)) {
       console.log(`🔍 Recherche réservation pour ${dateStr} à ${timeSlot}`);
-      console.log('📋 Réservations disponibles:', realReservations.map(r => `${r.date} à ${r.time} (${r.client})`));
+      console.log('📋 Réservations disponibles pour cette date:', realReservations.filter(r => r.date === dateStr).map(r => `${r.time} (${r.client})`));
     }
     
     return reservation;
