@@ -2,8 +2,8 @@
 const getAPIBaseURL = () => {
   // En production, utilise l'URL de ton API déployée
   if (import.meta.env.PROD) {
-    // URL de production - Backend LADL sur le nouveau domaine
-    return import.meta.env.VITE_API_URL || 'https://lesasdelauto06.fr';
+    // URL de production - Backend LADL temporairement sur Render
+    return import.meta.env.VITE_API_URL || 'https://ladla.onrender.com';
   }
   
   // En développement, utilise localhost
