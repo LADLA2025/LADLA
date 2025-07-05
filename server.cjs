@@ -8,14 +8,13 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration CORS pour autoriser Vercel
+// Configuration CORS pour autoriser Hostinger
 const corsOptions = {
   origin: [
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
-    'https://lesasdelauto06.fr', // Votre domaine principal
-    'https://www.lesasdelauto06.fr', // Avec www
-    /\.lesasdelauto06\.fr$/ // Tous les sous-domaines
+    'https://greenyellow-rat-105874.hostingersite.com', // Votre domaine Hostinger
+    /\.hostingersite\.com$/ // Tous les domaines Hostinger
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
