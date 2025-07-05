@@ -36,6 +36,14 @@ const Calendar = () => {
   });
   const [submittingReservation, setSubmittingReservation] = useState(false);
 
+  // État pour le modal de suppression par mois
+  const [showDeleteMonthModal, setShowDeleteMonthModal] = useState(false);
+  const [deleteMonthData, setDeleteMonthData] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1
+  });
+  const [deletingMonth, setDeletingMonth] = useState(false);
+
   // Fonction pour récupérer les réservations depuis l'API
   const fetchWeekReservations = async (date) => {
     try {
@@ -528,6 +536,55 @@ const Calendar = () => {
         damping: 10
       }
     }
+  };
+
+  // Fonction pour supprimer toutes les réservations d'un mois
+  const deleteReservationsByMonth = async () => {
+    try {
+      setDeletingMonth(true);
+
+      const response = await fetch(
+        buildAPIUrl(`${API_ENDPOINTS.DELETE_RESERVATIONS_BY_MONTH}/${deleteMonthData.year}/${deleteMonthData.month}`),
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Recharger les réservations
+        await fetchWeekReservations(currentDate);
+        setShowDeleteMonthModal(false);
+        
+        if (result.deletedCount > 0) {
+          alert(`✅ ${result.deletedCount} réservation(s) supprimée(s) pour ${deleteMonthData.month}/${deleteMonthData.year}`);
+        } else {
+          alert(`ℹ️ Aucune réservation trouvée pour ${deleteMonthData.month}/${deleteMonthData.year}`);
+        }
+      } else {
+        alert('❌ Erreur lors de la suppression : ' + (result.error || 'Erreur inconnue'));
+      }
+
+    } catch (error) {
+      console.error('Erreur lors de la suppression par mois:', error);
+      alert('❌ Erreur lors de la suppression des réservations');
+    } finally {
+      setDeletingMonth(false);
+    }
+  };
+
+  // Fonction pour ouvrir le modal de suppression par mois
+  const openDeleteMonthModal = () => {
+    const currentWeekDate = getWeekDates(currentDate)[0];
+    setDeleteMonthData({
+      year: currentWeekDate.getFullYear(),
+      month: currentWeekDate.getMonth() + 1
+    });
+    setShowDeleteMonthModal(true);
   };
 
   return (
@@ -1168,8 +1225,26 @@ const Calendar = () => {
         <motion.div variants={itemVariants} className="mt-8">
           <div className="bg-white rounded-3xl shadow-lg p-6">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Liste des Réservations</h2>
-              <p className="text-gray-600">Toutes les réservations de la semaine avec informations clients</p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Liste des Réservations</h2>
+                  <p className="text-gray-600">Toutes les réservations de la semaine avec informations clients</p>
+                </div>
+                
+                {/* Bouton de suppression par mois */}
+                <div className="flex gap-2">
+                  <motion.button 
+                    onClick={openDeleteMonthModal}
+                    className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2 text-sm font-medium shadow-lg"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <i className="bx bx-trash text-lg"></i>
+                    <span className="hidden sm:inline">Effacer par mois</span>
+                    <span className="sm:hidden">Effacer</span>
+                  </motion.button>
+                </div>
+              </div>
             </div>
 
             {loadingReservations ? (
@@ -1548,6 +1623,119 @@ const Calendar = () => {
             )}
           </div>
         </motion.div>
+
+        {/* Modal de suppression par mois */}
+        {showDeleteMonthModal && (
+          <motion.div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDeleteMonthModal(false)}
+          >
+            <motion.div 
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-red-100 rounded-xl">
+                    <i className="bx bx-trash text-red-600 text-2xl"></i>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800">Supprimer les réservations</h2>
+                    <p className="text-gray-600 text-sm">Cette action est irréversible</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-4">
+                    <div className="flex items-center gap-2 text-red-800 mb-2">
+                      <i className="bx bx-error-circle"></i>
+                      <span className="font-bold">Attention !</span>
+                    </div>
+                    <p className="text-red-700 text-sm">
+                      Vous êtes sur le point de supprimer <strong>TOUTES</strong> les réservations du mois sélectionné. 
+                      Cette action ne peut pas être annulée.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Année
+                      </label>
+                      <select
+                        value={deleteMonthData.year}
+                        onChange={(e) => setDeleteMonthData(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none"
+                        disabled={deletingMonth}
+                      >
+                        {Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i).map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Mois
+                      </label>
+                      <select
+                        value={deleteMonthData.month}
+                        onChange={(e) => setDeleteMonthData(prev => ({ ...prev, month: parseInt(e.target.value) }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none"
+                        disabled={deletingMonth}
+                      >
+                        {months.map((month, index) => (
+                          <option key={index + 1} value={index + 1}>{month}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">
+                      <strong>Période sélectionnée :</strong> {months[deleteMonthData.month - 1]} {deleteMonthData.year}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteMonthModal(false)}
+                    disabled={deletingMonth}
+                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+                  >
+                    Annuler
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={deleteReservationsByMonth}
+                    disabled={deletingMonth}
+                    className="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-medium disabled:opacity-50 flex items-center gap-2 justify-center"
+                  >
+                    {deletingMonth ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Suppression...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bx bx-trash"></i>
+                        Supprimer
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Modal de nouvelle réservation */}
         {showNewReservationModal && (

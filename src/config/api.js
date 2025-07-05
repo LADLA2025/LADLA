@@ -33,4 +33,5 @@ export const API_ENDPOINTS = {
   RESERVATIONS: '/reservations',
   RESERVATIONS_BY_DATE: '/reservations/date',
   RESERVATIONS_BY_WEEK: '/reservations/semaine',
+  DELETE_RESERVATIONS_BY_MONTH: '/reservations/month',
 }; 

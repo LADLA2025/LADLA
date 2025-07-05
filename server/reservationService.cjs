@@ -538,6 +538,78 @@ class ReservationService {
       };
     }
   }
+
+  // Supprimer toutes les réservations d'un mois spécifique
+  static async deleteReservationsByMonth(year, month) {
+    try {
+      // Valider les paramètres
+      const yearNum = parseInt(year);
+      const monthNum = parseInt(month);
+      
+      if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+        return {
+          success: false,
+          error: 'Année ou mois invalide'
+        };
+      }
+
+      // Calculer le premier et dernier jour du mois
+      const firstDay = new Date(yearNum, monthNum - 1, 1);
+      const lastDay = new Date(yearNum, monthNum, 0);
+      
+      const firstDayStr = firstDay.toISOString().split('T')[0];
+      const lastDayStr = lastDay.toISOString().split('T')[0];
+
+      // Compter d'abord les réservations à supprimer
+      const countQuery = `
+        SELECT COUNT(*) as count 
+        FROM reservations 
+        WHERE date_rdv BETWEEN $1 AND $2
+      `;
+      
+      const countResult = await pool.query(countQuery, [firstDayStr, lastDayStr]);
+      const reservationsCount = parseInt(countResult.rows[0].count);
+
+      if (reservationsCount === 0) {
+        return {
+          success: true,
+          deletedCount: 0,
+          message: 'Aucune réservation trouvée pour ce mois'
+        };
+      }
+
+      // Supprimer toutes les réservations du mois
+      const deleteQuery = `
+        DELETE FROM reservations 
+        WHERE date_rdv BETWEEN $1 AND $2
+        RETURNING id, prenom, nom, date_rdv
+      `;
+      
+      const deleteResult = await pool.query(deleteQuery, [firstDayStr, lastDayStr]);
+      
+      console.log(`🗑️ Suppression de ${deleteResult.rows.length} réservations pour ${monthNum}/${yearNum}`);
+      
+      return {
+        success: true,
+        deletedCount: deleteResult.rows.length,
+        deletedReservations: deleteResult.rows,
+        message: `${deleteResult.rows.length} réservation(s) supprimée(s) pour ${monthNum}/${yearNum}`,
+        period: {
+          year: yearNum,
+          month: monthNum,
+          firstDay: firstDayStr,
+          lastDay: lastDayStr
+        }
+      };
+
+    } catch (error) {
+      console.error('Erreur lors de la suppression des réservations par mois:', error);
+      return {
+        success: false,
+        error: 'Erreur lors de la suppression des réservations'
+      };
+    }
+  }
 }
 
 module.exports = {

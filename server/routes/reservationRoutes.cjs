@@ -299,4 +299,46 @@ router.get('/stats/periode', async (req, res) => {
   }
 });
 
+// Supprimer toutes les réservations d'un mois spécifique
+router.delete('/month/:year/:month', async (req, res) => {
+  try {
+    const { year, month } = req.params;
+    
+    console.log(`🗑️ Demande de suppression pour le mois ${month}/${year}`);
+    
+    // Valider les paramètres
+    const yearNum = parseInt(year);
+    const monthNum = parseInt(month);
+    
+    if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+      return res.status(400).json({
+        success: false,
+        error: 'Paramètres invalides. Année et mois requis (mois entre 1 et 12)'
+      });
+    }
+
+    if (yearNum < 2020 || yearNum > 2030) {
+      return res.status(400).json({
+        success: false,
+        error: 'Année invalide (doit être entre 2020 et 2030)'
+      });
+    }
+
+    const result = await ReservationService.deleteReservationsByMonth(year, month);
+
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(400).json(result);
+    }
+
+  } catch (error) {
+    console.error('Erreur dans la route DELETE /reservations/month:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Erreur serveur lors de la suppression des réservations' 
+    });
+  }
+});
+
 module.exports = router; 
