@@ -2,8 +2,8 @@
 const getAPIBaseURL = () => {
   // En production, utilise l'URL de ton API déployée
   if (import.meta.env.PROD) {
-    // URL de production Render
-    return import.meta.env.VITE_API_URL || 'https://client1-2-zs9g.onrender.com';
+    // URL de production Render - Backend LADL
+    return import.meta.env.VITE_API_URL || 'https://ladl-backend.onrender.com';
   }
   
   // En développement, utilise localhost

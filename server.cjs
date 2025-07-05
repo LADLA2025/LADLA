@@ -8,13 +8,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration CORS pour autoriser Hostinger
+// Configuration CORS pour autoriser Hostinger et Render
 const corsOptions = {
   origin: [
     'http://localhost:5173', // Développement local
     'http://localhost:3000',
     'https://greenyellow-rat-105874.hostingersite.com', // Votre domaine Hostinger
-    /\.hostingersite\.com$/ // Tous les domaines Hostinger
+    'https://ladl-frontend.onrender.com', // Frontend Render (si déployé)
+    /\.hostingersite\.com$/, // Tous les domaines Hostinger
+    /\.onrender\.com$/ // Tous les domaines Render
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
