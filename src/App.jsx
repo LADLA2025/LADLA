@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import './App.css'
 import "aos/dist/aos.css"; 
@@ -15,11 +15,83 @@ import berlineImg from './IMG/berline.png';
 import suvImg from './IMG/suv 4x4.png';
 import AnimatedButton from './components/AnimatedButton';
 
+// Composant vidéo optimisé pour mobile
+const OptimizedVideo = ({ src, className, children, ...props }) => {
+  const [hasError, setHasError] = useState(false);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedData = () => {
+      // Tenter de jouer la vidéo après chargement
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          console.log('Autoplay prevented:', e);
+          // Si autoplay échoue, on n'affiche pas d'erreur
+        });
+      }
+    };
+
+    const handleError = () => {
+      setHasError(true);
+    };
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('error', handleError);
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('error', handleError);
+    };
+  }, []);
+
+  // Si erreur, on retourne un div vide avec la même classe pour maintenir la mise en page
+  if (hasError) {
+    return <div className={className} style={{ backgroundColor: 'transparent' }} />;
+  }
+
+  return (
+    <video 
+      ref={videoRef}
+      className={className}
+      {...props}
+    >
+      <source src={src} type="video/mp4" />
+      {children}
+    </video>
+  );
+};
+
 function App() {
   const [openFaq, setOpenFaq] = useState(null);
   
   useEffect(() => {
     AOS.init();
+    
+    // Forcer le démarrage des vidéos sur mobile
+    const handleUserInteraction = () => {
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        if (video.paused) {
+          video.play().catch(e => {
+            console.log('Autoplay prevented:', e);
+          });
+        }
+      });
+    };
+
+    // Écouter les interactions utilisateur
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('click', handleUserInteraction, { once: true });
+
+    // Nettoyage
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
   }, []);
 
   const toggleFaq = (index) => {
@@ -41,19 +113,19 @@ function App() {
           </p>
           <ul className="mt-4 space-y-2">
             <li className="flex items-center gap-2 text-gray-600">
-              <i className='bx bx-check text-[#FFA600]'></i>
+              <i className='bx bx-check text-[#FF0000]'></i>
               Lavage intérieur et extérieur (détailing)
             </li>
             <li className="flex items-center gap-2 text-gray-600">
-              <i className='bx bx-check text-[#FFA600]'></i>
+              <i className='bx bx-check text-[#FF0000]'></i>
               Carrosserie
             </li>
             <li className="flex items-center gap-2 text-gray-600">
-              <i className='bx bx-check text-[#FFA600]'></i>
+              <i className='bx bx-check text-[#FF0000]'></i>
               Vente et achat de voitures d'occasion
             </li>
             <li className="flex items-center gap-2 text-gray-600">
-              <i className='bx bx-check text-[#FFA600]'></i>
+              <i className='bx bx-check text-[#FF0000]'></i>
               Location de véhicules
             </li>
           </ul>
@@ -97,18 +169,23 @@ function App() {
       {/* Hero Section */}
       <section className="relative bg-gray-900 text-white h-[85vh] flex items-center justify-center pt-15 overflow-hidden">
          {/* Vidéo d'arrière-plan */}
-         <video 
+         <OptimizedVideo
+           src={mainVideo}
            className="absolute inset-0 w-full h-full object-cover"
            autoPlay 
            loop 
            muted 
            playsInline
-           preload="auto"
+           preload="metadata"
            controls={false}
+           webkit-playsinline="true"
+           x5-playsinline="true"
+           x5-video-player-type="h5"
+           x5-video-player-fullscreen="true"
+           x5-video-orientation="portraint"
          >
-           <source src={mainVideo} type="video/mp4" />
            Votre navigateur ne supporte pas la vidéo HTML5.
-         </video>
+         </OptimizedVideo>
          
          {/* Cercles d'ambiance animés - AVANT l'overlay */}
          <div className="light-circle circle1" style={{zIndex: 5}}></div>
@@ -127,7 +204,7 @@ function App() {
              VOTRE PARTENAIRE AUTOMOBILE DE CONFIANCE
              </h1>
              <p className="text-sm md:text-xl mb-8 opacity-90">
-               Notre équipe assure l'entretien complet et professionnel 
+               Notre équipe assure l'entretien esthétique complet et professionnel 
                de votre véhicule avec des outils performants dans un centre 
                équipé et moderne
              </p>
@@ -136,7 +213,7 @@ function App() {
                  href="https://wa.me/33625138033?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" 
                  target="_blank" 
                  rel="noopener noreferrer"
-                 className="bg-gradient-to-r from-[#FFA600] to-orange-600 hover:from-[#E6950E] hover:to-orange-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 font-medium group"
+                 className="bg-gradient-to-r from-[#FF0000] to-[#FF4500] hover:from-[#CC0000] hover:to-[#FF6600] text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 font-medium group"
                >
                  <i className='bx bxl-whatsapp text-2xl'></i>
                  <span>WhatsApp</span>
@@ -172,11 +249,11 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             {/* Petite Citadine */}
             <Link to="/voitures/petite-citadine" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FF0000] to-[#FF4500] flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">PETITE CITADINE</span>
                 </div>
-                <img src={petiteCitadineImg} alt="Petite Citadine" className="max-w-40 max-h-full object-contain relative z-10 hover:scale-105 transition-transform duration-300" />
+                <img src={petiteCitadineImg} alt="Petite Citadine" className="max-w-50 max-h-full object-contain relative z-10 hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="pt-8 pb-6 px-4">
                 <h3 className="font-bold text-xl mb-4">PETITE CITADINE</h3>
@@ -189,11 +266,11 @@ function App() {
 
             {/* Citadine */}
             <Link to="/voitures/citadine" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FF0000] to-[#FF4500] flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">CITADINE</span>
                 </div>
-                <img src={citadineImg} alt="Citadine" className="max-w-48 max-h-full object-contain relative z-10 hover:scale-105 transition-transform duration-300" />
+                <img src={citadineImg} alt="Citadine" className="max-w-118 max-h-full object-contain relative z-10 hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="pt-8 pb-6 px-4">
                 <h3 className="font-bold text-xl mb-4">CITADINE</h3>
@@ -206,7 +283,7 @@ function App() {
 
             {/* Berline */}
             <Link to="/voitures/berline" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FF0000] to-[#FF4500] flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">BERLINE</span>
                 </div>
@@ -223,7 +300,7 @@ function App() {
 
             {/* SUV 4x4 */}
             <Link to="/voitures/suv" className="bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FFA600] to-orange-600 flex items-center justify-center p-3 relative">
+              <div className="h-60 bg-gradient-to-b from-[#F3F3F3] via-[#FF0000] to-[#FF4500] flex items-center justify-center p-3 relative">
                 <div className="absolute inset-0 flex items-start justify-center pt-6">
                   <span data-aos="fade-up" data-aos-duration="2000" className="text-white text-4xl font-bold opacity-40">SUV 4X4</span>
                 </div>
@@ -245,10 +322,10 @@ function App() {
               en centre ou sur rendez-vous
             </p>
             <Link to="/tarifs" className="relative inline-block">
-              <button className="bg-gradient-to-r from-transparent font-bold via-[#FFA600] to-transparent hover:from-transparent hover:via-orange-600 hover:to-transparent text-white px-8 py-3 rounded-xl transition-colors relative z-10 border border-4 border-[#FFA600]/30">
+              <button className="bg-gradient-to-r from-transparent font-bold via-[#FF0000] to-transparent hover:from-transparent hover:via-[#FF4500] hover:to-transparent text-white px-8 py-3 rounded-xl transition-colors relative z-10 border border-4 border-[#FF0000]/30">
                 Découvrir nos tarifs
               </button>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FFA600] to-orange-600 rounded-full blur-md opacity-40 transform scale-y-[-1] translate-y-8"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FF0000] to-[#FF4500] rounded-full blur-md opacity-40 transform scale-y-[-1] translate-y-8"></div>
             </Link>
           </div>
         </div>
@@ -277,16 +354,18 @@ function App() {
             
             {/* Service Principal - Grande carte avec vidéo dominante */}
             <div className="col-span-5 md:col-span-3 h-80 bg-black rounded-3xl overflow-hidden relative group">
-              <video 
+              <OptimizedVideo
+                src={cercle1Video}
                 autoPlay 
                 loop 
                 muted 
                 playsInline
                 controls={false}
+                preload="metadata"
+                webkit-playsinline="true"
+                x5-playsinline="true"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              >
-                <source src={cercle1Video} type="video/mp4" />
-              </video>
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
               <div className="absolute inset-0 p-8 flex flex-col justify-between">
                 <div className="flex items-start justify-between">
@@ -303,11 +382,11 @@ function App() {
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <i className='bx bx-time text-[#FFA600]'></i>
+                      <i className='bx bx-time text-[#FF0000]'></i>
                       <span className="text-sm">45 min</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <i className='bx bx-star text-[#FFA600]'></i>
+                      <i className='bx bx-star text-[#FF0000]'></i>
                       <span className="text-sm">Premium</span>
                     </div>
                   </div>
@@ -319,7 +398,7 @@ function App() {
             <div className="col-span-5 md:col-span-2 h-80 space-y-6">
               
               {/* Stats */}
-              <div data-aos="flip-up"  data-aos-duration="3000"  className="h-36 bg-gradient-to-br from-[#FFA600] to-orange-600 rounded-3xl p-6 text-white relative overflow-hidden">
+              <div data-aos="flip-up"  data-aos-duration="3000"  className="h-36 bg-gradient-to-br from-[#FF0000] to-[#FF4500] rounded-3xl p-6 text-white relative overflow-hidden">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
                 <div className="relative z-10">
                   <div className="text-4xl font-black mb-2">100%</div>
@@ -330,16 +409,18 @@ function App() {
                              {/* Service Intérieur */}
                <div className="h-40 bg-white rounded-3xl overflow-hidden shadow-lg  relative">
                  <div className="absolute inset-0">
-                   <video 
+                   <OptimizedVideo
+                     src={cercle4Video}
                      autoPlay 
                      loop 
                      muted 
                      playsInline
                      controls={false}
+                     preload="metadata"
+                     webkit-playsinline="true"
+                     x5-playsinline="true"
                      className="w-full h-full object-cover"
-                   >
-                     <source src={cercle4Video} type="video/mp4" />
-                   </video>
+                   />
                    <div className="absolute inset-0 bg-black/40"></div>
                  </div>
                  <div className="relative z-10 p-6 h-full flex flex-col justify-between">
@@ -367,16 +448,18 @@ function App() {
                              {/* Service Complet */}
                <div data-aos="flip-up"  data-aos-duration="3000"  className="md:col-span-2 h-48 bg-black rounded-3xl overflow-hidden relative">
                  <div className="absolute inset-0">
-                   <video 
+                   <OptimizedVideo
+                     src={cercle3Video}
                      autoPlay 
                      loop 
                      muted 
                      playsInline
                      controls={false}
+                     preload="metadata"
+                     webkit-playsinline="true"
+                     x5-playsinline="true"
                      className="w-full h-full object-cover"
-                   >
-                     <source src={cercle3Video} type="video/mp4" />
-                   </video>
+                   />
                    <div className="absolute inset-0 bg-black/50"></div>
                  </div>
                  <div   className="relative z-10 p-6 h-full flex flex-col justify-between">
@@ -389,7 +472,7 @@ function App() {
                    <div className="text-white">
                      <div className="flex items-center gap-2 mb-3">
                        <h4 className="font-bold text-xl">Formule Complète</h4>
-                       <span className="bg-[#FFA600] text-white text-xs px-2 py-1 rounded-full">POPULAIRE</span>
+                       <span className="bg-[#FF0000] text-white text-xs px-2 py-1 rounded-full">POPULAIRE</span>
                      </div>
                      <p className="text-gray-200 text-sm leading-relaxed">
                        Formule premium combinant lavage extérieur, nettoyage intérieur et protection longue durée.
@@ -401,31 +484,31 @@ function App() {
               {/* Caractéristiques */}
               <div className="h-48 bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
                 <h4 className="font-bold text-lg text-gray-800 mb-4">Nos Atouts</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-droplet text-[#FFA600] text-sm'></i>
+                                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                        <i className='bx bx-droplet text-[#FF0000] text-sm'></i>
+                      </div>
+                      <span className="text-sm text-gray-600">Produits premium</span>
                     </div>
-                    <span className="text-sm text-gray-600">Produits premium</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-cog text-[#FFA600] text-sm'></i>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                        <i className='bx bx-cog text-[#FF0000] text-sm'></i>
+                      </div>
+                      <span className="text-sm text-gray-600">Équipement moderne</span>
                     </div>
-                    <span className="text-sm text-gray-600">Équipement moderne</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-shield-check text-[#FFA600] text-sm'></i>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                        <i className='bx bx-shield-check text-[#FF0000] text-sm'></i>
+                      </div>
+                      <span className="text-sm text-gray-600">Garantie qualité</span>
                     </div>
-                    <span className="text-sm text-gray-600">Garantie qualité</span>
                   </div>
-                </div>
               </div>
 
               {/* Temps de service */}
               <div className="h-48 bg-black rounded-3xl p-6 text-white flex flex-col justify-center items-center text-center">
-                <i className='bx bx-time-five text-[#FFA600] text-4xl mb-4'></i>
+                <i className='bx bx-time-five text-[#FF0000] text-4xl mb-4'></i>
                 <div className="text-3xl font-bold mb-2">30-60</div>
                 <div className="text-sm opacity-70">MINUTES</div>
                 <div className="mt-3 text-xs opacity-50">Temps moyen</div>
@@ -438,7 +521,7 @@ function App() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-12 bg-gradient-to-br from-[#FFA600] to-orange-600 relative overflow-hidden">
+      <section className="py-12 bg-gradient-to-br from-[#FF0000] to-[#FF4500] relative overflow-hidden">
         {/* Cercles d'ambiance pour la section FAQ */}
         <div className="light-circle circle1" style={{zIndex: 1, opacity: 0.1}}></div>
         <div className="light-circle circle5" style={{zIndex: 1, opacity: 0.1}}></div>
@@ -493,16 +576,16 @@ function App() {
                 >
                   <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-gradient-to-br from-[#FFA600] to-orange-600 text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">
+                      <span className="w-6 h-6 bg-gradient-to-br from-[#FF0000] to-[#FF4500] text-white rounded-full flex items-center justify-center text-xs flex-shrink-0">
                         {index + 1}
                       </span>
-                      <div className="w-8 h-8 bg-[#FFA600]/10 rounded-full flex items-center justify-center">
-                        <i className={`bx ${faq.icon} text-[#FFA600] text-xl`}></i>
+                      <div className="w-8 h-8 bg-[#FF0000]/10 rounded-full flex items-center justify-center">
+                        <i className={`bx ${faq.icon} text-[#FF0000] text-xl`}></i>
                       </div>
                     </div>
                     {faq.question}
                   </h3>
-                  <i className={`bx ${openFaq === index ? 'bx-minus' : 'bx-plus'} text-[#FFA600] text-xl transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`}></i>
+                  <i className={`bx ${openFaq === index ? 'bx-minus' : 'bx-plus'} text-[#FF0000] text-xl transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`}></i>
                 </button>
                 <div 
                   className={`px-4 overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-72 pb-4' : 'max-h-0'}`}
@@ -524,7 +607,7 @@ function App() {
               Notre équipe est là pour vous aider.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <a href="tel:0625138033" className="bg-white text-[#FFA600] px-6 py-2 rounded-full font-semibold hover:bg-white/90 transition-colors flex items-center gap-2 text-sm">
+              <a href="tel:0625138033" className="bg-white text-[#FF0000] px-6 py-2 rounded-full font-semibold hover:bg-white/90 transition-colors flex items-center gap-2 text-sm">
                 <i className='bx bx-phone'></i>
                 06 25 13 80 33
               </a>
@@ -561,7 +644,7 @@ function App() {
             <div data-aos="fade-right" className="lg:col-span-2 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-[#FFA600] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#FF0000] rounded-full flex items-center justify-center">
                     <i className='bx bx-play text-white text-2xl'></i>
                   </div>
                   <div>
@@ -589,7 +672,7 @@ function App() {
             <div className="space-y-6">
               
               {/* Notre Mission */}
-              <div data-aos="fade-left" data-aos-delay="100" className="bg-gradient-to-br from-[#FFA600] to-orange-600 rounded-3xl p-8 text-white">
+              <div data-aos="fade-left" data-aos-delay="100" className="bg-gradient-to-br from-[#FF0000] to-[#FF4500] rounded-3xl p-8 text-white">
                 <div className="flex items-center gap-3 mb-4">
                   <i className='bx bx-target-lock text-3xl'></i>
                   <h4 className="text-xl font-bold">Notre Mission</h4>
@@ -602,25 +685,25 @@ function App() {
               {/* Nos Valeurs */}
               <div data-aos="fade-left" data-aos-delay="200" className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <i className='bx bx-heart text-[#FFA600]'></i>
+                  <i className='bx bx-heart text-[#FF0000]'></i>
                   Nos Valeurs
                 </h4>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-check text-[#FFA600]'></i>
+                    <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                      <i className='bx bx-check text-[#FF0000]'></i>
                     </div>
                     <span className="text-gray-700">Excellence du service</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-leaf text-[#FFA600]'></i>
+                    <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                      <i className='bx bx-leaf text-[#FF0000]'></i>
                     </div>
                     <span className="text-gray-700">Respect environnemental</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#FFA600]/20 rounded-lg flex items-center justify-center">
-                      <i className='bx bx-smile text-[#FFA600]'></i>
+                    <div className="w-8 h-8 bg-[#FF0000]/20 rounded-lg flex items-center justify-center">
+                      <i className='bx bx-smile text-[#FF0000]'></i>
                     </div>
                     <span className="text-gray-700">Satisfaction client</span>
                   </div>
@@ -630,24 +713,24 @@ function App() {
               {/* Statistiques */}
               <div data-aos="fade-left" data-aos-delay="300" className="bg-black rounded-3xl p-6 text-white">
                 <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <i className='bx bx-bar-chart text-[#FFA600]'></i>
+                  <i className='bx bx-bar-chart text-[#FF0000]'></i>
                   En Chiffres
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#FFA600]">10+</div>
+                    <div className="text-2xl font-bold text-[#FF0000]">10+</div>
                     <div className="text-sm opacity-80">Années d'expérience</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#FFA600]">5000+</div>
+                    <div className="text-2xl font-bold text-[#FF0000]">5000+</div>
                     <div className="text-sm opacity-80">Véhicules traités</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#FFA600]">98%</div>
+                    <div className="text-2xl font-bold text-[#FF0000]">98%</div>
                     <div className="text-sm opacity-80">Clients satisfaits</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-[#FFA600]">24h</div>
+                    <div className="text-2xl font-bold text-[#FF0000]">24h</div>
                     <div className="text-sm opacity-80">Service disponible</div>
                   </div>
                 </div>
@@ -658,124 +741,9 @@ function App() {
           </div>
         </div>
       </section>
-{/* Reviews Section */}
-<section className="py-20 bg-gray-50 relative overflow-hidden">
-        {/* Cercles d'ambiance pour la section Reviews */}
-        <div className="light-circle circle2" style={{zIndex: 1, opacity: 0.6}}></div>
-        <div className="light-circle circle4" style={{zIndex: 1, opacity: 0.8}}></div>
-        <div className="light-circle circle1" style={{zIndex: 1, opacity: 0.5}}></div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-6">
-              Nos avis clients
-            </h2>
-            <div className="flex justify-center mb-8">
-              <div className="bg-green-500 text-white px-4 py-2 rounded-full flex items-center gap-2">
-                <span className="font-bold">Trustpilot</span>
-                <div className="flex text-white">
-                  ★★★★★
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Review 1 - Grande carte */}
-            <div className="md:col-span-2 lg:col-span-1 bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
-              <div className="flex items-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FFA600] to-orange-600 flex items-center justify-center mr-4">
-                  <span className="text-white font-bold text-lg">M</span>
-                </div>
-                <div>
-                  <h3 className="text-gray-800 font-bold text-lg">MATTHIEU</h3>
-                  <div className="flex text-[#FFA600] text-lg mb-1">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                "Excellent service professionnel ! Mon véhicule n'a jamais été aussi propre. L'équipe est vraiment compétente et le résultat dépasse mes attentes."
-              </p>
-            </div>
-
-            {/* Review 2 - Carte moyenne */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">V</span>
-                </div>
-                <div>
-                  <h3 className="text-gray-800 font-bold">VALERIE</h3>
-                  <div className="flex text-[#FFA600] text-sm">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700">
-                "Service rapide et de qualité. Je recommande vivement cette station de lavage !"
-              </p>
-            </div>
-
-            {/* Review 3 - Carte moyenne */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">M</span>
-                </div>
-                <div>
-                  <h3 className="text-gray-800 font-bold">MATTHIEU</h3>
-                  <div className="flex text-[#FFA600] text-sm">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700">
-                "Très satisfait du résultat ! Service professionnel et prix raisonnable."
-              </p>
-            </div>
-
-            {/* Review 4 - Carte large */}
-            <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">S</span>
-                </div>
-                <div>
-                  <h3 className="text-gray-800 font-bold">SOPHIE</h3>
-                  <div className="flex text-[#FFA600] text-sm">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700 text-lg">
-                "Un service de qualité exceptionnelle ! L'entretien complet de ma voiture a été parfait. Équipe professionnelle et résultats impeccables."
-              </p>
-            </div>
-
-            {/* Review 5 - Carte compacte */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mr-3">
-                  <span className="text-white font-bold">L</span>
-                </div>
-                <div>
-                  <h3 className="text-gray-800 font-bold">LUCAS</h3>
-                  <div className="flex text-[#FFA600] text-sm">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700">
-                "Parfait pour mon SUV ! Service rapide et efficace."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
       {/* Section bas avec engagement */}
-      <div data-aos="fade-up" data-aos-delay="400" className="mt-16 bg-gradient-to-r from-[#FFA600] to-orange-600  p-8 text-center">
+      <div data-aos="fade-up" data-aos-delay="400" className="mt-16 bg-gradient-to-r from-[#FF0000] to-[#FF4500]  p-8 text-center">
         <h4 className="text-2xl font-bold text-white mb-4">Notre Engagement Qualité</h4>
         <p className="text-white/90 text-lg max-w-4xl mx-auto mb-6">
           Chez Les AS de L'Auto, chaque véhicule est traité avec le même soin et la même attention aux détails. 
@@ -783,7 +751,7 @@ function App() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-white transition-colors">
-            <i className='bx bx-shield text-orange-600'></i>
+            <i className='bx bx-shield text-[#FF0000]'></i>
             <span className="font-semibold text-gray-800">Garantie Satisfait ou Remboursé</span>
           </div>
           <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-white transition-colors">

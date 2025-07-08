@@ -3,6 +3,7 @@ import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import { motion } from 'framer-motion';
 import jsPDF from 'jspdf';
 
+
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -32,7 +33,20 @@ const Calendar = () => {
     prix: '',
     date_rdv: '',
     heure_rdv: '',
-    commentaires: ''
+    commentaires: '',
+    // Options supplémentaires
+    options: {
+      baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+      pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+      pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+      renov_chrome: { selected: false },
+      assaisonnement_ozone: { selected: false, prix: 30 },
+      polissage: { selected: false },
+      lustrage: { selected: false }
+    }
   });
   const [submittingReservation, setSubmittingReservation] = useState(false);
 
@@ -62,10 +76,8 @@ const Calendar = () => {
       if (result.success) {
         // Transformer les données pour correspondre au format attendu
         const formattedReservations = result.data.map(reservation => {
-          // Extraire la date et corriger le décalage UTC
-          const dateString = reservation.date_rdv.split('T')[0];
-          const date = new Date(dateString + 'T12:00:00'); // Utiliser midi pour éviter les problèmes de timezone
-          const formattedDate = date.toISOString().split('T')[0];
+          // Maintenant que le serveur retourne des dates comme texte, on peut les utiliser directement
+          const formattedDate = reservation.date_rdv;
           
           return {
             id: reservation.id,
@@ -79,7 +91,8 @@ const Calendar = () => {
             email: reservation.email,
             adresse: reservation.adresse,
             commentaires: reservation.commentaires,
-            prix: reservation.prix
+            prix: reservation.prix,
+            options: reservation.options // Ajouter les options
           };
         });
         
@@ -207,6 +220,51 @@ const Calendar = () => {
     try {
       setSubmittingReservation(true);
 
+      // Calculer le prix total avec options
+      const basePrice = parseFloat(newReservationData.prix) || 0;
+      const optionsPrice = calculateTotalOptionsPrice();
+      const totalPrice = basePrice + optionsPrice;
+
+      // Construire la description des options pour les commentaires
+      const optionsDescription = [];
+      const options = newReservationData.options;
+
+      if (options.baume_sieges.quantity > 0) {
+        optionsDescription.push(`Baume sièges x${options.baume_sieges.quantity} (${calculateOptionPrice(options.baume_sieges)}€)`);
+      }
+      if (options.pressing_sieges.quantity > 0) {
+        optionsDescription.push(`Pressing sièges x${options.pressing_sieges.quantity} (${calculateOptionPrice(options.pressing_sieges)}€)`);
+      }
+      if (options.pressing_tapis.quantity > 0) {
+        optionsDescription.push(`Pressing tapis x${options.pressing_tapis.quantity} (${calculateOptionPrice(options.pressing_tapis)}€)`);
+      }
+      if (options.pressing_coffre_plafonnier.quantity > 0) {
+        optionsDescription.push(`Pressing coffre/plafonnier x${options.pressing_coffre_plafonnier.quantity} (${options.pressing_coffre_plafonnier.quantity * options.pressing_coffre_plafonnier.prix_unitaire}€)`);
+      }
+      if (options.pressing_panneau_porte.quantity > 0) {
+        optionsDescription.push(`Pressing panneau porte x${options.pressing_panneau_porte.quantity} (${calculateOptionPrice(options.pressing_panneau_porte)}€)`);
+      }
+      if (options.renov_phare.quantity > 0) {
+        optionsDescription.push(`Renov phare x${options.renov_phare.quantity} (${calculateOptionPrice(options.renov_phare)}€)`);
+      }
+      if (options.renov_chrome.selected) {
+        optionsDescription.push('Renov chrome (sur devis)');
+      }
+      if (options.assaisonnement_ozone.selected) {
+        optionsDescription.push(`Assaisonnement ozone (${options.assaisonnement_ozone.prix}€)`);
+      }
+      if (options.polissage.selected) {
+        optionsDescription.push('Polissage (sur devis)');
+      }
+      if (options.lustrage.selected) {
+        optionsDescription.push('Lustrage (sur devis)');
+      }
+
+      const fullCommentaires = [
+        newReservationData.commentaires || '',
+        optionsDescription.length > 0 ? `Options: ${optionsDescription.join(', ')}` : ''
+      ].filter(Boolean).join('\n');
+
       // Transformer les données pour correspondre au format attendu par le serveur
       const serverData = {
         prenom: newReservationData.prenom,
@@ -217,10 +275,10 @@ const Calendar = () => {
         typeVoiture: newReservationData.type_voiture,
         marqueVoiture: newReservationData.marque_voiture,
         formule: newReservationData.formule,
-        prix: newReservationData.prix || 0,
+        prix: totalPrice,
         date: newReservationData.date_rdv,
         heure: newReservationData.heure_rdv,
-        commentaires: newReservationData.commentaires || '',
+        commentaires: fullCommentaires,
         newsletter: false
       };
 
@@ -237,12 +295,32 @@ const Calendar = () => {
       const result = await response.json();
 
       if (result.success) {
+        console.log('✅ Réservation créée avec succès, envoi des emails...');
+        
+        // Préparer les données complètes pour l'envoi d'emails
+        const reservationDataForEmail = {
+          ...serverData,
+          options: newReservationData.options
+        };
+        
+        // Envoyer les emails via EmailJS côté client
+        try {
+          const emailResult = await emailClientService.sendReservationEmails(reservationDataForEmail);
+          if (emailResult.success) {
+            console.log('📧 Emails envoyés avec succès via EmailJS !');
+          } else {
+            console.warn('⚠️ Erreur lors de l\'envoi des emails:', emailResult.error);
+          }
+        } catch (emailError) {
+          console.error('❌ Erreur lors de l\'envoi des emails:', emailError);
+        }
+        
         // Recharger les réservations
         await fetchWeekReservations(currentDate);
         // Réinitialiser le formulaire et fermer le modal
         resetNewReservationForm();
         setShowNewReservationModal(false);
-        alert('Réservation créée avec succès !');
+        alert('Réservation créée avec succès ! Les emails de confirmation ont été envoyés.');
       } else {
         alert('Erreur lors de la création : ' + (result.error || 'Erreur inconnue'));
       }
@@ -269,7 +347,20 @@ const Calendar = () => {
       prix: '',
       date_rdv: '',
       heure_rdv: '',
-      commentaires: ''
+      commentaires: '',
+      // Options supplémentaires
+      options: {
+        baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+        pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+        pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+        renov_chrome: { selected: false },
+        assaisonnement_ozone: { selected: false, prix: 30 },
+        polissage: { selected: false },
+        lustrage: { selected: false }
+      }
     });
   };
 
@@ -279,6 +370,67 @@ const Calendar = () => {
     setNewReservationData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  // Fonction pour calculer le prix d'une option avec réduction automatique
+  const calculateOptionPrice = (option) => {
+    const { quantity, prix_unitaire, prix_x4 } = option;
+    if (quantity === 0) return 0;
+    if (quantity >= 4 && prix_x4) {
+      return prix_x4;
+    }
+    return quantity * prix_unitaire;
+  };
+
+  // Fonction pour calculer le prix total des options
+  const calculateTotalOptionsPrice = () => {
+    const options = newReservationData.options;
+    let total = 0;
+
+    // Options avec quantité et réduction x4
+    total += calculateOptionPrice(options.baume_sieges);
+    total += calculateOptionPrice(options.pressing_sieges);
+    total += calculateOptionPrice(options.pressing_tapis);
+    total += calculateOptionPrice(options.pressing_panneau_porte);
+    total += calculateOptionPrice(options.renov_phare);
+
+    // Options à prix fixe avec quantité
+    total += options.pressing_coffre_plafonnier.quantity * options.pressing_coffre_plafonnier.prix_unitaire;
+
+    // Options à prix fixe simple
+    if (options.assaisonnement_ozone.selected) {
+      total += options.assaisonnement_ozone.prix;
+    }
+
+    return total;
+  };
+
+  // Fonction pour gérer les changements d'options
+  const handleOptionQuantityChange = (optionName, quantity) => {
+    setNewReservationData(prev => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        [optionName]: {
+          ...prev.options[optionName],
+          quantity: Math.max(0, parseInt(quantity) || 0)
+        }
+      }
+    }));
+  };
+
+  // Fonction pour gérer les options on/off
+  const handleOptionToggle = (optionName) => {
+    setNewReservationData(prev => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        [optionName]: {
+          ...prev.options[optionName],
+          selected: !prev.options[optionName].selected
+        }
+      }
     }));
   };
 
@@ -383,6 +535,110 @@ const Calendar = () => {
     if (!selectedTimeSlot) return null;
     const [dateStr, timeStr] = selectedTimeSlot.split('-');
     return realReservations.find(res => res.date === dateStr && res.time === timeStr);
+  };
+
+  // Fonction pour afficher les options de manière formatée
+  const renderOptions = (options) => {
+    if (!options || typeof options !== 'object') return null;
+
+    const optionsToShow = [];
+
+    // Options avec quantité et réduction x4
+    if (options.baume_sieges?.quantity > 0) {
+      const qty = options.baume_sieges.quantity;
+      const price = qty >= 4 ? options.baume_sieges.prix_x4 : qty * options.baume_sieges.prix_unitaire;
+      optionsToShow.push({
+        name: `Baume sièges (x${qty})`,
+        price: `${price}€`,
+        hasReduction: qty >= 4
+      });
+    }
+
+    if (options.pressing_sieges?.quantity > 0) {
+      const qty = options.pressing_sieges.quantity;
+      const price = qty >= 4 ? options.pressing_sieges.prix_x4 : qty * options.pressing_sieges.prix_unitaire;
+      optionsToShow.push({
+        name: `Pressing sièges (x${qty})`,
+        price: `${price}€`,
+        hasReduction: qty >= 4
+      });
+    }
+
+    if (options.pressing_tapis?.quantity > 0) {
+      const qty = options.pressing_tapis.quantity;
+      const price = qty >= 4 ? options.pressing_tapis.prix_x4 : qty * options.pressing_tapis.prix_unitaire;
+      optionsToShow.push({
+        name: `Pressing tapis (x${qty})`,
+        price: `${price}€`,
+        hasReduction: qty >= 4
+      });
+    }
+
+    if (options.pressing_panneau_porte?.quantity > 0) {
+      const qty = options.pressing_panneau_porte.quantity;
+      const price = qty >= 4 ? options.pressing_panneau_porte.prix_x4 : qty * options.pressing_panneau_porte.prix_unitaire;
+      optionsToShow.push({
+        name: `Pressing panneaux (x${qty})`,
+        price: `${price}€`,
+        hasReduction: qty >= 4
+      });
+    }
+
+    if (options.renov_phare?.quantity > 0) {
+      const qty = options.renov_phare.quantity;
+      const price = qty >= 4 ? options.renov_phare.prix_x4 : qty * options.renov_phare.prix_unitaire;
+      optionsToShow.push({
+        name: `Renov phare (x${qty})`,
+        price: `${price}€`,
+        hasReduction: qty >= 4
+      });
+    }
+
+    if (options.pressing_coffre_plafonnier?.quantity > 0) {
+      const qty = options.pressing_coffre_plafonnier.quantity;
+      const price = qty * options.pressing_coffre_plafonnier.prix_unitaire;
+      optionsToShow.push({
+        name: `Pressing coffre/plafonnier (x${qty})`,
+        price: `${price}€`,
+        hasReduction: false
+      });
+    }
+
+    // Options à prix fixe
+    if (options.assaisonnement_ozone?.selected) {
+      optionsToShow.push({
+        name: 'Assaisonnement ozone',
+        price: `${options.assaisonnement_ozone.prix}€`,
+        hasReduction: false
+      });
+    }
+
+    // Options sur devis
+    if (options.renov_chrome?.selected) {
+      optionsToShow.push({
+        name: 'Renov chrome',
+        price: 'Sur devis',
+        hasReduction: false
+      });
+    }
+
+    if (options.polissage?.selected) {
+      optionsToShow.push({
+        name: 'Polissage',
+        price: 'Sur devis',
+        hasReduction: false
+      });
+    }
+
+    if (options.lustrage?.selected) {
+      optionsToShow.push({
+        name: 'Lustrage',
+        price: 'Sur devis',
+        hasReduction: false
+      });
+    }
+
+    return optionsToShow;
   };
 
 
@@ -725,6 +981,49 @@ const Calendar = () => {
                               <div className="font-bold truncate text-gray-800 mb-1">{reservation.client}</div>
                               <div className="text-gray-600 truncate text-xs mb-2">{reservation.service}</div>
                               <div className="text-sm text-gray-600 truncate mb-2">{reservation.vehicle}</div>
+                              
+                              {/* Affichage des options si elles existent */}
+                              {reservation.options && Object.keys(reservation.options).some(key => {
+                                const option = reservation.options[key];
+                                return (option.quantity > 0) || (option.selected === true);
+                              }) && (
+                                <div className="mb-2">
+                                  <div className="text-xs text-blue-600 font-medium mb-1">📦 Options:</div>
+                                  <div className="space-y-1">
+                                    {reservation.options.baume_sieges?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">💺 Baume sièges x{reservation.options.baume_sieges.quantity}</div>
+                                    )}
+                                    {reservation.options.pressing_sieges?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">🪑 Pressing sièges x{reservation.options.pressing_sieges.quantity}</div>
+                                    )}
+                                    {reservation.options.pressing_tapis?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">🎯 Pressing tapis x{reservation.options.pressing_tapis.quantity}</div>
+                                    )}
+                                    {reservation.options.pressing_panneau_porte?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">🚪 Pressing porte x{reservation.options.pressing_panneau_porte.quantity}</div>
+                                    )}
+                                    {reservation.options.renov_phare?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">💡 Renov phare x{reservation.options.renov_phare.quantity}</div>
+                                    )}
+                                    {reservation.options.pressing_coffre_plafonnier?.quantity > 0 && (
+                                      <div className="text-xs text-gray-600">📦 Pressing coffre x{reservation.options.pressing_coffre_plafonnier.quantity}</div>
+                                    )}
+                                    {reservation.options.assaisonnement_ozone?.selected && (
+                                      <div className="text-xs text-blue-600">🌬️ Ozone</div>
+                                    )}
+                                    {reservation.options.renov_chrome?.selected && (
+                                      <div className="text-xs text-orange-600">✨ Renov chrome</div>
+                                    )}
+                                    {reservation.options.polissage?.selected && (
+                                      <div className="text-xs text-orange-600">💎 Polissage</div>
+                                    )}
+                                    {reservation.options.lustrage?.selected && (
+                                      <div className="text-xs text-orange-600">🔆 Lustrage</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              
                               <div className="flex justify-center">
                                 <span className={`px-2 py-1 rounded-full text-xs font-bold ${getStatusColor(reservation.status)}`}>
                                   {reservation.status === 'confirmed' ? '✓ Confirmé' : 
@@ -882,6 +1181,30 @@ const Calendar = () => {
                                 <div className="font-bold text-gray-800 text-sm">{reservation.client}</div>
                                 <div className="text-xs text-gray-600 truncate">{reservation.service}</div>
                                 <div className="text-xs text-gray-500 truncate">{reservation.vehicle}</div>
+                                
+                                {/* Affichage compact des options pour mobile */}
+                                {reservation.options && Object.keys(reservation.options).some(key => {
+                                  const option = reservation.options[key];
+                                  return (option.quantity > 0) || (option.selected === true);
+                                }) && (
+                                  <div className="mt-1">
+                                    <div className="text-xs text-blue-600 font-medium">
+                                      📦 Options: {[
+                                        reservation.options.baume_sieges?.quantity > 0 && `💺x${reservation.options.baume_sieges.quantity}`,
+                                        reservation.options.pressing_sieges?.quantity > 0 && `🪑x${reservation.options.pressing_sieges.quantity}`,
+                                        reservation.options.pressing_tapis?.quantity > 0 && `🎯x${reservation.options.pressing_tapis.quantity}`,
+                                        reservation.options.pressing_panneau_porte?.quantity > 0 && `🚪x${reservation.options.pressing_panneau_porte.quantity}`,
+                                        reservation.options.renov_phare?.quantity > 0 && `💡x${reservation.options.renov_phare.quantity}`,
+                                        reservation.options.pressing_coffre_plafonnier?.quantity > 0 && `📦x${reservation.options.pressing_coffre_plafonnier.quantity}`,
+                                        reservation.options.assaisonnement_ozone?.selected && '🌬️',
+                                        reservation.options.renov_chrome?.selected && '✨',
+                                        reservation.options.polissage?.selected && '💎',
+                                        reservation.options.lustrage?.selected && '🔆'
+                                      ].filter(Boolean).join(', ')}
+                                    </div>
+                                  </div>
+                                )}
+                                
                                 {reservation.phone && (
                                   <div className="text-xs text-[#FFA600] mt-1">
                                     <i className="bx bx-phone mr-1"></i>
@@ -965,7 +1288,7 @@ const Calendar = () => {
                   {/* Bouton principal - Nouveau RDV */}
                   <motion.button 
                     onClick={() => openNewReservationModal()}
-                    className="w-full p-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 flex items-center gap-3 justify-center shadow-lg font-medium"
+                    className="w-full p-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:from-[#CC0000] hover:to-[#FF6600] transition-all duration-200 flex items-center gap-3 justify-center shadow-lg font-medium"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -1175,7 +1498,7 @@ const Calendar = () => {
 
                   <motion.button 
                     onClick={() => openNewReservationModal()}
-                    className="w-full p-4 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 flex items-center gap-3 justify-center shadow-lg hover:shadow-xl font-medium"
+                    className="w-full p-4 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:from-[#CC0000] hover:to-[#FF6600] transition-all duration-200 flex items-center gap-3 justify-center shadow-lg hover:shadow-xl font-medium"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -1353,8 +1676,35 @@ const Calendar = () => {
                             <td className="px-6 py-4">
                               <div className="flex flex-col">
                                 <span className="font-medium text-gray-900">{reservation.service}</span>
+                                
+                                {/* Affichage des options supplémentaires */}
+                                {renderOptions(reservation.options)?.length > 0 && (
+                                  <div className="mt-2 space-y-1">
+                                    <div className="text-xs font-medium text-blue-600 flex items-center">
+                                      <i className="bx bx-wrench mr-1"></i>
+                                      Options:
+                                    </div>
+                                    {renderOptions(reservation.options).map((option, idx) => (
+                                      <div key={idx} className="flex items-center justify-between text-xs bg-blue-50 rounded px-2 py-1 max-w-[250px]">
+                                        <div className="flex items-center">
+                                          <i className="bx bx-check-circle text-blue-600 mr-1"></i>
+                                          <span className="text-gray-700">{option.name}</span>
+                                          {option.hasReduction && (
+                                            <span className="ml-1 bg-green-100 text-green-700 px-1 rounded text-[10px]">
+                                              -x4
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className={`font-medium ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
+                                          {option.price}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
                                 {reservation.commentaires && (
-                                  <div className="mt-1 text-xs text-gray-500 bg-blue-50 rounded px-2 py-1 max-w-[200px]">
+                                  <div className="mt-1 text-xs text-gray-500 bg-gray-50 rounded px-2 py-1 max-w-[200px]">
                                     <i className="bx bx-comment mr-1"></i>
                                     <span className="truncate" title={reservation.commentaires}>
                                       {reservation.commentaires}
@@ -1534,10 +1884,40 @@ const Calendar = () => {
                         </div>
                       </div>
 
-                      {reservation.commentaires && (
+                      {/* Affichage des options supplémentaires pour mobile */}
+                      {renderOptions(reservation.options)?.length > 0 && (
                         <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                          <div className="flex items-start text-sm text-blue-800">
-                            <i className="bx bx-comment mr-2 text-blue-600 mt-0.5"></i>
+                          <div className="mb-2">
+                            <div className="text-sm font-medium text-blue-800 flex items-center">
+                              <i className="bx bx-wrench mr-2 text-blue-600"></i>
+                              Options supplémentaires
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 gap-2">
+                            {renderOptions(reservation.options).map((option, idx) => (
+                              <div key={idx} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-blue-100">
+                                <div className="flex items-center">
+                                  <i className="bx bx-check-circle text-green-600 mr-2"></i>
+                                  <span className="text-sm text-gray-700">{option.name}</span>
+                                  {option.hasReduction && (
+                                    <span className="ml-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                                      Réduction x4 !
+                                    </span>
+                                  )}
+                                </div>
+                                <span className={`font-medium text-sm ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
+                                  {option.price}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {reservation.commentaires && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="flex items-start text-sm text-gray-800">
+                            <i className="bx bx-comment mr-2 text-gray-600 mt-0.5"></i>
                             <span>{reservation.commentaires}</span>
                           </div>
                         </div>
@@ -1987,6 +2367,334 @@ const Calendar = () => {
                       />
                     </div>
                   </div>
+
+                  {/* Section Options Supplémentaires */}
+                  <div className="md:col-span-2 space-y-4">
+                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                      <i className="bx bx-plus-circle text-[#FF0000]"></i>
+                      Options Supplémentaires
+                    </h3>
+
+                    {/* Options avec quantité et réduction x4 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                                                     <i className="bx bx-car-mechanic text-[#FF0000]"></i>
+                          Services avec quantité
+                        </h4>
+
+                        {/* Baume sièges */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-gray-700">Baume sièges</label>
+                            <div className="text-sm text-gray-600">
+                              x1: 20€ | x4: 60€
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('baume_sieges', newReservationData.options.baume_sieges.quantity - 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-minus"></i>
+                            </button>
+                                                         <input
+                               type="number"
+                               value={newReservationData.options.baume_sieges.quantity}
+                               onChange={(e) => handleOptionQuantityChange('baume_sieges', e.target.value)}
+                               min="0"
+                               className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('baume_sieges', newReservationData.options.baume_sieges.quantity + 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-plus"></i>
+                            </button>
+                                                         <div className="ml-auto font-bold text-[#FF0000]">
+                               {calculateOptionPrice(newReservationData.options.baume_sieges)}€
+                             </div>
+                          </div>
+                        </div>
+
+                        {/* Pressing des sièges */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-gray-700">Pressing des sièges</label>
+                            <div className="text-sm text-gray-600">
+                              x1: 30€ | x4: 75€
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('pressing_sieges', newReservationData.options.pressing_sieges.quantity - 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-minus"></i>
+                            </button>
+                                                         <input
+                               type="number"
+                               value={newReservationData.options.pressing_sieges.quantity}
+                               onChange={(e) => handleOptionQuantityChange('pressing_sieges', e.target.value)}
+                               min="0"
+                               className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('pressing_sieges', newReservationData.options.pressing_sieges.quantity + 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-plus"></i>
+                            </button>
+                                                         <div className="ml-auto font-bold text-[#FF0000]">
+                               {calculateOptionPrice(newReservationData.options.pressing_sieges)}€
+                             </div>
+                          </div>
+                        </div>
+
+                        {/* Pressing des tapis */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-gray-700">Pressing des tapis</label>
+                            <div className="text-sm text-gray-600">
+                              x1: 30€ | x4: 75€
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('pressing_tapis', newReservationData.options.pressing_tapis.quantity - 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-minus"></i>
+                            </button>
+                                                         <input
+                               type="number"
+                               value={newReservationData.options.pressing_tapis.quantity}
+                               onChange={(e) => handleOptionQuantityChange('pressing_tapis', e.target.value)}
+                               min="0"
+                               className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('pressing_tapis', newReservationData.options.pressing_tapis.quantity + 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-plus"></i>
+                            </button>
+                                                         <div className="ml-auto font-bold text-[#FF0000]">
+                               {calculateOptionPrice(newReservationData.options.pressing_tapis)}€
+                             </div>
+                           </div>
+                         </div>
+ 
+                         {/* Pressing panneau de porte */}
+                         <div className="bg-gray-50 rounded-xl p-4">
+                           <div className="flex items-center justify-between mb-3">
+                             <label className="font-medium text-gray-700">Pressing panneau de porte</label>
+                             <div className="text-sm text-gray-600">
+                               x1: 30€ | x4: 75€
+                             </div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                             <button
+                               type="button"
+                               onClick={() => handleOptionQuantityChange('pressing_panneau_porte', newReservationData.options.pressing_panneau_porte.quantity - 1)}
+                               className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                             >
+                               <i className="bx bx-minus"></i>
+                             </button>
+                             <input
+                               type="number"
+                               value={newReservationData.options.pressing_panneau_porte.quantity}
+                               onChange={(e) => handleOptionQuantityChange('pressing_panneau_porte', e.target.value)}
+                               min="0"
+                               className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => handleOptionQuantityChange('pressing_panneau_porte', newReservationData.options.pressing_panneau_porte.quantity + 1)}
+                               className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                             >
+                               <i className="bx bx-plus"></i>
+                             </button>
+                             <div className="ml-auto font-bold text-[#FF0000]">
+                               {calculateOptionPrice(newReservationData.options.pressing_panneau_porte)}€
+                             </div>
+                          </div>
+                        </div>
+
+                        {/* Renov phare */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-gray-700">Renov phare</label>
+                            <div className="text-sm text-gray-600">
+                              x1: 30€ | x4: 100€
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('renov_phare', newReservationData.options.renov_phare.quantity - 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-minus"></i>
+                            </button>
+                            <input
+                              type="number"
+                              value={newReservationData.options.renov_phare.quantity}
+                              onChange={(e) => handleOptionQuantityChange('renov_phare', e.target.value)}
+                              min="0"
+                                                             className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => handleOptionQuantityChange('renov_phare', newReservationData.options.renov_phare.quantity + 1)}
+                               className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                             >
+                               <i className="bx bx-plus"></i>
+                             </button>
+                             <div className="ml-auto font-bold text-[#FF0000]">
+                               {calculateOptionPrice(newReservationData.options.renov_phare)}€
+                             </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                                                     <i className="bx bx-wrench text-[#FF0000]"></i>
+                          Services spéciaux
+                        </h4>
+
+                        {/* Pressing coffre ou plafonnier */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-gray-700">Pressing coffre/plafonnier</label>
+                            <div className="text-sm text-gray-600">
+                              30€/unité
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleOptionQuantityChange('pressing_coffre_plafonnier', newReservationData.options.pressing_coffre_plafonnier.quantity - 1)}
+                              className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                            >
+                              <i className="bx bx-minus"></i>
+                            </button>
+                            <input
+                              type="number"
+                              value={newReservationData.options.pressing_coffre_plafonnier.quantity}
+                              onChange={(e) => handleOptionQuantityChange('pressing_coffre_plafonnier', e.target.value)}
+                              min="0"
+                                                             className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:border-[#FF0000] focus:outline-none"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => handleOptionQuantityChange('pressing_coffre_plafonnier', newReservationData.options.pressing_coffre_plafonnier.quantity + 1)}
+                               className="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                             >
+                               <i className="bx bx-plus"></i>
+                             </button>
+                             <div className="ml-auto font-bold text-[#FF0000]">
+                               {newReservationData.options.pressing_coffre_plafonnier.quantity * newReservationData.options.pressing_coffre_plafonnier.prix_unitaire}€
+                             </div>
+                          </div>
+                        </div>
+
+                        {/* Assaisonnement à l'ozone */}
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700">Assaisonnement à l'ozone</label>
+                              <div className="text-sm text-gray-600">20-25min - 30€</div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                checked={newReservationData.options.assaisonnement_ozone.selected}
+                                onChange={() => handleOptionToggle('assaisonnement_ozone')}
+                                                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                               />
+                               <div className="font-bold text-[#FF0000]">
+                                 {newReservationData.options.assaisonnement_ozone.selected ? '30€' : '0€'}
+                               </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Services sur devis */}
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-gray-600">Services sur devis</h5>
+
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center justify-between">
+                              <label className="font-medium text-gray-700">Renov chrome</label>
+                              <input
+                                type="checkbox"
+                                checked={newReservationData.options.renov_chrome.selected}
+                                onChange={() => handleOptionToggle('renov_chrome')}
+                                                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                               />
+                             </div>
+                           </div>
+ 
+                           <div className="bg-gray-50 rounded-xl p-4">
+                             <div className="flex items-center justify-between">
+                               <label className="font-medium text-gray-700">Polissage</label>
+                               <input
+                                 type="checkbox"
+                                 checked={newReservationData.options.polissage.selected}
+                                 onChange={() => handleOptionToggle('polissage')}
+                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                               />
+                             </div>
+                           </div>
+ 
+                           <div className="bg-gray-50 rounded-xl p-4">
+                             <div className="flex items-center justify-between">
+                               <label className="font-medium text-gray-700">Lustrage</label>
+                               <input
+                                 type="checkbox"
+                                 checked={newReservationData.options.lustrage.selected}
+                                 onChange={() => handleOptionToggle('lustrage')}
+                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                                         {/* Récapitulatif des prix */}
+                     <div className="bg-gradient-to-r from-[#FF0000]/10 to-[#FF4500]/5 rounded-xl p-6 border border-[#FF0000]/20">
+                       <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                         <i className="bx bx-calculator text-[#FF0000]"></i>
+                         Récapitulatif des prix
+                       </h4>
+                       <div className="space-y-2">
+                         <div className="flex justify-between">
+                           <span className="text-gray-600">Prix de base :</span>
+                           <span className="font-medium">{newReservationData.prix || 0}€</span>
+                         </div>
+                         <div className="flex justify-between">
+                           <span className="text-gray-600">Options :</span>
+                           <span className="font-medium">{calculateTotalOptionsPrice()}€</span>
+                         </div>
+                         <hr className="border-gray-300" />
+                         <div className="flex justify-between text-lg font-bold">
+                           <span className="text-gray-800">Total :</span>
+                           <span className="text-[#FF0000]">
+                             {(parseFloat(newReservationData.prix) || 0) + calculateTotalOptionsPrice()}€
+                           </span>
+                         </div>
+                       </div>
+                     </div>
+                  </div>
                 </div>
 
                 {/* Boutons d'action */}
@@ -2015,7 +2723,7 @@ const Calendar = () => {
                   <button
                     type="submit"
                     disabled={submittingReservation}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:from-[#CC0000] hover:to-[#FF6600] transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
                   >
                     {submittingReservation ? (
                       <>

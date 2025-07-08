@@ -23,9 +23,9 @@ function Header() {
             <li key={item.to}>
               <Link 
                 to={item.to} 
-                className="hover:text-[#FFA600] transition-colors flex items-center gap-2"
+                className="hover:text-[#FF0000] transition-colors flex items-center gap-2"
               >
-                <i className={`bx ${item.icon} text-[#FFA600] text-lg`}></i>
+                <i className={`bx ${item.icon} text-[#FF0000] text-lg`}></i>
                 {item.text}
               </Link>
             </li>
@@ -45,7 +45,7 @@ function Header() {
             }}
           >
             {isMenuOpen ? (
-              <i className='bx bx-x text-2xl text-[#FFA600]'></i>
+              <i className='bx bx-x text-2xl text-[#FF0000]'></i>
             ) : (
               <i className='bx bx-menu text-2xl'></i>
             )}
@@ -78,10 +78,10 @@ function Header() {
                   >
                     <Link 
                       to={item.to} 
-                      className="flex items-center gap-3 text-base font-medium hover:text-[#FFA600] transition-colors"
+                      className="flex items-center gap-3 text-base font-medium hover:text-[#FF0000] transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <i className={`bx ${item.icon} text-[#FFA600] text-xl`}></i>
+                      <i className={`bx ${item.icon} text-[#FF0000] text-xl`}></i>
                       {item.text}
                     </Link>
                   </motion.li>

@@ -44,7 +44,7 @@ function Garage() {
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
                       Notre Garage
                     </h1>
-                    <div className="w-20 h-1 bg-[#FFA600] mb-6"></div>
+                    <div className="w-20 h-1 bg-[#FF0000] mb-6"></div>
                     <p className="text-xl text-gray-600 mb-8">
                       Votre partenaire automobile de confiance
                     </p>
@@ -52,8 +52,8 @@ function Garage() {
                     {/* Infos pratiques */}
                     <div className="space-y-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-                          <i className='bx bx-time text-[#FFA600] text-2xl'></i>
+                        <div className="w-12 h-12 rounded-full bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+                          <i className='bx bx-time text-[#FF0000] text-2xl'></i>
                         </div>
                         <div>
                           <p className="text-gray-900 font-medium">Horaires d'ouverture</p>
@@ -61,8 +61,8 @@ function Garage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-                          <i className='bx bx-phone text-[#FFA600] text-2xl'></i>
+                        <div className="w-12 h-12 rounded-full bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+                          <i className='bx bx-phone text-[#FF0000] text-2xl'></i>
                         </div>
                         <div>
                           <p className="text-gray-900 font-medium">Téléphone</p>
@@ -71,8 +71,8 @@ function Garage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-                          <i className='bx bx-map text-[#FFA600] text-2xl'></i>
+                        <div className="w-12 h-12 rounded-full bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+                          <i className='bx bx-map text-[#FF0000] text-2xl'></i>
                         </div>
                         <div>
                           <p className="text-gray-900 font-medium">Adresse</p>
@@ -86,11 +86,16 @@ function Garage() {
 
               {/* Badges flottants */}
               <div className="flex justify-center gap-4 -mt-6">
-                <div className="bg-black text-white z-10 px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                  <i className='bx bx-phone mr-2'></i>
+                <a 
+                  href="https://wa.me/33625138033?text=Bonjour,%20je%20souhaite%20vous%20contacter%20concernant%20vos%20services%20automobiles"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-black text-white z-10 px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 cursor-pointer"
+                >
+                  <i className='bx bxl-whatsapp mr-2'></i>
                   Contactez-nous
-                </div>
-                <div className="bg-[#FFA600] text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                </a>
+                <div className="bg-[#FF0000] text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
                   <i className='bx bx-car mr-2'></i>
                   Services Auto
                 </div>
@@ -106,7 +111,7 @@ function Garage() {
         <h2 className="text-3xl font-bold text-center mb-12">Nos Services</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300">
-            <div className="w-16 h-16 bg-[#FFA600] rounded-full flex items-center justify-center mb-6 mx-auto">
+            <div className="w-16 h-16 bg-[#FF0000] rounded-full flex items-center justify-center mb-6 mx-auto">
               <i className='bx bx-car text-white text-3xl'></i>
             </div>
             <h3 className="text-xl font-bold text-center mb-4">Lavage</h3>
@@ -114,7 +119,7 @@ function Garage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300">
-            <div className="w-16 h-16 bg-[#FFA600] rounded-full flex items-center justify-center mb-6 mx-auto">
+            <div className="w-16 h-16 bg-[#FF0000] rounded-full flex items-center justify-center mb-6 mx-auto">
               <i className='bx bx-paint text-white text-3xl'></i>
             </div>
             <h3 className="text-xl font-bold text-center mb-4">Carrosserie</h3>
@@ -122,7 +127,7 @@ function Garage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300">
-            <div className="w-16 h-16 bg-[#FFA600] rounded-full flex items-center justify-center mb-6 mx-auto">
+            <div className="w-16 h-16 bg-[#FF0000] rounded-full flex items-center justify-center mb-6 mx-auto">
               <i className='bx bx-transfer text-white text-3xl'></i>
             </div>
             <h3 className="text-xl font-bold text-center mb-4">Achat & Vente</h3>
@@ -130,7 +135,7 @@ function Garage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-2 transition-transform duration-300">
-            <div className="w-16 h-16 bg-[#FFA600] rounded-full flex items-center justify-center mb-6 mx-auto">
+            <div className="w-16 h-16 bg-[#FF0000] rounded-full flex items-center justify-center mb-6 mx-auto">
               <i className='bx bx-key text-white text-3xl'></i>
             </div>
             <h3 className="text-xl font-bold text-center mb-4">Location</h3>
@@ -140,14 +145,14 @@ function Garage() {
       </div>
 
       {/* Galerie Photos - Bento Grid */}
-      <div className="bg-gradient-to-br from-[#FFA600] to-orange-600 py-16">
+      <div className="bg-gradient-to-br from-[#FF0000] to-orange-600 py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12 text-white">Notre Atelier</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {/* Grande carte de présentation */}
             <div className="lg:col-span-2 bg-white/95 backdrop-blur-sm rounded-3xl shadow-lg p-8 transform hover:-translate-y-1 transition-all duration-300">
-              <h3 className="text-2xl font-bold text-[#FFA600] mb-4">
+              <h3 className="text-2xl font-bold text-[#FF0000] mb-4">
                 L'expertise et la passion au service de tous vos besoins automobiles !
               </h3>
               <p className="text-gray-600 leading-relaxed text-lg">

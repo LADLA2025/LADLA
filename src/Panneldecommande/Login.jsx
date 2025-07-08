@@ -2,19 +2,57 @@ import React, { useState } from 'react';
 import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { detectMaliciousInput, sanitizeString } from '../utils/security';
+import SecurityAlert from '../components/SecurityAlert';
 
 function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [securityWarnings, setSecurityWarnings] = useState([]);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Gestion sécurisée du mot de passe
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    
+    // Détecter les tentatives d'attaque
+    if (detectMaliciousInput(value)) {
+      setSecurityWarnings([{
+        field: 'password',
+        message: 'Contenu suspect détecté dans le mot de passe',
+        timestamp: Date.now()
+      }]);
+      console.warn('[SÉCURITÉ] Tentative d\'attaque détectée dans le champ mot de passe:', value);
+      return;
+    }
+
+    // Supprimer les avertissements si la nouvelle valeur est sûre
+    setSecurityWarnings([]);
+    setPassword(value);
+  };
+
+  // Fonction pour fermer les alertes de sécurité
+  const dismissSecurityWarning = (field) => {
+    setSecurityWarnings(prev => prev.filter(w => w.field !== field));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+
+    // Vérification de sécurité avant soumission
+    if (securityWarnings.length > 0) {
+      setError('Veuillez corriger les problèmes de sécurité avant de continuer.');
+      setIsLoading(false);
+      return;
+    }
+
+    // Sanitiser le mot de passe avant envoi
+    const sanitizedPassword = sanitizeString(password);
 
     try {
       console.log('Tentative de connexion...');
@@ -24,7 +62,7 @@ function Login() {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password: sanitizedPassword }),
       });
 
       console.log('Statut de la réponse:', response.status);
@@ -74,6 +112,13 @@ function Login() {
               <p className="text-gray-400">Accédez à votre espace administrateur</p>
             </div>
 
+            {/* Alertes de sécurité */}
+            <SecurityAlert 
+              warnings={securityWarnings} 
+              onDismiss={dismissSecurityWarning}
+              className="mb-4"
+            />
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -82,7 +127,7 @@ function Login() {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   className="w-full pl-10 pr-10 py-3 bg-white/5 border border-gray-600 rounded-xl text-white focus:border-[#FFA600] focus:ring-1 focus:ring-[#FFA600] transition-colors"
                   placeholder="Entrez votre mot de passe"
                   disabled={isLoading}

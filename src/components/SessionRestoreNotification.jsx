@@ -62,7 +62,7 @@ const SessionRestoreNotification = () => {
           className="fixed top-4 right-4 z-50 max-w-sm"
         >
           <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#FFA600] to-orange-500 px-4 py-2">
+            <div className="bg-gradient-to-r from-[#FF0000] to-#CC0000 px-4 py-2">
               <div className="flex items-center gap-2">
                 <i className="bx bx-check-circle text-white text-lg"></i>
                 <h3 className="text-white font-medium">Session restaurée</h3>

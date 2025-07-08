@@ -63,20 +63,20 @@ function VoituresRoot() {
                   alt={category.title}
                   className="w-full h-48 object-cover"
                 />
-                <div className="absolute top-0 right-0 bg-[#FFA600] text-white px-4 py-2 rounded-bl-2xl">
+                <div className="absolute top-0 right-0 bg-[#FF0000] text-white px-4 py-2 rounded-bl-2xl">
                   À partir de {category.startingPrice}
                 </div>
               </div>
               
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                  <i className='bx bx-car text-[#FFA600]'></i>
+                  <i className='bx bx-car text-[#FF0000]'></i>
                   {category.title}
                 </h3>
                 <p className="text-gray-600 mb-4">{category.description}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#FFA600] font-semibold">Voir les détails</span>
-                  <i className='bx bx-right-arrow-alt text-[#FFA600] text-2xl'></i>
+                  <span className="text-[#FF0000] font-semibold">Voir les détails</span>
+                  <i className='bx bx-right-arrow-alt text-[#FF0000] text-2xl'></i>
                 </div>
               </div>
             </Link>
@@ -86,7 +86,7 @@ function VoituresRoot() {
         <div className="mt-12 text-center">
           <div className="bg-gray-100 rounded-2xl p-8 max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold mb-4 flex items-center justify-center gap-2">
-              <i className='bx bx-info-circle text-[#FFA600]'></i>
+              <i className='bx bx-info-circle text-[#FF0000]'></i>
               Information Importante
             </h2>
             <p className="text-gray-600">

@@ -36,7 +36,7 @@ function MentionsLegales() {
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-r from-[#FFA600] to-orange-500 rounded-xl">
+            <div className="p-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] rounded-xl">
               <i className="bx bx-file-blank text-white text-3xl"></i>
             </div>
           </div>
@@ -55,8 +55,8 @@ function MentionsLegales() {
             {/* Éditeur du site */}
             <section className="mb-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                  <i className="bx bx-building text-[#FFA600] text-xl"></i>
+                <div className="p-2 bg-[#FF0000]/20 rounded-lg">
+                  <i className="bx bx-building text-[#FF0000] text-xl"></i>
                 </div>
                 Éditeur du site
               </h2>
@@ -107,7 +107,7 @@ function MentionsLegales() {
                     href="https://rebu1ld.com/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-[#FFA600] hover:text-[#FF9500] font-semibold underline"
+                    className="text-[#FF0000] hover:text-[#CC0000] font-semibold underline"
                   >
                     @rebu1ld.com
                   </a>
@@ -128,7 +128,7 @@ function MentionsLegales() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white rounded-xl p-4 border border-gray-200">
                     <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <i className="bx bx-building text-[#FFA600]"></i>
+                      <i className="bx bx-building text-[#FF0000]"></i>
                       Propriété LADL - Les AS de L'Auto
                     </h4>
                     <ul className="text-sm space-y-1">
@@ -173,7 +173,7 @@ function MentionsLegales() {
                         href="https://rebu1ld.com/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-[#FFA600] hover:text-[#FF9500] font-semibold underline"
+                        className="text-[#FF0000] hover:text-[#CC0000] font-semibold underline"
                       >
                         @rebu1ld.com
                       </a>
@@ -271,7 +271,7 @@ function MentionsLegales() {
             <section className="mb-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                 <div className="p-2 bg-orange-100 rounded-lg">
-                  <i className="bx bx-gavel text-orange-600 text-xl"></i>
+                  <i className="bx bx-gavel text-#990000 text-xl"></i>
                 </div>
                 Droit applicable et juridiction
               </h2>
@@ -289,12 +289,12 @@ function MentionsLegales() {
             {/* Contact */}
             <section className="mb-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                  <i className="bx bx-phone text-[#FFA600] text-xl"></i>
+                <div className="p-2 bg-[#FF0000]/20 rounded-lg">
+                  <i className="bx bx-phone text-[#FF0000] text-xl"></i>
                 </div>
                 Nous contacter
               </h2>
-              <div className="bg-gradient-to-r from-[#FFA600]/10 to-orange-500/5 rounded-2xl p-6 space-y-3">
+              <div className="bg-gradient-to-r from-[#FF0000]/10 to-#CC0000/5 rounded-2xl p-6 space-y-3">
                 <p><strong>Email :</strong> lesasdelauto06@gmail.com</p>
                 <p><strong>Téléphone :</strong> 06.50.30.44.17 / 06.25.13.80.33</p>
                 <p><strong>Adresse :</strong> LE SANSEVERIA 102 AVENUE SAINT-LAMBERT, 06000 NICE</p>
@@ -320,7 +320,7 @@ function MentionsLegales() {
         <motion.div variants={itemVariants} className="text-center mt-12">
           <button 
             onClick={() => window.history.back()}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white font-semibold rounded-2xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 shadow-lg"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#FF0000] to-#CC0000 text-white font-semibold rounded-2xl hover:from-[#CC0000] hover:to-#990000 transition-all duration-200 shadow-lg"
           >
             <i className="bx bx-arrow-back"></i>
             Retour

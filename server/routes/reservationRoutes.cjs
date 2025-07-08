@@ -9,8 +9,14 @@ router.post('/', async (req, res) => {
     const {
       prenom, nom, email, telephone, adresse,
       typeVoiture, marqueVoiture, formule, prix,
-      date, heure, commentaires, newsletter
+      date, heure, commentaires, newsletter, options
     } = req.body;
+
+    console.log('📝 Données reçues pour la réservation:', {
+      prenom, nom, email, telephone, adresse,
+      typeVoiture, marqueVoiture, formule, prix,
+      date, heure, commentaires, newsletter, options
+    });
 
     // Validation des données requises
     if (!prenom || !nom || !email || !telephone || !adresse || 
@@ -24,20 +30,26 @@ router.post('/', async (req, res) => {
     const result = await ReservationService.createReservation({
       prenom, nom, email, telephone, adresse,
       typeVoiture, marqueVoiture, formule, prix,
-      date, heure, commentaires, newsletter
+      date, heure, commentaires, newsletter, options
     });
 
+    console.log('🔄 Résultat du service:', result);
+
     if (result.success) {
+      console.log('✅ Réservation créée avec succès:', result.data?.id);
       res.status(201).json(result);
     } else {
+      console.error('❌ Échec création réservation:', result.error);
       res.status(500).json(result);
     }
 
   } catch (error) {
-    console.error('Erreur dans la route POST /reservations:', error);
+    console.error('💥 Erreur dans la route POST /reservations:', error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({ 
       success: false,
-      error: 'Erreur serveur lors de la création de la réservation' 
+      error: 'Erreur serveur lors de la création de la réservation',
+      details: error.message
     });
   }
 });

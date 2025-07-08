@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+// Service de réservation - backend uniquement
 
 // Configuration de la base de données (utilise la même config que le serveur principal)
 const pool = new Pool({
@@ -34,6 +35,7 @@ const createReservationsTable = async () => {
         -- Informations supplémentaires
         commentaires TEXT,
         newsletter BOOLEAN DEFAULT false,
+        options JSONB, -- Options supplémentaires sélectionnées
         
         -- Statut de la réservation
         status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'confirmed', 'cancelled', 'completed'
@@ -55,10 +57,12 @@ class ReservationService {
   // Créer une nouvelle réservation
   static async createReservation(reservationData) {
     try {
+      console.log('🔍 ReservationService.createReservation appelé avec:', reservationData);
+      
       const {
         prenom, nom, email, telephone, adresse,
         typeVoiture, marqueVoiture, formule, prix,
-        date, heure, commentaires, newsletter
+        date, heure, commentaires, newsletter, options
       } = reservationData;
 
       // Vérifier les conflits de créneaux avant de créer la réservation
@@ -85,18 +89,22 @@ class ReservationService {
         INSERT INTO reservations (
           prenom, nom, email, telephone, adresse,
           type_voiture, marque_voiture, formule, prix,
-          date_rdv, heure_rdv, commentaires, newsletter, status
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          date_rdv, heure_rdv, commentaires, newsletter, options, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         RETURNING *
       `;
 
       const values = [
         prenom, nom, email, telephone, adresse,
         typeVoiture, marqueVoiture, formule, prix || 0,
-        date, heure, commentaires || '', newsletter || false, 'pending'
+        date, heure, commentaires || '', newsletter || false, 
+        options ? JSON.stringify(options) : null, 'pending'
       ];
 
       const result = await pool.query(query, values);
+      
+      console.log('✅ Réservation créée avec succès, ID:', result.rows[0].id);
+      
       return {
         success: true,
         data: result.rows[0],
@@ -178,8 +186,15 @@ class ReservationService {
       endOfWeek.setDate(startOfWeek.getDate() + 6);
 
       const query = `
-        SELECT * FROM reservations 
+        SELECT 
+          id, prenom, nom, email, telephone, adresse,
+          type_voiture, marque_voiture, formule, prix,
+          date_rdv::text as date_rdv, heure_rdv::text as heure_rdv,
+          commentaires, newsletter, options, status,
+          created_at, updated_at
+        FROM reservations 
         WHERE date_rdv BETWEEN $1 AND $2 
+        AND status != 'cancelled'
         ORDER BY date_rdv, heure_rdv
       `;
       
@@ -188,7 +203,14 @@ class ReservationService {
         endOfWeek.toISOString().split('T')[0]
       ];
 
+      console.log(`📅 Recherche réservations entre ${values[0]} et ${values[1]}`);
+
       const result = await pool.query(query, values);
+      
+      console.log(`📋 ${result.rows.length} réservations trouvées pour la semaine`);
+      if (result.rows.length > 0) {
+        console.log('📋 Détails des réservations:', result.rows.map(r => `${r.prenom} ${r.nom} - ${r.date_rdv} à ${r.heure_rdv}`));
+      }
       
       return {
         success: true,
@@ -215,7 +237,8 @@ class ReservationService {
         SELECT 
           id, prenom, nom, email, telephone,
           type_voiture, marque_voiture, formule, prix,
-          date_rdv, heure_rdv, commentaires, status
+          date_rdv::text as date_rdv, heure_rdv::text as heure_rdv, 
+          commentaires, status, options
         FROM reservations 
         WHERE date_rdv = $1 AND status != 'cancelled'
         ORDER BY heure_rdv ASC
@@ -254,19 +277,34 @@ class ReservationService {
         };
 
         const tableName = tableMapping[typeVoiture] || 'formules_citadine';
-        const formuleQuery = `SELECT duree FROM ${tableName} WHERE nom = $1`;
         
-        const formuleResult = await pool.query(formuleQuery, [formule]);
-        if (formuleResult.rows.length > 0) {
-          const duree = formuleResult.rows[0].duree;
-          if (duree) {
-            const match = duree.match(/(\d+)h?(\d*)/);
-            if (match) {
-              const hours = parseInt(match[1]) || 0;
-              const minutes = parseInt(match[2]) || 0;
-              durationMinutes = hours * 60 + minutes;
+        // Vérifier d'abord si la table existe
+        const tableExistsQuery = `
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = $1
+          );
+        `;
+        const tableExistsResult = await pool.query(tableExistsQuery, [tableName]);
+        
+        if (tableExistsResult.rows[0].exists) {
+          const formuleQuery = `SELECT duree FROM ${tableName} WHERE nom = $1`;
+          const formuleResult = await pool.query(formuleQuery, [formule]);
+          
+          if (formuleResult.rows.length > 0) {
+            const duree = formuleResult.rows[0].duree;
+            if (duree) {
+              const match = duree.match(/(\d+)h?(\d*)/);
+              if (match) {
+                const hours = parseInt(match[1]) || 0;
+                const minutes = parseInt(match[2]) || 0;
+                durationMinutes = hours * 60 + minutes;
+              }
             }
           }
+        } else {
+          console.warn(`Table ${tableName} n'existe pas, utilisation de 60 min par défaut`);
         }
       } catch (error) {
         console.warn('Impossible de récupérer la durée de la formule:', error.message);
@@ -310,17 +348,30 @@ class ReservationService {
           };
 
           const resTableName = resTableMapping[reservation.type_voiture] || 'formules_citadine';
-          const resFormuleQuery = `SELECT duree FROM ${resTableName} WHERE nom = $1`;
           
-          const resFormuleResult = await pool.query(resFormuleQuery, [reservation.formule]);
-          if (resFormuleResult.rows.length > 0) {
-            const duree = resFormuleResult.rows[0].duree;
-            if (duree) {
-              const match = duree.match(/(\d+)h?(\d*)/);
-              if (match) {
-                const hours = parseInt(match[1]) || 0;
-                const minutes = parseInt(match[2]) || 0;
-                resDurationMinutes = hours * 60 + minutes;
+          // Vérifier si la table existe
+          const resTableExistsQuery = `
+            SELECT EXISTS (
+              SELECT FROM information_schema.tables 
+              WHERE table_schema = 'public' 
+              AND table_name = $1
+            );
+          `;
+          const resTableExistsResult = await pool.query(resTableExistsQuery, [resTableName]);
+          
+          if (resTableExistsResult.rows[0].exists) {
+            const resFormuleQuery = `SELECT duree FROM ${resTableName} WHERE nom = $1`;
+            const resFormuleResult = await pool.query(resFormuleQuery, [reservation.formule]);
+            
+            if (resFormuleResult.rows.length > 0) {
+              const duree = resFormuleResult.rows[0].duree;
+              if (duree) {
+                const match = duree.match(/(\d+)h?(\d*)/);
+                if (match) {
+                  const hours = parseInt(match[1]) || 0;
+                  const minutes = parseInt(match[2]) || 0;
+                  resDurationMinutes = hours * 60 + minutes;
+                }
               }
             }
           }

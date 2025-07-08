@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +9,7 @@ import Calendar from './Calendar';
 import Settings from './Settings';
 import Newsletter from './Newsletter';
 import ContactMessages from './ContactMessages';
+import EmailJSConfig from './EmailJSConfig';
 import SessionInfo from '../components/SessionInfo';
 import SessionRestoreNotification from '../components/SessionRestoreNotification';
 import useSessionActivity from '../hooks/useSessionActivity';
@@ -1156,6 +1158,28 @@ const PanelAdmin = () => {
         return <ContactMessages />;
       case 'settings':
         return <Settings />;
+      case 'emailjs':
+        return (
+          <div className="space-y-6">
+            <EmailJSConfig />
+                          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <span className="mr-2">📧</span>
+                  Configuration Email
+                </h3>
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    EmailJS est maintenant intégré directement dans le formulaire de réservation.
+                  </p>
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-800 text-sm">
+                      ✅ Les emails de notification sont envoyés automatiquement lors des réservations vers stevenkuti20@gmail.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -1253,6 +1277,19 @@ const PanelAdmin = () => {
               >
                 <i className='bx bx-message text-xl'></i>
                 Messages
+              </button>
+
+              <button 
+                onClick={() => {
+                  setSelectedSection('emailjs');
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full px-6 py-3 flex items-center gap-3 rounded-lg transition-colors duration-200 ${
+                  selectedSection === 'emailjs' ? 'bg-[#FFA600] text-white' : 'text-gray-600 hover:bg-orange-50'
+                }`}
+              >
+                <i className='bx bx-paper-plane text-xl'></i>
+                Configuration Email
               </button>
 
               <button 

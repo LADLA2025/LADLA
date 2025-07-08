@@ -27,11 +27,11 @@ function AnimatedButton({ children }) {
 
   return (
     <button 
-      className={`group relative w-full overflow-hidden bg-white border-2 border-[#FFA600] ${isAnimating ? 'text-white' : 'text-[#FFA600]'} py-4 rounded-lg font-bold text-lg transition-all duration-500 hover:text-white hover:shadow-lg ${isAnimating ? 'animate-button' : ''}`}
+      className={`group relative w-full overflow-hidden bg-white border-2 border-[#FF0000] ${isAnimating ? 'text-white' : 'text-[#FF0000]'} py-4 rounded-lg font-bold text-lg transition-all duration-500 hover:text-white hover:shadow-lg ${isAnimating ? 'animate-button' : ''}`}
       onMouseEnter={() => !isMobile && setIsAnimating(true)}
       onMouseLeave={() => !isMobile && setIsAnimating(false)}
     >
-      <span className={`absolute inset-0 bg-[#FFA600] transform transition-transform duration-500 ease-out ${isAnimating ? 'translate-x-0' : '-translate-x-full'}`}></span>
+      <span className={`absolute inset-0 bg-gradient-to-r from-[#FF0000] to-[#FF4500] transform transition-transform duration-500 ease-out ${isAnimating ? 'translate-x-0' : '-translate-x-full'}`}></span>
       <span className="relative flex items-center justify-center gap-3">
         <i className={`bx bx-calendar text-xl transition-transform duration-300 ${isAnimating ? 'rotate-12' : ''}`}></i>
         <span className={`transition-all duration-300 ${isAnimating ? 'tracking-wider' : ''}`}>RÉSERVER</span>

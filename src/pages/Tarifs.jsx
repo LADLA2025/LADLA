@@ -70,11 +70,11 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
       className="group relative bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full"
       variants={cardVariants}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       <div className="relative flex flex-col h-full">
         <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-          <div className="w-12 h-12 rounded-2xl bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-            <i className={`bx ${icon} text-3xl text-[#FFA600]`}></i>
+          <div className="w-12 h-12 rounded-2xl bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+            <i className={`bx ${icon} text-3xl text-[#FF0000]`}></i>
           </div>
           <h2 className="text-2xl font-bold text-gray-800 line-clamp-2">{title}</h2>
         </div>
@@ -83,13 +83,13 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
           {items.map((item, index) => (
             <motion.li 
               key={index}
-              className="flex items-start gap-3 group/item hover:bg-[#FFA600]/5 p-2 rounded-lg transition-colors"
+              className="flex items-start gap-3 group/item hover:bg-[#FF0000]/5 p-2 rounded-lg transition-colors"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#FFA600]/10 flex items-center justify-center mt-0.5">
-                <i className="bx bx-check text-[#FFA600]"></i>
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#FF0000]/10 flex items-center justify-center mt-0.5">
+                <i className="bx bx-check text-[#FF0000]"></i>
               </span>
               <span className="text-gray-600 group-hover/item:text-gray-800 transition-colors">{item}</span>
             </motion.li>
@@ -99,16 +99,16 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
           {prices.map((price, index) => (
             <motion.div
               key={index}
-              className="relative group/price bg-gray-50 hover:bg-[#FFA600]/5 rounded-2xl transition-colors h-[100px] flex flex-col items-center justify-center"
+              className="relative group/price bg-gray-50 hover:bg-[#FF0000]/5 rounded-2xl transition-colors h-[100px] flex flex-col items-center justify-center"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <div className="text-center w-full px-3">
                 <div className="mb-2">
-                  <i className="bx bxs-car text-2xl text-[#FFA600] transform group-hover/price:scale-110 transition-transform"></i>
+                  <i className="bx bxs-car text-2xl text-[#FF0000] transform group-hover/price:scale-110 transition-transform"></i>
                 </div>
                 <div className="font-medium text-gray-600 text-sm line-clamp-1 mb-1">{price.type}</div>
-                <div className="text-xl font-bold text-[#FFA600]">{price.price}</div>
+                <div className="text-xl font-bold text-[#FF0000]">{price.price}</div>
               </div>
             </motion.div>
           ))}
@@ -117,7 +117,7 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onMoreInfo}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#FFA600] to-[#FF9500] text-white font-medium hover:from-[#FF9500] hover:to-[#FF8C00] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg mt-auto"
+          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg mt-auto"
         >
           <i className="bx bx-info-circle"></i>
           Plus d'informations
@@ -153,52 +153,52 @@ function Tarifs() {
           <p className="text-gray-600">Notre service de lavage extérieur comprend :</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Processus détaillé</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Processus détaillé</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Pré-rinçage haute pression
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Application du shampoing avec mousse active
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Nettoyage manuel des jantes
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Rinçage haute pression
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Séchage professionnel
                 </li>
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Options supplémentaires</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Options supplémentaires</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
+                  <i className="bx bx-plus text-[#FF0000]"></i>
                   Protection céramique (+30€)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
+                  <i className="bx bx-plus text-[#FF0000]"></i>
                   Traitement anti-pluie (+15€)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
+                  <i className="bx bx-plus text-[#FF0000]"></i>
                   Cire de protection (+20€)
                 </li>
               </ul>
             </div>
           </div>
           <div className="mt-6">
-            <h4 className="font-bold text-[#FFA600] mb-4">Durée estimée</h4>
+            <h4 className="font-bold text-[#FF0000] mb-4">Durée estimée</h4>
             <div className="flex items-center gap-4 text-gray-600">
-              <i className="bx bx-time text-2xl text-[#FFA600]"></i>
+              <i className="bx bx-time text-2xl text-[#FF0000]"></i>
               <span>30-45 minutes selon le type de véhicule</span>
             </div>
           </div>
@@ -212,7 +212,7 @@ function Tarifs() {
       items: [
         "Dépoussiérage complet de l'habitacle",
         "Aspiration en profondeur",
-        "Rénovation des plastiques",
+        "Rénovation des plastiques simples",
         "Nettoyage des tapis/moquettes"
       ],
       prices: [
@@ -226,48 +226,48 @@ function Tarifs() {
           <p className="text-gray-600">Notre service de lavage intérieur comprend :</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Processus détaillé</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Processus détaillé</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Aspiration complète (sièges, tapis, coffre)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Nettoyage des vitres intérieures
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
-                  Traitement des plastiques
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
+                  Rénovation des plastiques
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Désodorisation
                 </li>
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Options supplémentaires</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Options supplémentaires</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
-                  Shampoing des sièges (+25€)
+                  <i className="bx bx-plus text-[#FF0000]"></i>
+                  Shampoing des sièges (+30€)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
+                  <i className="bx bx-plus text-[#FF0000]"></i>
                   Traitement cuir (+30€)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-plus text-[#FFA600]"></i>
+                  <i className="bx bx-plus text-[#FF0000]"></i>
                   Désinfection à l'ozone (+30€)
                 </li>
               </ul>
             </div>
           </div>
           <div className="mt-6">
-            <h4 className="font-bold text-[#FFA600] mb-4">Durée estimée</h4>
+            <h4 className="font-bold text-[#FF0000] mb-4">Durée estimée</h4>
             <div className="flex items-center gap-4 text-gray-600">
-              <i className="bx bx-time text-2xl text-[#FFA600]"></i>
+              <i className="bx bx-time text-2xl text-[#FF0000]"></i>
               <span>45-60 minutes selon le type de véhicule</span>
             </div>
           </div>
@@ -292,7 +292,7 @@ function Tarifs() {
       ],
       modalContent: (
         <div className="space-y-6">
-          <div className="bg-[#FFA600]/5 rounded-xl p-6 text-center">
+          <div className="bg-[#FF0000]/5 rounded-xl p-6 text-center">
             <p className="text-lg text-gray-700">
               Le lavage intégral combine tous les avantages de nos services extérieur et intérieur
               avec une remise attractive sur le prix total.
@@ -300,48 +300,48 @@ function Tarifs() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Services inclus</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Services inclus</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Lavage extérieur complet
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Nettoyage intérieur approfondi
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Protection des surfaces
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Désodorisation premium
                 </li>
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Bonus exclusifs</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Options supplémentaires</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-gift text-[#FFA600]"></i>
-                  Parfum d'ambiance offert
+                  <i className="bx bx-plus text-[#FF0000]"></i>
+                  Option Beauté intégrale (+120€)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-gift text-[#FFA600]"></i>
-                  -10% sur le prochain service
+                  <i className="bx bx-plus text-[#FF0000]"></i>
+                  Traitement soigner surface
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-gift text-[#FFA600]"></i>
-                  Diagnostic gratuit
+                  <i className="bx bx-plus text-[#FF0000]"></i>
+                  Pressing des sièges
                 </li>
               </ul>
             </div>
           </div>
           <div className="mt-6">
-            <h4 className="font-bold text-[#FFA600] mb-4">Durée estimée</h4>
+            <h4 className="font-bold text-[#FF0000] mb-4">Durée estimée</h4>
             <div className="flex items-center gap-4 text-gray-600">
-              <i className="bx bx-time text-2xl text-[#FFA600]"></i>
+              <i className="bx bx-time text-2xl text-[#FF0000]"></i>
               <span>1h30-2h selon le type de véhicule</span>
             </div>
           </div>
@@ -374,7 +374,7 @@ function Tarifs() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Tarifs détaillés</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Tarifs détaillés</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center justify-between gap-2">
                   <span>Baume cuire</span>
@@ -399,7 +399,7 @@ function Tarifs() {
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Services supplémentaires</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Services supplémentaires</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center justify-between gap-2">
                   <span>Rénovation chromes</span>
@@ -447,7 +447,7 @@ function Tarifs() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Tarifs par catégorie</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Tarifs par catégorie</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h5 className="font-semibold mb-2">Pose 3/4</h5>
@@ -472,18 +472,18 @@ function Tarifs() {
               </div>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Services additionnels</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Services additionnels</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Vitre (avant) x2 : 79€
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Dépose complète : à partir de 199€
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Options sur devis (Bris de glace / Pare-brise)
                 </li>
               </ul>
@@ -514,7 +514,7 @@ function Tarifs() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Services Express</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Services Express</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center justify-between gap-2">
                   <span>Intérieur express</span>
@@ -527,22 +527,22 @@ function Tarifs() {
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Services Premium</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Services Premium</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Detailing express (sur devis)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Detailing premium (sur devis)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Lavage moteur (sur devis)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Traitement anti-pluie (sur devis)
                 </li>
               </ul>
@@ -572,35 +572,35 @@ function Tarifs() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Nos Services Spéciaux</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Nos Services Spéciaux</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Nettoyage cryogénique
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Carrosserie & petits chocs
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Débosselage sans peinture (sur rendez-vous)
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Carrosserie minute
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Intervention sur place ou à domicile (sur rendez-vous)
                 </li>
               </ul>
             </div>
             <div className="bg-gray-50 rounded-xl p-6">
-              <h4 className="font-bold text-[#FFA600] mb-4">Formalités</h4>
+              <h4 className="font-bold text-[#FF0000] mb-4">Formalités</h4>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
-                  <i className="bx bx-check-circle text-[#FFA600]"></i>
+                  <i className="bx bx-check-circle text-[#FF0000]"></i>
                   Prise en charge de toutes les démarches avec votre assurance
                 </li>
               </ul>
@@ -628,7 +628,7 @@ function Tarifs() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#FFA600] to-orange-500 inline-block">
+          <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500] inline-block">
             Nos Tarifs
           </h1>
           <p className="text-gray-600 text-xl max-w-2xl mx-auto">
@@ -665,8 +665,8 @@ function Tarifs() {
             className="flex items-center gap-6 px-8 py-4 rounded-2xl bg-white/90 backdrop-blur-lg shadow-xl hover:shadow-2xl transition-all border border-gray-100 w-full max-w-2xl"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-              <i className="bx bx-phone text-2xl text-[#FFA600]"></i>
+            <div className="w-12 h-12 rounded-2xl bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+              <i className="bx bx-phone text-2xl text-[#FF0000]"></i>
             </div>
             <span className="text-xl font-medium text-gray-700 text-left">06 25 13 80 33 - 06 50 30 44 17</span>
           </motion.div>
@@ -674,8 +674,8 @@ function Tarifs() {
             className="flex items-center gap-6 px-8 py-4 rounded-2xl bg-white/90 backdrop-blur-lg shadow-xl hover:shadow-2xl transition-all border border-gray-100 w-full max-w-2xl"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#FFA600]/10 flex items-center justify-center flex-shrink-0">
-              <i className="bx bx-map text-2xl text-[#FFA600]"></i>
+            <div className="w-12 h-12 rounded-2xl bg-[#FF0000]/10 flex items-center justify-center flex-shrink-0">
+              <i className="bx bx-map text-2xl text-[#FF0000]"></i>
             </div>
             <span className="text-xl font-medium text-gray-700 text-left">102 avenue saint Lambert, Nice, France</span>
           </motion.div>

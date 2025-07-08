@@ -61,16 +61,16 @@ function Footer() {
           <div>
             <h3 className="font-bold mb-4">À propos</h3>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><a href="#" className="hover:text-[#FFA600]">Notre histoire</a></li>
-              <li><a href="#" className="hover:text-[#FFA600]">Nos équipes</a></li>
+              <li><a href="#" className="hover:text-[#FF0000]">Notre histoire</a></li>
+              <li><a href="#" className="hover:text-[#FF0000]">Nos équipes</a></li>
             </ul>
           </div>
           <div>
             <h3 className="font-bold mb-4">Nous suivre</h3>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><a href="#" className="hover:text-[#FFA600]">Instagram</a></li>
-              <li><a href="#" className="hover:text-[#FFA600]">Facebook</a></li>
-              <li><a href="#" className="hover:text-[#FFA600]">Download</a></li>
+              <li><a href="#" className="hover:text-[#FF0000]">Instagram</a></li>
+              <li><a href="#" className="hover:text-[#FF0000]">Facebook</a></li>
+              <li><a href="#" className="hover:text-[#FF0000]">Download</a></li>
             </ul>
           </div>
           <div>
@@ -85,13 +85,13 @@ function Footer() {
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Entrez votre mail" 
-                  className="flex-1 px-4 py-2 bg-white text-black border border-gray-700 rounded-l focus:outline-none focus:border-[#FFA600]"
+                  className="flex-1 px-4 py-2 bg-white text-black border border-gray-700 rounded-l focus:outline-none focus:border-[#FF0000]"
                   required
                 />
                 <button 
                   type="submit"
                   disabled={isSubscribing}
-                  className="bg-[#FFA600] hover:bg-[#E6950E] px-6 py-2 rounded-r transition-colors disabled:opacity-50 flex items-center gap-2"
+                  className="bg-[#FF0000] hover:bg-[#CC0000] px-6 py-2 rounded-r transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubscribing ? (
                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
@@ -116,10 +116,10 @@ function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8 text-sm opacity-60">
           {/* Liens légaux - responsive */}
           <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:flex-wrap md:gap-x-6 md:gap-y-2 mb-6 md:mb-4">
-            <Link to="/mentions-legales" className="hover:text-[#FFA600] transition-colors">
+            <Link to="/mentions-legales" className="hover:text-[#FF0000] transition-colors">
               Mentions légales
             </Link>
-            <Link to="/cgv-politique" className="hover:text-[#FFA600] transition-colors">
+            <Link to="/cgv-politique" className="hover:text-[#FF0000] transition-colors">
               CGV - Politique de confidentialité
             </Link>
             <button 
@@ -129,14 +129,14 @@ function Footer() {
                 // Recharger la page pour réinitialiser le composant
                 window.location.reload();
               }}
-              className="text-left hover:text-[#FFA600] transition-colors focus:outline-none focus:text-[#FFA600]"
+              className="text-left hover:text-[#FF0000] transition-colors focus:outline-none focus:text-[#FF0000]"
             >
               Gérer les cookies
             </button>
-            <Link to="/contact" className="hover:text-[#FFA600] transition-colors">
+            <Link to="/contact" className="hover:text-[#FF0000] transition-colors">
               Contact
             </Link>
-            <Link to="/services" className="hover:text-[#FFA600] transition-colors">
+            <Link to="/services" className="hover:text-[#FF0000] transition-colors">
               Nos services
             </Link>
           </div>
@@ -155,7 +155,7 @@ function Footer() {
                   href="https://rebu1ld.com/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-[#FFA600] hover:text-[#FF9500] transition-colors font-semibold"
+                  className="text-[#FF0000] hover:text-[#CC0000] transition-colors font-semibold"
                 >
                   @rebu1ld.com
                 </a>

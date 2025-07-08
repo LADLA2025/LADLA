@@ -151,7 +151,7 @@ const CookieBanner = () => {
           >
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
               {/* Header avec icône */}
-              <div className="bg-gradient-to-r from-[#FFA600] to-orange-500 p-4 text-white">
+              <div className="bg-gradient-to-r from-[#FF0000] to-#CC0000 p-4 text-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <i className="bx bx-cookie text-2xl"></i>
@@ -176,7 +176,7 @@ const CookieBanner = () => {
                   {/* Bouton principal - Accepter */}
                   <motion.button
                     onClick={acceptAllCookies}
-                    className="w-full py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white font-semibold rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+                    className="w-full py-3 bg-gradient-to-r from-[#FF0000] to-#CC0000 text-white font-semibold rounded-xl hover:from-[#CC0000] hover:to-#990000 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -196,7 +196,7 @@ const CookieBanner = () => {
                     </motion.button>
                     <motion.button
                       onClick={() => setShowPreferences(true)}
-                      className="py-2.5 border border-[#FFA600] text-[#FFA600] font-medium rounded-xl hover:bg-[#FFA600]/5 transition-colors text-sm"
+                      className="py-2.5 border border-[#FF0000] text-[#FF0000] font-medium rounded-xl hover:bg-[#FF0000]/5 transition-colors text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -209,7 +209,7 @@ const CookieBanner = () => {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <p className="text-xs text-gray-500 text-center">
                     En continuant, vous acceptez notre{' '}
-                    <Link to="/cgv-politique" className="text-[#FFA600] hover:underline font-medium">
+                    <Link to="/cgv-politique" className="text-[#FF0000] hover:underline font-medium">
                       Politique de Confidentialité
                     </Link>
                   </p>
@@ -243,7 +243,7 @@ const CookieBanner = () => {
               className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:max-h-[90vh] bg-white rounded-3xl shadow-2xl z-50 overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#FFA600] to-orange-500 p-6 text-white">
+              <div className="bg-gradient-to-r from-[#FF0000] to-#CC0000 p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-xl">
@@ -308,7 +308,7 @@ const CookieBanner = () => {
                           onChange={() => handlePreferenceChange('analytics')}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFA600]"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF0000]"></div>
                       </label>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed">
@@ -336,7 +336,7 @@ const CookieBanner = () => {
                           onChange={() => handlePreferenceChange('marketing')}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFA600]"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF0000]"></div>
                       </label>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed">
@@ -350,7 +350,7 @@ const CookieBanner = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 rounded-lg">
-                          <i className="bx bx-user-circle text-orange-600 text-xl"></i>
+                          <i className="bx bx-user-circle text-#990000 text-xl"></i>
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-800">Cookies de Préférences</h3>
@@ -364,7 +364,7 @@ const CookieBanner = () => {
                           onChange={() => handlePreferenceChange('preferences')}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFA600]"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF0000]"></div>
                       </label>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed">
@@ -388,7 +388,7 @@ const CookieBanner = () => {
                   </motion.button>
                   <motion.button
                     onClick={() => savePreferences(cookiePreferences)}
-                    className="flex-1 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white font-semibold rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200"
+                    className="flex-1 py-3 bg-gradient-to-r from-[#FF0000] to-#CC0000 text-white font-semibold rounded-xl hover:from-[#CC0000] hover:to-#990000 transition-all duration-200"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

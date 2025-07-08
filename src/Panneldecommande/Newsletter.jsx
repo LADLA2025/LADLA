@@ -270,7 +270,7 @@ const Newsletter = () => {
         </motion.div>
 
         {/* Statistiques */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -313,9 +313,9 @@ const Newsletter = () => {
         </motion.div>
 
         {/* Actions et filtres */}
-        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex flex-col md:flex-row gap-4">
+        <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Filtre par statut */}
               <select
                 value={filterStatus}
@@ -335,42 +335,42 @@ const Newsletter = () => {
                   placeholder="Rechercher par email ou nom..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-[#FFA600] focus:outline-none w-full md:w-80"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:border-[#FFA600] focus:outline-none w-full sm:w-80"
                 />
                 <i className="bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <motion.button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-[#FFA600] text-white rounded-lg hover:bg-[#FF9500] transition-colors flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 bg-[#FFA600] text-white rounded-lg hover:bg-[#FF9500] transition-colors flex items-center gap-2 text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <i className="bx bx-plus"></i>
-                Ajouter
+                <span className="hidden sm:inline">Ajouter</span>
               </motion.button>
 
               <motion.button
                 onClick={exportToPDF}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <i className="bx bx-download"></i>
-                Export PDF
+                <span className="hidden sm:inline">Export PDF</span>
               </motion.button>
 
               <motion.button
                 onClick={fetchSubscribers}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:opacity-50 text-sm"
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
               >
                 <i className={`bx ${loading ? 'bx-loader-alt animate-spin' : 'bx-refresh'}`}></i>
-                Actualiser
+                <span className="hidden sm:inline">Actualiser</span>
               </motion.button>
             </div>
           </div>
@@ -406,7 +406,9 @@ const Newsletter = () => {
               <p className="text-gray-500 text-lg">Aucun abonné trouvé</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              {/* Vue Desktop - Tableau */}
+              <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -517,6 +519,85 @@ const Newsletter = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Vue Mobile - Cartes */}
+            <div className="lg:hidden space-y-4 p-4">
+              {filteredSubscribers.map((subscriber, index) => (
+                <motion.div
+                  key={subscriber.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900 text-sm break-all">
+                        {subscriber.email}
+                      </h3>
+                      <p className="text-gray-600 text-sm mt-1">
+                        {subscriber.nom && subscriber.prenom 
+                          ? `${subscriber.prenom} ${subscriber.nom}`
+                          : subscriber.nom || subscriber.prenom || 'Nom non renseigné'
+                        }
+                      </p>
+                    </div>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ml-2 ${getStatusColor(subscriber.status)}`}>
+                      {subscriber.status === 'active' ? 'Actif' : 
+                       subscriber.status === 'inactive' ? 'Inactif' : 'Désabonné'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                    <span>
+                      {subscriber.source === 'website' ? 'Site web' :
+                       subscriber.source === 'reservation' ? 'Réservation' : 'Manuel'}
+                    </span>
+                    <span>
+                      {new Date(subscriber.created_at).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3">
+                    {subscriber.status !== 'active' && (
+                      <button
+                        onClick={() => updateSubscriberStatus(subscriber.id, 'active')}
+                        className="text-green-600 hover:text-green-900 p-2"
+                        title="Activer"
+                      >
+                        <i className="bx bx-check-circle text-lg"></i>
+                      </button>
+                    )}
+                    {subscriber.status !== 'inactive' && (
+                      <button
+                        onClick={() => updateSubscriberStatus(subscriber.id, 'inactive')}
+                        className="text-orange-600 hover:text-orange-900 p-2"
+                        title="Désactiver"
+                      >
+                        <i className="bx bx-pause-circle text-lg"></i>
+                      </button>
+                    )}
+                    {subscriber.status !== 'unsubscribed' && (
+                      <button
+                        onClick={() => updateSubscriberStatus(subscriber.id, 'unsubscribed')}
+                        className="text-gray-600 hover:text-gray-900 p-2"
+                        title="Désabonner"
+                      >
+                        <i className="bx bx-x-circle text-lg"></i>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => deleteSubscriber(subscriber.id)}
+                      className="text-red-600 hover:text-red-900 p-2"
+                      title="Supprimer"
+                    >
+                      <i className="bx bx-trash text-lg"></i>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            </>
           )}
         </motion.div>
 
@@ -530,15 +611,15 @@ const Newsletter = () => {
             onClick={() => setShowAddModal(false)}
           >
             <motion.div
-              className="bg-white rounded-xl shadow-2xl max-w-md w-full"
+              className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-800">Ajouter un abonné</h2>
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-800">Ajouter un abonné</h2>
                   <button
                     onClick={() => setShowAddModal(false)}
                     className="text-gray-400 hover:text-gray-600"
@@ -562,7 +643,7 @@ const Newsletter = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Nom

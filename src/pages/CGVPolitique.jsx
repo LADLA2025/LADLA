@@ -38,7 +38,7 @@ function CGVPolitique() {
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-r from-[#FFA600] to-orange-500 rounded-xl">
+            <div className="p-3 bg-gradient-to-r from-[#FF4500] to-orange-500 rounded-xl">
               <i className="bx bx-file-blank text-white text-3xl"></i>
             </div>
           </div>
@@ -57,7 +57,7 @@ function CGVPolitique() {
               onClick={() => setActiveTab('cgv')}
               className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
                 activeTab === 'cgv'
-                  ? 'bg-gradient-to-r from-[#FFA600] to-orange-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-[#FF4500] to-orange-500 text-white shadow-lg'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -68,7 +68,7 @@ function CGVPolitique() {
               onClick={() => setActiveTab('confidentialite')}
               className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
                 activeTab === 'confidentialite'
-                  ? 'bg-gradient-to-r from-[#FFA600] to-orange-500 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-[#FF4500] to-orange-500 text-white shadow-lg'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -91,8 +91,8 @@ function CGVPolitique() {
               {/* Préambule */}
               <section className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                    <i className="bx bx-info-circle text-[#FFA600] text-xl"></i>
+                  <div className="p-2 bg-[#FF4500]/20 rounded-lg">
+                    <i className="bx bx-info-circle text-[#FF4500] text-xl"></i>
                   </div>
                   Préambule
                 </h2>
@@ -283,12 +283,12 @@ function CGVPolitique() {
               {/* Contact */}
               <section className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                    <i className="bx bx-phone text-[#FFA600] text-xl"></i>
+                  <div className="p-2 bg-[#FF4500]/20 rounded-lg">
+                    <i className="bx bx-phone text-[#FF4500] text-xl"></i>
                   </div>
                   Contact et litiges
                 </h2>
-                <div className="bg-gradient-to-r from-[#FFA600]/10 to-orange-500/5 rounded-2xl p-6 space-y-3">
+                <div className="bg-gradient-to-r from-[#FF4500]/10 to-orange-500/5 rounded-2xl p-6 space-y-3">
                   <p><strong>Contact :</strong> lesasdelauto06@gmail.com</p>
                   <p><strong>Téléphone :</strong> 06.50.30.44.17 / 06.25.13.80.33</p>
                   <p><strong>Médiation :</strong> En cas de litige, une solution amiable sera privilégiée.</p>
@@ -313,8 +313,8 @@ function CGVPolitique() {
               {/* Introduction */}
               <section className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                    <i className="bx bx-info-circle text-[#FFA600] text-xl"></i>
+                  <div className="p-2 bg-[#FF4500]/20 rounded-lg">
+                    <i className="bx bx-info-circle text-[#FF4500] text-xl"></i>
                   </div>
                   Introduction
                 </h2>
@@ -513,7 +513,7 @@ function CGVPolitique() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-6 p-4 bg-[#FFA600]/10 rounded-xl">
+                  <div className="mt-6 p-4 bg-[#FF4500]/10 rounded-xl">
                     <p className="text-sm">
                       <strong>Pour exercer vos droits :</strong> Contactez-nous à 
                       lesasdelauto06@gmail.com en précisant votre demande et en joignant 
@@ -549,12 +549,12 @@ function CGVPolitique() {
               {/* Contact DPO */}
               <section className="mb-10">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-[#FFA600]/20 rounded-lg">
-                    <i className="bx bx-phone text-[#FFA600] text-xl"></i>
+                  <div className="p-2 bg-[#FF4500]/20 rounded-lg">
+                    <i className="bx bx-phone text-[#FF4500] text-xl"></i>
                   </div>
                   Contact et réclamations
                 </h2>
-                <div className="bg-gradient-to-r from-[#FFA600]/10 to-orange-500/5 rounded-2xl p-6 space-y-3">
+                <div className="bg-gradient-to-r from-[#FF4500]/10 to-orange-500/5 rounded-2xl p-6 space-y-3">
                   <p><strong>Délégué à la Protection des Données :</strong> lesasdelauto06@gmail.com</p>
                   <p><strong>Téléphone :</strong> 06.50.30.44.17 / 06.25.13.80.33</p>
                   <p><strong>Adresse :</strong> 102 avenue Saint Lambert, 06100 Nice</p>
@@ -585,7 +585,7 @@ function CGVPolitique() {
         <motion.div variants={itemVariants} className="text-center mt-8">
           <button 
             onClick={() => window.history.back()}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white font-semibold rounded-2xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 shadow-lg"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#FF4500] to-orange-500 text-white font-semibold rounded-2xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-200 shadow-lg"
           >
             <i className="bx bx-arrow-back"></i>
             Retour

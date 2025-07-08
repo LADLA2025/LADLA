@@ -40,7 +40,7 @@ const SessionInfo = () => {
   const getTimeColor = () => {
     const hoursRemaining = timeRemaining / (60 * 60 * 1000);
     if (hoursRemaining < 0.5) return 'text-red-600'; // Moins de 30 min
-    if (hoursRemaining < 2) return 'text-orange-600'; // Moins de 2h
+    if (hoursRemaining < 2) return 'text-#990000'; // Moins de 2h
     return 'text-green-600'; // Plus de 2h
   };
 
@@ -66,7 +66,7 @@ const SessionInfo = () => {
           </div>
           <button
             onClick={() => setShowExtendDialog(true)}
-            className="text-[#FFA600] hover:text-orange-600 text-sm"
+            className="text-[#FF0000] hover:text-#990000 text-sm"
             title="Prolonger la session"
           >
             <i className="bx bx-refresh"></i>
@@ -91,7 +91,7 @@ const SessionInfo = () => {
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <i className="bx bx-time text-orange-600 text-2xl"></i>
+                  <i className="bx bx-time text-#990000 text-2xl"></i>
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-800">Session bientôt expirée</h3>
@@ -115,7 +115,7 @@ const SessionInfo = () => {
                 </button>
                 <button
                   onClick={handleExtendSession}
-                  className="flex-1 px-4 py-2 bg-[#FFA600] text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-#990000 transition-colors flex items-center justify-center gap-2"
                 >
                   <i className="bx bx-refresh"></i>
                   Prolonger

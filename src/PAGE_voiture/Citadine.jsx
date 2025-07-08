@@ -11,6 +11,18 @@ function Citadine() {
   const [showModal, setShowModal] = useState(false);
   const [selectedFormule, setSelectedFormule] = useState(null);
   const [additionalFormules, setAdditionalFormules] = useState([]);
+  const [options, setOptions] = useState({
+    baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+    pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+    pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+    pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+    pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+    renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+    renov_chrome: { selected: false },
+    assaisonnement_ozone: { selected: false, prix: 30 },
+    polissage: { selected: false },
+    lustrage: { selected: false }
+  });
 
   // Charger les formules au chargement du composant
   useEffect(() => {
@@ -46,6 +58,73 @@ function Citadine() {
     setShowModal(false);
     setSelectedFormule(null);
     setAdditionalFormules([]);
+    // Réinitialiser les options
+    setOptions({
+      baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+      pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+      pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+      renov_chrome: { selected: false },
+      assaisonnement_ozone: { selected: false, prix: 30 },
+      polissage: { selected: false },
+      lustrage: { selected: false }
+    });
+  };
+
+  // Fonction pour gérer les changements de quantité des options
+  const handleOptionQuantityChange = (optionName, newQuantity) => {
+    setOptions(prev => ({
+      ...prev,
+      [optionName]: {
+        ...prev[optionName],
+        quantity: Math.max(0, newQuantity)
+      }
+    }));
+  };
+
+  // Fonction pour gérer les options on/off
+  const handleOptionToggle = (optionName) => {
+    setOptions(prev => ({
+      ...prev,
+      [optionName]: {
+        ...prev[optionName],
+        selected: !prev[optionName].selected
+      }
+    }));
+  };
+
+  // Fonction pour calculer le prix d'une option avec réduction automatique
+  const calculateOptionPrice = (option) => {
+    const { quantity, prix_unitaire, prix_x4 } = option;
+    if (quantity === 0) return 0;
+    if (quantity >= 4 && prix_x4) {
+      return prix_x4;
+    }
+    return quantity * prix_unitaire;
+  };
+
+  // Fonction pour calculer le prix total des options
+  const calculateTotalOptionsPrice = () => {
+    let total = 0;
+
+    // Options avec quantité et réduction x4
+    total += calculateOptionPrice(options.baume_sieges);
+    total += calculateOptionPrice(options.pressing_sieges);
+    total += calculateOptionPrice(options.pressing_tapis);
+    total += calculateOptionPrice(options.pressing_panneau_porte);
+    total += calculateOptionPrice(options.renov_phare);
+
+    // Options à prix fixe avec quantité
+    total += options.pressing_coffre_plafonnier.quantity * options.pressing_coffre_plafonnier.prix_unitaire;
+
+    // Options à prix fixe simple
+    if (options.assaisonnement_ozone.selected) {
+      total += options.assaisonnement_ozone.prix;
+    }
+
+    return total;
   };
 
   // Fonction pour ajouter/retirer une formule supplémentaire
@@ -64,12 +143,15 @@ function Citadine() {
   const proceedToReservation = () => {
     const allFormules = [selectedFormule, ...additionalFormules];
     const formulesParam = allFormules.map(f => f.nom).join(',');
-    const totalPrice = allFormules.reduce((sum, f) => sum + parseFloat(f.prix), 0);
+    const formulesPrice = allFormules.reduce((sum, f) => sum + parseFloat(f.prix), 0);
+    const optionsPrice = calculateTotalOptionsPrice();
+    const totalPrice = formulesPrice + optionsPrice;
     
     const params = new URLSearchParams({
       formule: formulesParam,
       type: 'citadine',
-      prix_total: totalPrice.toFixed(2)
+      prix_total: totalPrice.toFixed(2),
+      options: JSON.stringify(options)
     });
     
     window.location.href = `/reservation?${params.toString()}`;
@@ -126,7 +208,7 @@ function Citadine() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FFA600] to-orange-500">
+          <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]">
             Formules Citadine
         </h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -134,7 +216,7 @@ function Citadine() {
           </p>
           <Link 
             to="/" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-gray-700 hover:text-[#FFA600]"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-gray-700 hover:text-[#FF0000]"
           >
             <i className="bx bx-arrow-back text-lg"></i>
             Retour à l'accueil
@@ -148,7 +230,7 @@ function Citadine() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFA600]"></div>
+                          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF0000]"></div>
             <p className="text-gray-600 mt-4">Chargement des formules...</p>
           </motion.div>
         )}
@@ -203,17 +285,17 @@ function Citadine() {
                     variants={itemVariants}
                     custom={index}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    {/* Header de la carte - Hauteur fixe */}
-                    <div className="p-6 bg-gradient-to-r from-[#FFA600] to-orange-500 flex-shrink-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                          <i className={`${formule.icone} text-2xl text-[#FFA600]`}></i>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                {/* Header de la carte - Hauteur fixe */}
+                <div className="p-6 bg-gradient-to-r from-[#FF0000] to-[#FF4500] flex-shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                      <i className={`${formule.icone} text-2xl text-[#FF0000]`}></i>
                         </div>
           <div>
                           <h2 className="text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
-                          <p className="text-orange-100 text-sm">{formule.duree}</p>
+                          <p className="text-red-100 text-sm">{formule.duree}</p>
                         </div>
                       </div>
                     </div>
@@ -223,13 +305,13 @@ function Citadine() {
                       {/* Services inclus - Espace variable */}
                       <div className="mb-6 flex-grow">
                         <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
-                          <i className="bx bx-list-check text-[#FFA600]"></i>
+                          <i className="bx bx-list-check text-[#FF0000]"></i>
                           Services inclus
                         </h3>
                         <ul className="space-y-2 min-h-[120px]">
                           {formule.services.map((service, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm">
-                              <i className="bx bx-check text-[#FFA600] flex-shrink-0 mt-0.5"></i>
+                              <i className="bx bx-check text-[#FF0000] flex-shrink-0 mt-0.5"></i>
                               <span className="text-gray-600 leading-relaxed">{service}</span>
                 </li>
                           ))}
@@ -237,8 +319,8 @@ function Citadine() {
             </div>
 
                       {/* Prix - Hauteur fixe */}
-                      <div className="bg-gradient-to-r from-[#FFA600]/10 to-orange-500/10 rounded-xl p-4 text-center border border-[#FFA600]/20 mb-6 flex-shrink-0">
-                        <div className="text-3xl font-bold text-[#FFA600] mb-1">
+                      <div className="bg-gradient-to-r from-[#FF0000]/10 to-[#CC0000]/10 rounded-xl p-4 text-center border border-[#FF0000]/20 mb-6 flex-shrink-0">
+                        <div className="text-3xl font-bold text-[#FF0000] mb-1">
                           {formule.prix}€
                         </div>
                         <p className="text-sm text-gray-500">Prix de la formule</p>
@@ -248,7 +330,7 @@ function Citadine() {
                       <div className="mt-auto">
                         <motion.button
                           onClick={() => openReservationModal(formule)}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:from-[#FF9500] hover:to-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                          className="w-full px-4 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:from-[#CC0000] hover:to-[#990000] transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -272,7 +354,7 @@ function Citadine() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative text-center">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">
                 Besoin d'aide pour choisir ?
@@ -284,14 +366,14 @@ function Citadine() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/reservation"
-                  className="px-6 py-3 bg-gradient-to-r from-[#FFA600] to-orange-500 text-white rounded-xl hover:shadow-lg transition-shadow inline-flex items-center justify-center gap-2 font-medium"
+                  className="px-6 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:shadow-lg transition-shadow inline-flex items-center justify-center gap-2 font-medium"
                 >
                   <i className="bx bx-calendar-plus"></i>
                   Faire une réservation
                 </Link>
                 <Link
                   to="/contact"
-                  className="px-6 py-3 bg-transparent border-2 border-[#FFA600] text-[#FFA600] rounded-xl hover:bg-[#FFA600] hover:text-white transition-colors inline-flex items-center justify-center gap-2 font-medium"
+                  className="px-6 py-3 bg-transparent border-2 border-[#FF0000] text-[#FF0000] rounded-xl hover:bg-[#FF0000] hover:text-white transition-colors inline-flex items-center justify-center gap-2 font-medium"
                 >
                   <i className="bx bx-phone"></i>
                   Nous contacter
@@ -312,6 +394,9 @@ function Citadine() {
           onProceedToReservation={proceedToReservation}
           onReserveDirectly={reserveDirectly}
           vehicleType="citadine"
+          options={options}
+          onOptionQuantityChange={handleOptionQuantityChange}
+          onOptionToggle={handleOptionToggle}
         />
       </div>
     </div>

@@ -34,6 +34,7 @@ class ReservationTableService {
           heure_rdv TIME NOT NULL,
           commentaires TEXT,
           newsletter BOOLEAN DEFAULT false,
+          options JSONB,
           status VARCHAR(20) DEFAULT 'pending',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -58,6 +59,21 @@ class ReservationTableService {
           
           IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_reservations_type_voiture') THEN
             CREATE INDEX idx_reservations_type_voiture ON reservations(type_voiture);
+          END IF;
+        END
+        $$;
+      `);
+
+      // Ajouter la colonne options si elle n'existe pas
+      await client.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_name = 'reservations' 
+            AND column_name = 'options'
+          ) THEN
+            ALTER TABLE reservations ADD COLUMN options JSONB;
           END IF;
         END
         $$;

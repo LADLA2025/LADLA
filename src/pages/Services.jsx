@@ -106,7 +106,7 @@ function Services() {
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.h1 
-          className="text-5xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FFA600] to-orange-500"
+          className="text-5xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -149,7 +149,7 @@ function Services() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <i className={`bx ${service.icon} text-[#FFA600] text-3xl`}></i>
+                    <i className={`bx ${service.icon} text-[#FF0000] text-3xl`}></i>
                     <h3 className="text-2xl font-bold text-white">{service.title}</h3>
                   </div>
                   <p className="text-white/90">{service.description}</p>
@@ -172,11 +172,11 @@ function Services() {
               className="bg-white rounded-3xl shadow-lg p-8 hover:shadow-xl transition-shadow relative overflow-hidden group"
               variants={itemVariants}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-[#FFA600]/10 flex items-center justify-center">
-                    <i className={`bx ${section.icon} text-[#FFA600] text-2xl`}></i>
+                  <div className="w-12 h-12 rounded-full bg-[#FF0000]/10 flex items-center justify-center">
+                    <i className={`bx ${section.icon} text-[#FF0000] text-2xl`}></i>
                   </div>
                   <h2 className="text-2xl font-bold text-gray-800">{section.title}</h2>
                 </div>
@@ -184,7 +184,7 @@ function Services() {
                   {section.items.map((item, index) => (
                     <motion.div
                       key={index}
-                      className="p-4 rounded-xl bg-gray-50 hover:bg-[#FFA600]/5 transition-colors"
+                      className="p-4 rounded-xl bg-gray-50 hover:bg-[#FF0000]/5 transition-colors"
                       whileHover={{ x: 10 }}
                     >
                       <h3 className="font-bold text-gray-800 mb-1">{item.name}</h3>

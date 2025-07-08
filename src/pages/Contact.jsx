@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { buildAPIUrl, API_ENDPOINTS } from '../config/api.js';
+import { useSecureForm } from '../hooks/useSecureForm';
+import SecurityAlert, { ValidationErrors } from '../components/SecurityAlert';
 import img1065 from './imgg/IMG_1065.jpeg';
 import img1067 from './imgg/IMG_1067.jpeg';
 import img2428 from './imgg/IMG_2428.jpeg';
 
 function Contact() {
-  const [formData, setFormData] = useState({
+  // Utilisation du hook de sécurité
+  const {
+    formData,
+    errors,
+    securityWarnings,
+    handleSecureChange,
+    submitSecureForm,
+    hasSecurityWarnings
+  } = useSecureForm('contact', {
     nom: '',
     email: '',
     message: ''
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
 
@@ -37,21 +48,31 @@ function Contact() {
     }
   };
 
-  // Gérer les changements de formulaire
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Fonction de soumission sécurisée
+  const handleSecureSubmit = async (sanitizedData) => {
+    const response = await fetch(buildAPIUrl(API_ENDPOINTS.CONTACT), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(sanitizedData)
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Erreur lors de l\'envoi');
+    }
+
+    return result;
   };
 
   // Soumettre le formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.nom || !formData.email || !formData.message) {
-      setSubmitMessage('Veuillez remplir tous les champs');
+    if (hasSecurityWarnings) {
+      setSubmitMessage('Veuillez corriger les problèmes de sécurité avant de continuer.');
       return;
     }
 
@@ -59,21 +80,13 @@ function Contact() {
       setIsSubmitting(true);
       setSubmitMessage('');
 
-      const response = await fetch(buildAPIUrl(API_ENDPOINTS.CONTACT), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      const result = await response.json();
+      const result = await submitSecureForm(handleSecureSubmit);
 
       if (result.success) {
         setSubmitMessage('Votre message a été envoyé avec succès ! Nous vous répondrons rapidement.');
-        setFormData({ nom: '', email: '', message: '' });
+        // Le formulaire sera réinitialisé automatiquement par le hook
       } else {
-        setSubmitMessage('Erreur lors de l\'envoi : ' + result.error);
+        setSubmitMessage(`Erreur : ${result.errors.join(', ')}`);
       }
     } catch (error) {
       console.error('Erreur lors de l\'envoi:', error);
@@ -81,6 +94,12 @@ function Contact() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Fonction pour fermer les alertes de sécurité
+  const dismissSecurityWarning = (field) => {
+    // Cette fonction pourrait être étendue pour gérer la fermeture des alertes
+    console.log(`Alerte fermée pour le champ: ${field}`);
   };
 
   const selectedImages = [
@@ -101,7 +120,7 @@ function Contact() {
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.h1 
-          className="text-5xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FFA600] to-orange-500"
+          className="text-5xl font-bold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -128,18 +147,29 @@ function Contact() {
             className="col-span-1 md:col-span-2 row-span-2 bg-white rounded-3xl shadow-lg p-6 md:p-8 hover:shadow-xl transition-shadow relative overflow-hidden group"
             variants={itemVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <h2 className="text-2xl font-bold mb-6 text-gray-800">Envoyez-nous un message</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              
+              {/* Alertes de sécurité - seulement si nécessaire */}
+              <SecurityAlert 
+                warnings={securityWarnings} 
+                onDismiss={dismissSecurityWarning}
+                className="mb-4"
+              />
+              
+              {/* Erreurs de validation */}
+              <ValidationErrors errors={errors} className="mb-4" />
+              
+              <form onSubmit={handleSubmit} className="space-y-4 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <input
                       type="text"
                       name="nom"
                       value={formData.nom}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FFA600] focus:outline-none transition-colors"
+                      onChange={handleSecureChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FF0000] focus:outline-none transition-colors"
                       placeholder="Votre nom"
                       required
                     />
@@ -149,8 +179,8 @@ function Contact() {
                       type="email"
                       name="email"
                       value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FFA600] focus:outline-none transition-colors"
+                      onChange={handleSecureChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FF0000] focus:outline-none transition-colors"
                       placeholder="votre@email.com"
                       required
                     />
@@ -160,9 +190,9 @@ function Contact() {
                   <textarea
                     name="message"
                     value={formData.message}
-                    onChange={handleInputChange}
+                    onChange={handleSecureChange}
                     rows="4"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FFA600] focus:outline-none transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 focus:border-[#FF0000] focus:outline-none transition-colors resize-none"
                     placeholder="Votre message..."
                     required
                   ></textarea>
@@ -183,7 +213,7 @@ function Contact() {
                   disabled={isSubmitting}
                   whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                  className="w-full bg-gradient-to-r from-[#FFA600] to-orange-500 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-shadow flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-[#FF0000] to-#FF4500 text-white py-3 rounded-xl font-medium hover:shadow-lg transition-shadow flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
@@ -222,11 +252,11 @@ function Contact() {
             className="col-span-1 md:col-span-2 bg-white rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow relative overflow-hidden group"
             variants={itemVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#FFA600]/10 flex items-center justify-center">
-                  <i className="bx bx-time text-[#FFA600] text-xl"></i>
+                <div className="w-10 h-10 rounded-full bg-[#FF0000]/10 flex items-center justify-center">
+                  <i className="bx bx-time text-[#FF0000] text-xl"></i>
                 </div>
                 <h3 className="font-bold text-gray-800">Nos horaires</h3>
               </div>
@@ -241,7 +271,7 @@ function Contact() {
                 </div>
                 <div className="text-center p-3 rounded-xl bg-gray-50">
                   <p className="font-medium text-gray-800">Dimanche</p>
-                  <p className="text-gray-600">9h00 - 13h00</p>
+                  <p className="text-gray-600">Sur RDV seulement</p>
                 </div>
               </div>
             </div>
@@ -252,11 +282,11 @@ function Contact() {
             className="col-span-1 bg-white rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow relative overflow-hidden group"
             variants={itemVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative h-full flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#FFA600]/10 flex items-center justify-center">
-                  <i className="bx bx-envelope text-[#FFA600] text-xl"></i>
+                <div className="w-10 h-10 rounded-full bg-[#FF0000]/10 flex items-center justify-center">
+                  <i className="bx bx-envelope text-[#FF0000] text-xl"></i>
                 </div>
                 <h3 className="font-bold text-gray-800">Email</h3>
               </div>
@@ -269,11 +299,11 @@ function Contact() {
             className="col-span-1 bg-white rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow relative overflow-hidden group"
             variants={itemVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative h-full flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#FFA600]/10 flex items-center justify-center">
-                  <i className="bx bx-phone text-[#FFA600] text-xl"></i>
+                <div className="w-10 h-10 rounded-full bg-[#FF0000]/10 flex items-center justify-center">
+                  <i className="bx bx-phone text-[#FF0000] text-xl"></i>
                 </div>
                 <h3 className="font-bold text-gray-800">Téléphone</h3>
               </div>
@@ -287,11 +317,11 @@ function Contact() {
             className="col-span-1 bg-white rounded-3xl shadow-lg p-6 hover:shadow-xl transition-shadow relative overflow-hidden group"
             variants={itemVariants}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFA600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative h-full flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#FFA600]/10 flex items-center justify-center">
-                  <i className="bx bx-map text-[#FFA600] text-xl"></i>
+                <div className="w-10 h-10 rounded-full bg-[#FF0000]/10 flex items-center justify-center">
+                  <i className="bx bx-map text-[#FF0000] text-xl"></i>
                 </div>
                 <h3 className="font-bold text-gray-800">Notre adresse</h3>
               </div>
