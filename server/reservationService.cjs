@@ -176,11 +176,12 @@ class ReservationService {
   static async getWeekReservations(date) {
     try {
       // Calculer le début et la fin de la semaine
-      const inputDate = new Date(date);
-      const dayOfWeek = inputDate.getDay() || 7; // 0 = dimanche, on veut 7
+      const inputDate = new Date(date + 'T12:00:00'); // Forcer UTC à midi pour éviter les problèmes de timezone
+      const dayOfWeek = inputDate.getDay(); // 0 = dimanche, 1 = lundi, etc.
+      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Distance du lundi
       
       const startOfWeek = new Date(inputDate);
-      startOfWeek.setDate(inputDate.getDate() - dayOfWeek + 1);
+      startOfWeek.setDate(inputDate.getDate() - daysFromMonday);
       
       const endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 6);
@@ -198,9 +199,17 @@ class ReservationService {
         ORDER BY date_rdv, heure_rdv
       `;
       
+      // Utiliser la date locale pour éviter les problèmes de timezone
+      const formatLocalDate = (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       const values = [
-        startOfWeek.toISOString().split('T')[0],
-        endOfWeek.toISOString().split('T')[0]
+        formatLocalDate(startOfWeek),
+        formatLocalDate(endOfWeek)
       ];
 
       console.log(`📅 Recherche réservations entre ${values[0]} et ${values[1]}`);
@@ -216,8 +225,8 @@ class ReservationService {
         success: true,
         data: result.rows,
         semaine: {
-          debut: startOfWeek.toISOString().split('T')[0],
-          fin: endOfWeek.toISOString().split('T')[0]
+          debut: formatLocalDate(startOfWeek),
+          fin: formatLocalDate(endOfWeek)
         }
       };
 

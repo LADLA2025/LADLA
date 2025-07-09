@@ -104,7 +104,7 @@ const Calendar = () => {
         
         // Calculer les dates de la semaine pour le debug
         const weekDatesForDebug = getWeekDates(date);
-        console.log('🗓️ Dates de la semaine:', weekDatesForDebug.map(d => d.toISOString().split('T')[0]));
+        console.log('🗓️ Dates de la semaine:', weekDatesForDebug.map(d => formatDate(d)));
         
         // Debug détaillé pour chaque réservation
         formattedReservations.forEach(res => {
@@ -478,9 +478,11 @@ const Calendar = () => {
   };
 
   const getWeekDates = (date) => {
-    const currentDay = date.getDay() || 7; // 0 = dimanche, on veut 7
+    const currentDay = date.getDay(); // 0 = dimanche, 1 = lundi, etc.
+    const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Distance du lundi
+    
     const monday = new Date(date);
-    monday.setDate(date.getDate() - currentDay + 1);
+    monday.setDate(date.getDate() - daysFromMonday);
     
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -492,7 +494,11 @@ const Calendar = () => {
   };
 
   const formatDate = (date) => {
-    return date.toISOString().split('T')[0];
+    // Utiliser la date locale plutôt qu'UTC pour éviter les décalages de timezone
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const getReservationForTimeSlot = (date, timeSlot) => {

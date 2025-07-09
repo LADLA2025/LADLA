@@ -475,7 +475,7 @@ function App() {
                        <span className="bg-[#FF0000] text-white text-xs px-2 py-1 rounded-full">POPULAIRE</span>
                      </div>
                      <p className="text-gray-200 text-sm leading-relaxed">
-                       Formule premium combinant lavage extérieur, nettoyage intérieur et protection longue durée.
+                       Service professionnel de polissage et rénovation carrosserie avec équipements spécialisés pour une finition parfaite.
                      </p>
                    </div>
                  </div>
