@@ -320,13 +320,13 @@ function Citadine() {
                   >
                                     <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                                    {/* Header de la carte - Hauteur fixe */}
+                {/* Header de la carte - Hauteur fixe */}
                     <div className="p-4 sm:p-6 bg-gradient-to-r from-[#FF0000] to-[#FF4500] flex-shrink-0">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
                           <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
-                        <div>
+          <div>
                           <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
                           <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>
@@ -335,7 +335,7 @@ function Citadine() {
 
                     {/* Contenu de la carte - Prend l'espace restant */}
                     <div className="p-4 sm:p-6 relative flex flex-col flex-grow">
-                                            {/* Services inclus - Espace variable */}
+                      {/* Services inclus - Espace variable */}
                       <div className="mb-4 sm:mb-6 flex-grow">
                         <h3 className="text-gray-800 font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
                           <i className="bx bx-list-check text-[#FF0000]"></i>
@@ -346,10 +346,10 @@ function Citadine() {
                             <li key={index} className="flex items-start gap-2 text-sm">
                               <i className="bx bx-check text-[#FF0000] flex-shrink-0 mt-0.5"></i>
                               <span className="text-gray-600 leading-relaxed">{service}</span>
-                            </li>
+                </li>
                           ))}
-                        </ul>
-                      </div>
+              </ul>
+            </div>
 
                       {/* Prix - Hauteur fixe */}
                       <div className="bg-gradient-to-r from-[#FF0000]/10 to-[#CC0000]/10 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-[#FF0000]/20 mb-4 sm:mb-6 flex-shrink-0">
@@ -370,7 +370,7 @@ function Citadine() {
                           <i className="bx bx-calendar-plus mr-1 sm:mr-2"></i>
                           Réserver cette formule
                         </motion.button>
-                      </div>
+                </div>
                 </div>
                   </motion.div>
                 ))}

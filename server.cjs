@@ -31,7 +31,7 @@ app.use(express.json());
 // Configuration de la connexion PostgreSQL
 const DATABASE_URL_POOLER = 'postgresql://postgres.sgcpymrobdjbcpzjmaos:Les_As_De_Auto_2025@aws-0-eu-west-3.pooler.supabase.com:5432/postgres';
 const DATABASE_URL_DIRECT = 'postgresql://postgres:Les_As_De_Auto_2025@db.sgcpymrobdjbcpzjmaos.supabase.co:5432/postgres';
-const DATABASE_URL = process.env.DATABASE_URL || DATABASE_URL_DIRECT;
+const DATABASE_URL = process.env.DATABASE_URL || DATABASE_URL_POOLER;
 
 console.log('🔍 DATABASE_URL format:', DATABASE_URL ? 'Définie' : 'Non définie');
 

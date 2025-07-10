@@ -312,7 +312,7 @@ function Berline() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 sm:px-0">
                 {formules.map((formule, index) => (
-                                    <motion.div 
+                  <motion.div 
                     key={formule.id} 
                     className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105 relative group h-full flex flex-col"
                     variants={itemVariants}
@@ -326,7 +326,7 @@ function Berline() {
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
                           <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
-                        <div>
+          <div>
                           <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
                           <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>

@@ -312,7 +312,7 @@ function SUV() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 sm:px-0">
                 {formules.map((formule, index) => (
-                                    <motion.div 
+                  <motion.div 
                     key={formule.id} 
                     className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105 relative group h-full flex flex-col"
                     variants={itemVariants}
@@ -335,10 +335,10 @@ function SUV() {
 
                     {/* Contenu de la carte - Prend l'espace restant */}
                     <div className="p-4 sm:p-6 relative flex flex-col flex-grow">
-                                            {/* Services inclus - Espace variable */}
+                      {/* Services inclus - Espace variable */}
                       <div className="mb-4 sm:mb-6 flex-grow">
                         <h3 className="text-gray-800 font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
-                          <i className="bx bx-list-check text-[#FF0000]"></i>
+                                                      <i className="bx bx-list-check text-[#FF0000]"></i>
                           Services inclus
                         </h3>
                         <ul className="space-y-1 sm:space-y-2 min-h-[100px] sm:min-h-[120px]">

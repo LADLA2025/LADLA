@@ -2626,7 +2626,7 @@ const Calendar = () => {
                           </div>
                         </div>
 
-                                                {/* Assaisonnement à l'ozone */}
+                        {/* Assaisonnement à l'ozone */}
                         <div className="bg-gray-50 rounded-xl p-4">
                           <div className="flex items-center justify-between">
                             <div>
@@ -2638,11 +2638,11 @@ const Calendar = () => {
                                 type="checkbox"
                                 checked={newReservationData.options.assaisonnement_ozone.selected}
                                 onChange={() => handleOptionToggle('assaisonnement_ozone')}
-                                className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
-                              />
-                              <div className="font-bold text-[#FF0000]">
-                                {newReservationData.options.assaisonnement_ozone.selected ? '30€' : '0€'}
-                              </div>
+                                                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                               />
+                               <div className="font-bold text-[#FF0000]">
+                                 {newReservationData.options.assaisonnement_ozone.selected ? '30€' : '0€'}
+                               </div>
                             </div>
                           </div>
                         </div>

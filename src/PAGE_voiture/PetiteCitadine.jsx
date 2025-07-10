@@ -324,12 +324,12 @@ function PetiteCitadine() {
                                               <div className="flex items-center gap-2 sm:gap-3">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
                             <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
-                          </div>
-                          <div>
+                        </div>
+                        <div>
                             <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
                             <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
-                          </div>
                         </div>
+                      </div>
                     </div>
 
                     {/* Contenu de la carte - Prend l'espace restant */}
