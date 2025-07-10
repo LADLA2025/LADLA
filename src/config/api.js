@@ -29,6 +29,9 @@ export const API_ENDPOINTS = {
   BERLINE: '/formules/berline',
   SUV: '/formules/suv',
   
+  // Options de service
+  SERVICE_OPTIONS: '/service-options',
+  
   // Réservations
   RESERVATIONS: '/reservations',
   RESERVATIONS_BY_DATE: '/reservations/date',

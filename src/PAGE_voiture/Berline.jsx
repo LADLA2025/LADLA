@@ -21,9 +21,9 @@ function Berline() {
     renov_chrome: { selected: false },
     assaisonnement_ozone: { selected: false, prix: 30 },
     polissage: { selected: false },
-    lustrage: { selected: false }
+    lustrage: { selected: false },
+    lavage_premium: { selected: false, prix: 120 }
   });
-
   // Charger les formules au chargement du composant
   useEffect(() => {
     fetchFormules();
@@ -51,6 +51,21 @@ function Berline() {
     setSelectedFormule(formule);
     setAdditionalFormules([]);
     setShowModal(true);
+    
+    // Initialiser les options, en activant lavage_premium si la formule l'inclut
+    setOptions({
+      baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+      pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+      pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+      renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+      renov_chrome: { selected: false },
+      assaisonnement_ozone: { selected: false, prix: 30 },
+      polissage: { selected: false },
+      lustrage: { selected: false },
+      lavage_premium: { selected: formule.lavage_premium || false, prix: 120 }
+    });
   };
 
   // Fonction pour fermer le modal
@@ -69,7 +84,8 @@ function Berline() {
       renov_chrome: { selected: false },
       assaisonnement_ozone: { selected: false, prix: 30 },
       polissage: { selected: false },
-      lustrage: { selected: false }
+      lustrage: { selected: false },
+      lavage_premium: { selected: false, prix: 120 }
     });
   };
 
@@ -86,13 +102,25 @@ function Berline() {
 
   // Fonction pour gérer les options on/off
   const handleOptionToggle = (optionName) => {
-    setOptions(prev => ({
-      ...prev,
-      [optionName]: {
+    setOptions(prev => {
+      const newOptions = { ...prev };
+      
+      // Si c'est l'option lavage premium qu'on active
+      if (optionName === 'lavage_premium' && !prev[optionName].selected) {
+        // Décocher automatiquement les options pressing
+        newOptions.pressing_sieges = { ...prev.pressing_sieges, quantity: 0 };
+        newOptions.pressing_tapis = { ...prev.pressing_tapis, quantity: 0 };
+        newOptions.pressing_panneau_porte = { ...prev.pressing_panneau_porte, quantity: 0 };
+      }
+      
+      // Toggle l'option demandée
+      newOptions[optionName] = {
         ...prev[optionName],
         selected: !prev[optionName].selected
-      }
-    }));
+      };
+      
+      return newOptions;
+    });
   };
 
   // Fonction pour calculer le prix d'une option avec réduction automatique
@@ -122,6 +150,11 @@ function Berline() {
     // Options à prix fixe simple
     if (options.assaisonnement_ozone.selected) {
       total += options.assaisonnement_ozone.prix;
+    }
+    
+    // Option lavage premium
+    if (options.lavage_premium.selected) {
+      total += options.lavage_premium.prix;
     }
 
     return total;
@@ -277,38 +310,38 @@ function Berline() {
           </div>
               </motion.div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 sm:px-0">
                 {formules.map((formule, index) => (
-                  <motion.div 
+                                    <motion.div 
                     key={formule.id} 
-                    className="bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105 relative group h-full flex flex-col"
+                    className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105 relative group h-full flex flex-col"
                     variants={itemVariants}
                     custom={index}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-[#FF0000]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     {/* Header de la carte - Hauteur fixe */}
-                    <div className="p-6 bg-gradient-to-r from-[#FF0000] to-[#FF4500] flex-shrink-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                          <i className={`${formule.icone} text-2xl text-[#FF0000]`}></i>
+                    <div className="p-4 sm:p-6 bg-gradient-to-r from-[#FF0000] to-[#FF4500] flex-shrink-0">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                          <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
-          <div>
-                          <h2 className="text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
-                          <p className="text-red-100 text-sm">{formule.duree}</p>
+                        <div>
+                          <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
+                          <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Contenu de la carte - Prend l'espace restant */}
-                    <div className="p-6 relative flex flex-col flex-grow">
+                    <div className="p-4 sm:p-6 relative flex flex-col flex-grow">
                       {/* Services inclus - Espace variable */}
-                      <div className="mb-6 flex-grow">
-                        <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                      <div className="mb-4 sm:mb-6 flex-grow">
+                        <h3 className="text-gray-800 font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
                           <i className="bx bx-list-check text-[#FF0000]"></i>
                           Services inclus
                         </h3>
-                        <ul className="space-y-2 min-h-[120px]">
+                        <ul className="space-y-1 sm:space-y-2 min-h-[100px] sm:min-h-[120px]">
                           {formule.services.map((service, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm">
                               <i className="bx bx-check text-[#FF0000] flex-shrink-0 mt-0.5"></i>
@@ -319,22 +352,22 @@ function Berline() {
             </div>
 
                       {/* Prix - Hauteur fixe */}
-                      <div className="bg-gradient-to-r from-[#FF0000]/10 to-[#CC0000]/10 rounded-xl p-4 text-center border border-[#FF0000]/20 mb-6 flex-shrink-0">
-                        <div className="text-3xl font-bold text-[#FF0000] mb-1">
+                      <div className="bg-gradient-to-r from-[#FF0000]/10 to-[#CC0000]/10 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-[#FF0000]/20 mb-4 sm:mb-6 flex-shrink-0">
+                        <div className="text-2xl sm:text-3xl font-bold text-[#FF0000] mb-1">
                           {formule.prix}€
                         </div>
-                        <p className="text-sm text-gray-500">Prix de la formule</p>
+                        <p className="text-xs sm:text-sm text-gray-500">Prix de la formule</p>
                 </div>
 
                       {/* Bouton de réservation - Toujours en bas */}
                       <div className="mt-auto">
                         <motion.button
                           onClick={() => openReservationModal(formule)}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:from-[#CC0000] hover:to-#990000 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-lg sm:rounded-xl hover:from-[#CC0000] hover:to-[#990000] transition-all duration-300 font-semibold shadow-lg hover:shadow-xl text-sm sm:text-base"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
-                          <i className="bx bx-calendar-plus mr-2"></i>
+                          <i className="bx bx-calendar-plus mr-1 sm:mr-2"></i>
                           Réserver cette formule
                         </motion.button>
                 </div>
@@ -397,6 +430,7 @@ function Berline() {
           options={options}
           onOptionQuantityChange={handleOptionQuantityChange}
           onOptionToggle={handleOptionToggle}
+
         />
       </div>
     </div>

@@ -104,12 +104,12 @@ class ReservationService {
       const result = await pool.query(query, values);
       
       console.log('✅ Réservation créée avec succès, ID:', result.rows[0].id);
-      
-      return {
-        success: true,
-        data: result.rows[0],
+        
+        return {
+          success: true,
+          data: result.rows[0],
         message: 'Réservation créée avec succès'
-      };
+        };
 
     } catch (error) {
       console.error('Erreur lors de la création de la réservation:', error);
@@ -206,7 +206,7 @@ class ReservationService {
         const day = date.getDate().toString().padStart(2, '0');
         return `${year}-${month}-${day}`;
       };
-
+      
       const values = [
         formatLocalDate(startOfWeek),
         formatLocalDate(endOfWeek)

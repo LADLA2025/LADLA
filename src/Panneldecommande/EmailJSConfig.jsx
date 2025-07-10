@@ -46,12 +46,12 @@ function EmailJSConfig() {
         </motion.div>
 
         {/* Configuration actuelle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-4xl mx-auto"
-        >
+            >
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
               <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -82,14 +82,14 @@ function EmailJSConfig() {
                       <label className="block text-sm font-medium text-gray-600 mb-1">Template ID</label>
                       <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg font-mono text-sm">
                         {config.templateId}
-                      </div>
+                    </div>
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Clé Publique</label>
                       <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg font-mono text-sm">
                         {config.publicKey}
-                      </div>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -111,19 +111,19 @@ function EmailJSConfig() {
                       <label className="block text-sm font-medium text-gray-600 mb-1">Nom Entreprise</label>
                       <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
                         {config.companyName}
-                      </div>
+                    </div>
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Site Web</label>
                       <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
                         {config.companyWebsite}
-                      </div>
+                    </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
+                </div>
+                
               {/* Info importante */}
               <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
                 <div className="flex items-start gap-3">
@@ -133,8 +133,8 @@ function EmailJSConfig() {
                     <p className="text-blue-700 text-sm leading-relaxed">
                       EmailJS est maintenant configuré directement dans React selon la documentation officielle. 
                       Les emails sont envoyés depuis le navigateur, plus besoin de serveur pour les emails !
-                    </p>
-                  </div>
+                  </p>
+                </div>
                 </div>
               </div>
 
@@ -150,12 +150,12 @@ function EmailJSConfig() {
                       <li>• Envoi automatique après chaque réservation</li>
                       <li>• Testez avec le bouton "Tester EmailJS côté client" ci-dessous</li>
                     </ul>
-                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+                </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
       </div>
     </div>
   );

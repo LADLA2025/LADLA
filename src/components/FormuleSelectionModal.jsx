@@ -22,7 +22,8 @@ function FormuleSelectionModal({
     renov_chrome: { selected: false },
     assaisonnement_ozone: { selected: false, prix: 30 },
     polissage: { selected: false },
-    lustrage: { selected: false }
+    lustrage: { selected: false },
+    lavage_premium: { selected: false, prix: 120 }
   },
   onOptionQuantityChange,
   onOptionToggle
@@ -56,6 +57,11 @@ function FormuleSelectionModal({
     // Options à prix fixe simple
     if (options.assaisonnement_ozone.selected) {
       total += options.assaisonnement_ozone.prix;
+    }
+    
+    // Option lavage premium
+    if (options.lavage_premium && options.lavage_premium.selected) {
+      total += options.lavage_premium.prix;
     }
 
     return total;
@@ -144,7 +150,7 @@ function FormuleSelectionModal({
               </div>
 
               {/* Formules supplémentaires disponibles */}
-              <div className="mb-4">
+              <div className="mb-4 hidden">
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-dashed border-green-300 mb-3 shadow-sm">
                   <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
                     <i className="bx bx-plus-circle text-green-600 animate-pulse"></i>
@@ -210,6 +216,56 @@ function FormuleSelectionModal({
                 </div>
               </div>
 
+              {/* Lavage Premium - Uniquement si cette formule l'inclut */}
+              {selectedFormule.lavage_premium && (
+                <div className="mb-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-3 border border-dashed border-purple-300 mb-3 shadow-sm">
+                    <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+                      <i className="bx bx-diamond text-purple-600 animate-pulse"></i>
+                      <span>💎 Lavage Premium</span>
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-700 leading-tight">
+                      ⭐ <span className="font-bold text-purple-600">Option premium incluse dans cette formule !</span>
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-3 border border-purple-300 hover:border-purple-400 transition-all shadow-md">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💎 Lavage Premium</span>
+                        <div className="text-xs text-purple-700">
+                          {options.lavage_premium.selected 
+                            ? "✅ Remplace pressing sièges, tapis et panneaux | +120€ ⭐" 
+                            : "Remplace automatiquement pressing sièges, tapis et panneaux | +120€ ⭐"
+                          }
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <motion.button
+                          onClick={() => onOptionToggle && onOptionToggle('lavage_premium')}
+                          className={`w-12 h-6 rounded-full transition-colors flex items-center ${
+                            options.lavage_premium.selected ? 'bg-purple-500' : 'bg-gray-300'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                            options.lavage_premium.selected ? 'translate-x-6' : 'translate-x-0.5'
+                          }`} />
+                        </motion.button>
+                        <div className={`font-bold text-sm px-2 py-1 rounded-md ${
+                          options.lavage_premium.selected 
+                            ? 'bg-purple-50 text-purple-600' 
+                            : 'bg-gray-50 text-gray-400'
+                        }`}>
+                          {options.lavage_premium.selected ? '+120€' : '0€'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Options supplémentaires */}
               <div className="mb-4">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-dashed border-blue-300 mb-3 shadow-sm">
@@ -267,8 +323,10 @@ function FormuleSelectionModal({
                     </div>
                   </div>
 
-                  {/* Pressing des sièges */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
+                  {/* Pressing des sièges - Masqué si Lavage Premium activé */}
+                  <div className={`bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm ${
+                    options.lavage_premium && options.lavage_premium.selected ? 'hidden' : ''
+                  }`}>
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <span className="font-bold text-gray-800 text-xs sm:text-sm">🧽 Pressing des sièges</span>
@@ -304,8 +362,10 @@ function FormuleSelectionModal({
                     </div>
                   </div>
 
-                  {/* Pressing des tapis */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
+                  {/* Pressing des tapis - Masqué si Lavage Premium activé */}
+                  <div className={`bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm ${
+                    options.lavage_premium && options.lavage_premium.selected ? 'hidden' : ''
+                  }`}>
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <span className="font-bold text-gray-800 text-xs sm:text-sm">🏠 Pressing des tapis</span>
@@ -341,8 +401,10 @@ function FormuleSelectionModal({
                     </div>
                   </div>
 
-                  {/* Pressing panneau de porte */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
+                  {/* Pressing panneau de porte - Masqué si Lavage Premium activé */}
+                  <div className={`bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm ${
+                    options.lavage_premium && options.lavage_premium.selected ? 'hidden' : ''
+                  }`}>
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <span className="font-bold text-gray-800 text-xs sm:text-sm">🚪 Pressing panneau de porte</span>
@@ -621,19 +683,19 @@ function FormuleSelectionModal({
                       <span className="font-medium text-xs sm:text-sm flex-shrink-0">+{calculateOptionPrice(options.baume_sieges)}€</span>
                     </div>
                   )}
-                  {options.pressing_sieges.quantity > 0 && (
+                  {options.pressing_sieges.quantity > 0 && !(options.lavage_premium && options.lavage_premium.selected) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">Pressing sièges x{options.pressing_sieges.quantity}</span>
                       <span className="font-medium text-xs sm:text-sm flex-shrink-0">+{calculateOptionPrice(options.pressing_sieges)}€</span>
                     </div>
                   )}
-                  {options.pressing_tapis.quantity > 0 && (
+                  {options.pressing_tapis.quantity > 0 && !(options.lavage_premium && options.lavage_premium.selected) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">Pressing tapis x{options.pressing_tapis.quantity}</span>
                       <span className="font-medium text-xs sm:text-sm flex-shrink-0">+{calculateOptionPrice(options.pressing_tapis)}€</span>
                     </div>
                   )}
-                  {options.pressing_panneau_porte.quantity > 0 && (
+                  {options.pressing_panneau_porte.quantity > 0 && !(options.lavage_premium && options.lavage_premium.selected) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">Pressing panneau porte x{options.pressing_panneau_porte.quantity}</span>
                       <span className="font-medium text-xs sm:text-sm flex-shrink-0">+{calculateOptionPrice(options.pressing_panneau_porte)}€</span>
@@ -655,6 +717,12 @@ function FormuleSelectionModal({
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">Assaisonnement ozone</span>
                       <span className="font-medium text-xs sm:text-sm flex-shrink-0">+{options.assaisonnement_ozone.prix}€</span>
+                    </div>
+                  )}
+                  {options.lavage_premium && options.lavage_premium.selected && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">💎 Lavage Premium</span>
+                      <span className="font-medium text-xs sm:text-sm flex-shrink-0 text-purple-600">+{options.lavage_premium.prix}€</span>
                     </div>
                   )}
                   {options.renov_chrome.selected && (

@@ -348,6 +348,140 @@ function Tarifs() {
         </div>
       )
     },
+    options: {
+      title: "Options & Services",
+      icon: "bx-cog",
+      description: "Toutes nos options et services supplémentaires pour personnaliser votre prestation.",
+      items: [
+        "Options lavage (protection, traitement)",
+        "Services pressing (sièges, tapis, panneaux)",
+        "Rénovation (chromes, phares)",
+        "Services spécialisés (ozone, polish)",
+        "Formules sur mesure"
+      ],
+      prices: [
+        { type: "Protection", price: "15€-30€" },
+        { type: "Pressing", price: "30€" },
+        { type: "Rénovation", price: "20€-30€" },
+        { type: "Spécialisés", price: "Sur devis" }
+      ],
+      modalContent: (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="font-bold text-[#FF0000] mb-4">Options de Lavage</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center justify-between gap-2">
+                  <span>Protection céramique</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Traitement anti-pluie</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Cire de protection</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Shampoing des sièges</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Traitement cuir</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Désinfection à l'ozone</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="font-bold text-[#FF0000] mb-4">Services Pressing</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center justify-between gap-2">
+                  <span>Pressing de sièges</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Pressing moquette/tapis</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Pressing plafonnier/coffre</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Pressing panneaux de porte</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Baume cuir</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">20€</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="font-bold text-[#FF0000] mb-4">Rénovation</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center justify-between gap-2">
+                  <span>Renov chrome</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Prix personnalisé selon véhicule 💎</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Rénovation phares</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€/unité</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Assainissement ozone</span>
+                  <span className="font-semibold text-[#FF0000] w-48 text-right">30€</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="font-bold text-[#FF0000] mb-4">Services Sur Devis</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-center justify-between gap-2">
+                  <span>🔥 Polissage</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Restauration carrosserie personnalisée ✨</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>💎 Lustrage</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Detailing express</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Detailing premium</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Lavage moteur</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+                <li className="flex items-center justify-between gap-2">
+                  <span>Nettoyage cryogénique</span>
+                  <span className="font-semibold text-orange-500 w-48 text-right">Sur devis</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="bg-[#FF0000]/5 rounded-xl p-6">
+            <h4 className="font-bold text-[#FF0000] mb-3">💎 Option Premium</h4>
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-medium text-gray-700">Lavage Premium (Option Beauté intégrale)</span>
+              <span className="text-2xl font-bold text-purple-600">120€</span>
+            </div>
+            <p className="text-gray-600 mt-2">Remplace automatiquement pressing sièges, tapis et panneaux</p>
+          </div>
+        </div>
+      )
+    },
     protection: {
       title: "Protection / Rénovation",
       icon: "bx-shield",

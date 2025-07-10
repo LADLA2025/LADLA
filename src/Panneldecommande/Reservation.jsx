@@ -344,6 +344,9 @@ function Reservation() {
             const templateID = 'template_0q2h3np';
             const publicKey = '0ygI7AuTVWD9Tc4eB';
             
+            // Formater les options pour l'email
+            const { optionsText, optionsPrice } = formatOptionsForEmail(reservationData.options);
+            
             // Préparation des paramètres du template
             const templateParams = {
               client_nom: `${reservationData.prenom} ${reservationData.nom}`,
@@ -356,7 +359,11 @@ function Reservation() {
               prix: reservationData.prix,
               date_rdv: reservationData.date,
               heure_rdv: reservationData.heure,
-              commentaires: reservationData.commentaires
+              commentaires: reservationData.commentaires,
+              // Nouvelles informations sur les options
+              options_selectionnees: optionsText,
+              prix_options: optionsPrice,
+              prix_total_avec_options: reservationData.prix + optionsPrice
             };
             
             // Envoi de l'email avec EmailJS
@@ -369,7 +376,7 @@ function Reservation() {
             
             if (result.text === 'OK') {
               console.log('✅ Email de notification envoyé avec succès !');
-            } else {
+        } else {
               console.warn('⚠️ Erreur envoi email:', result);
             }
           } catch (emailError) {
@@ -449,6 +456,87 @@ function Reservation() {
   const getSelectedFormules = () => {
     if (!formData.formule) return [];
     return formData.formule.split(',').map(nom => nom.trim());
+  };
+
+  // Fonction pour formater les options pour l'email
+  const formatOptionsForEmail = (options) => {
+    if (!options || typeof options !== 'object') return { optionsText: '', optionsPrice: 0 };
+
+    const selectedOptions = [];
+    let totalOptionsPrice = 0;
+
+    // Options avec quantité et réduction x4
+    if (options.baume_sieges?.quantity > 0) {
+      const qty = options.baume_sieges.quantity;
+      const price = qty >= 4 ? options.baume_sieges.prix_x4 : qty * options.baume_sieges.prix_unitaire;
+      selectedOptions.push(`• Baume sièges (x${qty}) : ${price}€${qty >= 4 ? ' (Réduction x4 appliquée)' : ''}`);
+      totalOptionsPrice += price;
+    }
+
+    if (options.pressing_sieges?.quantity > 0) {
+      const qty = options.pressing_sieges.quantity;
+      const price = qty >= 4 ? options.pressing_sieges.prix_x4 : qty * options.pressing_sieges.prix_unitaire;
+      selectedOptions.push(`• Pressing sièges (x${qty}) : ${price}€${qty >= 4 ? ' (Réduction x4 appliquée)' : ''}`);
+      totalOptionsPrice += price;
+    }
+
+    if (options.pressing_tapis?.quantity > 0) {
+      const qty = options.pressing_tapis.quantity;
+      const price = qty >= 4 ? options.pressing_tapis.prix_x4 : qty * options.pressing_tapis.prix_unitaire;
+      selectedOptions.push(`• Pressing tapis (x${qty}) : ${price}€${qty >= 4 ? ' (Réduction x4 appliquée)' : ''}`);
+      totalOptionsPrice += price;
+    }
+
+    if (options.pressing_panneau_porte?.quantity > 0) {
+      const qty = options.pressing_panneau_porte.quantity;
+      const price = qty >= 4 ? options.pressing_panneau_porte.prix_x4 : qty * options.pressing_panneau_porte.prix_unitaire;
+      selectedOptions.push(`• Pressing panneau porte (x${qty}) : ${price}€${qty >= 4 ? ' (Réduction x4 appliquée)' : ''}`);
+      totalOptionsPrice += price;
+    }
+
+    if (options.renov_phare?.quantity > 0) {
+      const qty = options.renov_phare.quantity;
+      const price = qty >= 4 ? options.renov_phare.prix_x4 : qty * options.renov_phare.prix_unitaire;
+      selectedOptions.push(`• Renov phare (x${qty}) : ${price}€${qty >= 4 ? ' (Réduction x4 appliquée)' : ''}`);
+      totalOptionsPrice += price;
+    }
+
+    if (options.pressing_coffre_plafonnier?.quantity > 0) {
+      const qty = options.pressing_coffre_plafonnier.quantity;
+      const price = qty * options.pressing_coffre_plafonnier.prix_unitaire;
+      selectedOptions.push(`• Pressing coffre/plafonnier (x${qty}) : ${price}€`);
+      totalOptionsPrice += price;
+    }
+
+    // Options à prix fixe
+    if (options.assaisonnement_ozone?.selected) {
+      selectedOptions.push(`• Assaisonnement à l'ozone : ${options.assaisonnement_ozone.prix}€`);
+      totalOptionsPrice += options.assaisonnement_ozone.prix;
+    }
+
+    if (options.lavage_premium?.selected) {
+      selectedOptions.push(`• 💎 Lavage Premium : ${options.lavage_premium.prix}€`);
+      totalOptionsPrice += options.lavage_premium.prix;
+    }
+
+    // Options sur devis
+    if (options.renov_chrome?.selected) {
+      selectedOptions.push(`• Renov chrome : Sur devis`);
+    }
+
+    if (options.polissage?.selected) {
+      selectedOptions.push(`• Polissage : Sur devis`);
+    }
+
+    if (options.lustrage?.selected) {
+      selectedOptions.push(`• Lustrage : Sur devis`);
+    }
+
+    const optionsText = selectedOptions.length > 0 
+      ? selectedOptions.join('\n') 
+      : 'Aucune option supplémentaire sélectionnée';
+
+    return { optionsText, optionsPrice: totalOptionsPrice };
   };
 
   const containerVariants = {
@@ -644,13 +732,13 @@ function Reservation() {
           ) : (
             // Formulaire de réservation
             <>
-              {/* Barre de progression */}
-              <motion.div 
-                className="mb-6 sm:mb-12"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
+          {/* Barre de progression */}
+          <motion.div 
+            className="mb-6 sm:mb-12"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="flex items-center justify-between relative px-2">
               {/* Ligne de progression */}
               <div className="absolute top-5 sm:top-6 left-6 sm:left-0 right-6 sm:right-0 h-0.5 sm:h-1 bg-gray-200 rounded-full z-0">
@@ -998,6 +1086,15 @@ function Reservation() {
                                   <span className="font-medium text-blue-600">{formData.options.assaisonnement_ozone.prix}€</span>
                                 </div>
                               )}
+                              {formData.options.lavage_premium?.selected && (
+                                <div className="flex items-center justify-between bg-white rounded p-2">
+                                  <span className="text-gray-700">
+                                    <i className="bx bx-check-circle text-green-600 mr-1"></i>
+                                    💎 Lavage Premium
+                                  </span>
+                                  <span className="font-medium text-purple-600">{formData.options.lavage_premium.prix}€</span>
+                                </div>
+                              )}
                               {formData.options.renov_chrome?.selected && (
                                 <div className="flex items-center justify-between bg-white rounded p-2">
                                   <span className="text-gray-700">
@@ -1332,6 +1429,15 @@ function Reservation() {
                                   <span className="text-[#FF0000] font-medium">{formData.options.assaisonnement_ozone.prix}€</span>
                                 </div>
                               )}
+                              {formData.options.lavage_premium?.selected && (
+                                <div className="flex justify-between items-center text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <i className="bx bx-chevron-right text-[#FF0000] text-sm"></i>
+                                    <span>💎 Lavage Premium</span>
+                                  </div>
+                                  <span className="text-purple-600 font-medium">{formData.options.lavage_premium.prix}€</span>
+                                </div>
+                              )}
                               {/* Options sur devis */}
                               {formData.options.renov_chrome?.selected && (
                                 <div className="flex justify-between items-center text-sm">
@@ -1474,8 +1580,8 @@ function Reservation() {
                       </>
                     ) : (
                       <>
-                        <i className="bx bx-check mr-2"></i>
-                        Confirmer
+                    <i className="bx bx-check mr-2"></i>
+                    Confirmer
                       </>
                     )}
                   </motion.button>

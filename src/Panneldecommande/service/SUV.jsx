@@ -9,7 +9,8 @@ function SUV() {
     prix: '',
     duree: '',
     icone: '',
-    services: ''
+    services: '',
+    lavage_premium: false
   });
   const [message, setMessage] = useState({ type: '', content: '' });
 
@@ -30,12 +31,44 @@ function SUV() {
     }
   };
 
+  // Fonction pour récupérer les options de service
+  const fetchServiceOptions = async () => {
+    try {
+      const response = await fetch(buildAPIUrl(`${API_ENDPOINTS.SERVICE_OPTIONS}/suv`));
+      if (!response.ok) throw new Error('Erreur lors de la récupération des options');
+      const data = await response.json();
+      setServiceOptions(prev => ({ ...prev, ...data }));
+    } catch (error) {
+      console.error('Erreur lors du chargement des options:', error);
+    }
+  };
+
+  // Fonction pour mettre à jour une option de service
+  const updateServiceOption = async (optionName, value) => {
+    try {
+      const response = await fetch(buildAPIUrl(`${API_ENDPOINTS.SERVICE_OPTIONS}/suv/${optionName}`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ value }),
+      });
+
+      if (!response.ok) throw new Error('Erreur lors de la mise à jour de l\'option');
+      
+      setServiceOptions(prev => ({ ...prev, [optionName]: value }));
+      setMessage({ type: 'success', content: `Option "${optionName}" ${value ? 'activée' : 'désactivée'} avec succès!` });
+    } catch (error) {
+      setMessage({ type: 'error', content: error.message });
+    }
+  };
+
   // Gérer les changements dans le formulaire
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -68,7 +101,8 @@ function SUV() {
         prix: '',
         duree: '',
         icone: '',
-        services: ''
+        services: '',
+        lavage_premium: false
       });
       setMessage({ type: 'success', content: 'Formule ajoutée avec succès!' });
       
@@ -121,6 +155,33 @@ function SUV() {
             {message.content}
           </div>
         )}
+
+        {/* Options de service */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-md mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-[#FFA600]">Options de service</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">💎 Lavage Premium</h3>
+                <p className="text-sm text-gray-600">
+                  Option premium qui remplace automatiquement le pressing des sièges, des tapis et des panneaux de porte (+120€)
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={serviceOptions.lavage_premium || false}
+                  onChange={(e) => updateServiceOption('lavage_premium', e.target.checked)}
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+                <span className="ml-3 text-sm font-medium text-gray-700">
+                  {serviceOptions.lavage_premium ? 'Activé' : 'Désactivé'}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
 
         {/* Formulaire d'ajout de formule */}
         <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-md mb-8">

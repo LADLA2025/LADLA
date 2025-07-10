@@ -16,9 +16,21 @@ class CitadineService {
           duree VARCHAR(50) NOT NULL,
           icone VARCHAR(50) NOT NULL,
           services TEXT[] NOT NULL,
+          lavage_premium BOOLEAN DEFAULT FALSE,
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
       `);
+      
+      // Ajouter la colonne lavage_premium si elle n'existe pas déjà
+      try {
+        await this.pool.query(`
+          ALTER TABLE formules_citadine 
+          ADD COLUMN IF NOT EXISTS lavage_premium BOOLEAN DEFAULT FALSE;
+        `);
+      } catch (alterErr) {
+        // Ignorer l'erreur si la colonne existe déjà
+        console.log('Note: Colonne lavage_premium déjà existante ou erreur lors de l\'ajout');
+      }
       console.log('✅ Table formules_citadine créée avec succès');
     } catch (err) {
       console.error('❌ Erreur lors de la création de la table formules_citadine:', err);
@@ -40,7 +52,7 @@ class CitadineService {
   // Ajouter une nouvelle formule citadine
   async addFormule(formuleData) {
     try {
-      const { nom, prix, duree, icone, services } = formuleData;
+      const { nom, prix, duree, icone, services, lavage_premium = false } = formuleData;
 
       // Validation des données
       if (!nom || !prix || !duree || !icone || !services || !Array.isArray(services)) {
@@ -48,8 +60,8 @@ class CitadineService {
       }
 
       const result = await this.pool.query(
-        'INSERT INTO formules_citadine (nom, prix, duree, icone, services) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-        [nom, prix, duree, icone, services]
+        'INSERT INTO formules_citadine (nom, prix, duree, icone, services, lavage_premium) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [nom, prix, duree, icone, services, lavage_premium]
       );
 
       console.log(`✅ Formule "${nom}" ajoutée avec succès`);
@@ -80,7 +92,7 @@ class CitadineService {
   // Mettre à jour une formule citadine
   async updateFormule(id, formuleData) {
     try {
-      const { nom, prix, duree, icone, services } = formuleData;
+      const { nom, prix, duree, icone, services, lavage_premium = false } = formuleData;
 
       // Validation des données
       if (!nom || !prix || !duree || !icone || !services || !Array.isArray(services)) {
@@ -88,8 +100,8 @@ class CitadineService {
       }
 
       const result = await this.pool.query(
-        'UPDATE formules_citadine SET nom = $1, prix = $2, duree = $3, icone = $4, services = $5 WHERE id = $6 RETURNING *',
-        [nom, prix, duree, icone, services, id]
+        'UPDATE formules_citadine SET nom = $1, prix = $2, duree = $3, icone = $4, services = $5, lavage_premium = $6 WHERE id = $7 RETURNING *',
+        [nom, prix, duree, icone, services, lavage_premium, id]
       );
 
       if (result.rows.length === 0) {

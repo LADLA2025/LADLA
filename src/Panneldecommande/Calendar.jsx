@@ -44,6 +44,7 @@ const Calendar = () => {
       renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
       renov_chrome: { selected: false },
       assaisonnement_ozone: { selected: false, prix: 30 },
+      lavage_premium: { selected: false, prix: 120 },
       polissage: { selected: false },
       lustrage: { selected: false }
     }
@@ -358,6 +359,7 @@ const Calendar = () => {
         renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
         renov_chrome: { selected: false },
         assaisonnement_ozone: { selected: false, prix: 30 },
+        lavage_premium: { selected: false, prix: 120 },
         polissage: { selected: false },
         lustrage: { selected: false }
       }
@@ -401,6 +403,10 @@ const Calendar = () => {
     // Options à prix fixe simple
     if (options.assaisonnement_ozone.selected) {
       total += options.assaisonnement_ozone.prix;
+    }
+
+    if (options.lavage_premium.selected) {
+      total += options.lavage_premium.prix;
     }
 
     return total;
@@ -615,6 +621,14 @@ const Calendar = () => {
       optionsToShow.push({
         name: 'Assaisonnement ozone',
         price: `${options.assaisonnement_ozone.prix}€`,
+        hasReduction: false
+      });
+    }
+
+    if (options.lavage_premium?.selected) {
+      optionsToShow.push({
+        name: '💎 Lavage Premium',
+        price: `${options.lavage_premium.prix}€`,
         hasReduction: false
       });
     }
@@ -2612,7 +2626,7 @@ const Calendar = () => {
                           </div>
                         </div>
 
-                        {/* Assaisonnement à l'ozone */}
+                                                {/* Assaisonnement à l'ozone */}
                         <div className="bg-gray-50 rounded-xl p-4">
                           <div className="flex items-center justify-between">
                             <div>
@@ -2624,11 +2638,35 @@ const Calendar = () => {
                                 type="checkbox"
                                 checked={newReservationData.options.assaisonnement_ozone.selected}
                                 onChange={() => handleOptionToggle('assaisonnement_ozone')}
-                                                                 className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
-                               />
-                               <div className="font-bold text-[#FF0000]">
-                                 {newReservationData.options.assaisonnement_ozone.selected ? '30€' : '0€'}
-                               </div>
+                                className="w-5 h-5 text-[#FF0000] rounded focus:ring-[#FF0000]"
+                              />
+                              <div className="font-bold text-[#FF0000]">
+                                {newReservationData.options.assaisonnement_ozone.selected ? '30€' : '0€'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Lavage Premium */}
+                        <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="font-medium text-gray-700 flex items-center gap-2">
+                                💎 Lavage Premium
+                                <span className="inline-block animate-pulse">✨</span>
+                              </label>
+                              <div className="text-sm text-gray-600">Service haut de gamme - 120€</div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                checked={newReservationData.options.lavage_premium.selected}
+                                onChange={() => handleOptionToggle('lavage_premium')}
+                                className="w-5 h-5 text-purple-600 rounded focus:ring-purple-600"
+                              />
+                              <div className="font-bold text-purple-600">
+                                {newReservationData.options.lavage_premium.selected ? '120€' : '0€'}
+                              </div>
                             </div>
                           </div>
                         </div>

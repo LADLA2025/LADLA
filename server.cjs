@@ -101,10 +101,12 @@ const PetiteCitadineService = require('./server/petiteCitadineService.cjs');
 const CitadineService = require('./server/citadineService.cjs');
 const BerlineService = require('./server/berlineService.cjs');
 const SuvService = require('./server/suvService.cjs');
+const ServiceOptionsService = require('./server/serviceOptionsService.cjs');
 const createPetiteCitadineRoutes = require('./server/routes/petiteCitadineRoutes.cjs');
 const createCitadineRoutes = require('./server/routes/citadineRoutes.cjs');
 const createBerlineRoutes = require('./server/routes/berlineRoutes.cjs');
 const createSuvRoutes = require('./server/routes/suvRoutes.cjs');
+const createServiceOptionsRoutes = require('./server/routes/serviceOptionsRoutes.cjs');
 const reservationRoutes = require('./server/routes/reservationRoutes.cjs');
 const newsletterRoutes = require('./server/routes/newsletterRoutes.cjs');
 const contactRoutes = require('./server/routes/contactRoutes.cjs');
@@ -116,6 +118,7 @@ const petiteCitadineService = new PetiteCitadineService(pool);
 const citadineService = new CitadineService(pool);
 const berlineService = new BerlineService(pool);
 const suvService = new SuvService(pool);
+const serviceOptionsService = new ServiceOptionsService(pool);
 
 // Initialiser le pool pour le service de réservation
 initPool(pool);
@@ -130,6 +133,7 @@ const initializeDatabase = async () => {
     await citadineService.createTable();
     await berlineService.createTable();
     await suvService.createTable();
+    await serviceOptionsService.createTable();
     await ReservationTableService.createTable();
     console.log('✅ Base de données initialisée avec succès!');
   } catch (err) {
@@ -148,6 +152,7 @@ try {
   app.use('/api/formules/citadine', createCitadineRoutes(citadineService));
   app.use('/api/formules/berline', createBerlineRoutes(berlineService));
   app.use('/api/formules/suv', createSuvRoutes(suvService));
+  app.use('/api/service-options', createServiceOptionsRoutes(serviceOptionsService));
   app.use('/api/reservations', reservationRoutes);
   app.use('/api/newsletter', newsletterRoutes);
   app.use('/api/contact', contactRoutes);

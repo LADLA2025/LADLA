@@ -9,7 +9,8 @@ function PetiteCitadine() {
     prix: '',
     duree: '',
     icone: '',
-    services: ''
+    services: '',
+    lavage_premium: false
   });
   const [message, setMessage] = useState({ type: '', content: '' });
 
@@ -30,12 +31,14 @@ function PetiteCitadine() {
     }
   };
 
+
+
   // Gérer les changements dans le formulaire
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -46,15 +49,17 @@ function PetiteCitadine() {
       // Convertir les services en tableau
       const servicesArray = formData.services.split('\n').filter(service => service.trim() !== '');
       
+      const dataToSend = {
+        ...formData,
+        services: servicesArray
+      };
+      
       const response = await fetch(buildAPIUrl(API_ENDPOINTS.PETITE_CITADINE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          services: servicesArray
-        }),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!response.ok) {
@@ -68,7 +73,8 @@ function PetiteCitadine() {
         prix: '',
         duree: '',
         icone: '',
-        services: ''
+        services: '',
+        lavage_premium: false
       });
       setMessage({ type: 'success', content: 'Formule ajoutée avec succès!' });
       
@@ -121,6 +127,8 @@ function PetiteCitadine() {
             {message.content}
           </div>
         )}
+
+
 
         {/* Formulaire d'ajout de formule */}
         <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-md mb-8">
@@ -197,6 +205,25 @@ function PetiteCitadine() {
                 required
               ></textarea>
             </div>
+            
+            {/* Option Lavage Premium */}
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+              <input
+                type="checkbox"
+                name="lavage_premium"
+                id="lavage_premium"
+                checked={formData.lavage_premium}
+                onChange={handleChange}
+                className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+              />
+              <label htmlFor="lavage_premium" className="flex-1 cursor-pointer">
+                <div className="text-sm font-semibold text-gray-800">💎 Lavage Premium</div>
+                <div className="text-xs text-gray-600">
+                  Cette formule inclut automatiquement l'option "Lavage Premium" (+120€) qui remplace les services de pressing
+                </div>
+              </label>
+            </div>
+            
             <div className="flex justify-end">
               <button
                 type="submit"
@@ -212,12 +239,19 @@ function PetiteCitadine() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {formules.map((formule) => (
             <div key={formule.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden hover:scale-105">
-              <div className="p-4 bg-gradient-to-r from-[#FFA600] to-[#FF8C00]">
+              <div className="p-4 bg-gradient-to-r from-[#FFA600] to-[#FF8C00] relative">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center">
                     <i className={`${formule.icone} text-2xl text-[#FFA600]`}></i>
                   </div>
-                  <h2 className="text-xl font-bold text-white">{formule.nom}</h2>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-white">{formule.nom}</h2>
+                    {formule.lavage_premium && (
+                      <div className="text-xs text-purple-200 bg-purple-500/30 px-2 py-1 rounded-full inline-block mt-1">
+                        💎 Lavage Premium
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="p-4">
