@@ -39,8 +39,19 @@ function createBerlineRoutes(berlineService) {
   // PUT /api/formules/berline/:id - Mettre à jour une formule
   router.put('/:id', async (req, res) => {
     try {
-      const formule = await berlineService.updateFormule(req.params.id, req.body);
-      res.json(formule);
+      // Vérifier si c'est une mise à jour du prix lavage premium uniquement
+      const bodyKeys = Object.keys(req.body);
+      const isLavagePremiumPriceUpdate = bodyKeys.length === 1 && bodyKeys.includes('lavage_premium_prix');
+      
+      if (isLavagePremiumPriceUpdate) {
+        // Utiliser la méthode spécifique pour mettre à jour le prix lavage premium
+        const formule = await berlineService.updateLavagePremiumPrice(req.params.id, req.body.lavage_premium_prix);
+        res.json(formule);
+      } else {
+        // Utiliser la méthode de mise à jour complète
+        const formule = await berlineService.updateFormule(req.params.id, req.body);
+        res.json(formule);
+      }
     } catch (error) {
       console.error(`Erreur PUT /api/formules/berline/${req.params.id}:`, error);
       res.status(400).json({ error: error.message });

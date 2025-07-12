@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const cardVariants = {
   hidden: { 
@@ -113,15 +114,59 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
             </motion.div>
           ))}
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onMoreInfo}
-          className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg mt-auto"
-        >
-          <i className="bx bx-info-circle"></i>
-          Plus d'informations
-        </motion.button>
+        <div className="space-y-3 mt-auto">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onMoreInfo}
+            className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-medium hover:from-gray-200 hover:to-gray-300 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          >
+            <i className="bx bx-info-circle"></i>
+            Plus d'infos
+          </motion.button>
+          
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-2 font-medium">Réserver pour :</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Link to="/voitures/petite-citadine">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl text-sm"
+                >
+                  Petite Citadine
+                </motion.button>
+              </Link>
+              <Link to="/voitures/citadine">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl text-sm"
+                >
+                  Citadine
+                </motion.button>
+              </Link>
+              <Link to="/voitures/berline">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl text-sm"
+                >
+                  Berline
+                </motion.button>
+              </Link>
+              <Link to="/voitures/suv">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl text-sm"
+                >
+                  SUV / 4x4
+                </motion.button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -325,7 +370,7 @@ function Tarifs() {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center gap-2">
                   <i className="bx bx-plus text-[#FF0000]"></i>
-                  Option Beauté intégrale (+120€)
+                  Option Beauté intégrale (Prix personnalisé)
                 </li>
                 <li className="flex items-center gap-2">
                   <i className="bx bx-plus text-[#FF0000]"></i>
@@ -477,7 +522,7 @@ function Tarifs() {
             <h4 className="font-bold text-[#FF0000] mb-3">💎 Option Premium</h4>
             <div className="flex items-center justify-between">
               <span className="text-lg font-medium text-gray-700">Lavage Premium (Option Beauté intégrale)</span>
-              <span className="text-2xl font-bold text-purple-600">120€</span>
+              <span className="text-2xl font-bold text-purple-600">Prix personnalisé</span>
             </div>
                                     <p className="text-gray-600 mt-2">ce service inclus les prestations prenium pressing des sieges des plastiques des tapis</p>
           </div>

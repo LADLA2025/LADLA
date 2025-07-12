@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function FormuleSelectionModal({ 
@@ -34,8 +34,81 @@ function FormuleSelectionModal({
   const [showMobileConfirmation, setShowMobileConfirmation] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
 
+  // Gérer l'affichage du header et footer quand le modal est ouvert
+  useEffect(() => {
+    // Fonction pour ajouter les styles CSS
+    const addModalStyles = () => {
+      const styleId = 'modal-hide-styles';
+      let existingStyle = document.getElementById(styleId);
+      
+      if (!existingStyle) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          .modal-open header,
+          .modal-open footer {
+            display: none !important;
+          }
+          .modal-open {
+            overflow: hidden !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    };
+
+    // Fonction pour masquer header/footer
+    const hideHeaderFooter = () => {
+      addModalStyles();
+      document.body.classList.add('modal-open');
+      console.log('✅ Modal ouvert - Header/Footer masqués');
+    };
+
+    // Fonction pour restaurer header/footer
+    const showHeaderFooter = () => {
+      document.body.classList.remove('modal-open');
+      console.log('✅ Modal fermé - Header/Footer restaurés');
+    };
+
+    // Logique principale
+    if (showModal || showMobileConfirmation) {
+      hideHeaderFooter();
+    } else {
+      // FORCER la restauration à chaque fermeture
+      setTimeout(() => {
+        showHeaderFooter();
+        console.log('🔄 Restauration forcée du header/footer');
+      }, 100);
+    }
+
+    // Cleanup robuste au démontage
+    return () => {
+      showHeaderFooter();
+      console.log('🧹 Cleanup - Header/Footer restaurés');
+    };
+  }, [showModal, showMobileConfirmation]);
+
+  // Effet supplémentaire pour s'assurer de la restauration à la fermeture
+  useEffect(() => {
+    if (!showModal && !showMobileConfirmation) {
+      // Double vérification - restaurer header/footer si modal fermé
+      const timer = setTimeout(() => {
+        document.body.classList.remove('modal-open');
+        console.log('🔍 Double vérification - Header/Footer restaurés');
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showModal, showMobileConfirmation]);
+
   // Vérifier si on est sur mobile
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+  // Fonction pour forcer la restauration du header/footer
+  const forceRestoreHeaderFooter = () => {
+    document.body.classList.remove('modal-open');
+    console.log('🚨 Restauration forcée du header/footer');
+  };
 
   // Handlers pour la confirmation sur mobile
   const handleContinueClick = () => {
@@ -62,21 +135,37 @@ function FormuleSelectionModal({
     }
     setShowMobileConfirmation(false);
     setConfirmationAction(null);
+    // Forcer la restauration
+    setTimeout(forceRestoreHeaderFooter, 100);
   };
 
   const handleCancelConfirmation = () => {
     setShowMobileConfirmation(false);
     setConfirmationAction(null);
+    // Forcer la restauration
+    setTimeout(forceRestoreHeaderFooter, 100);
+  };
+
+  // Gestionnaire de fermeture amélioré
+  const handleCloseModal = () => {
+    onCloseModal();
+    // Forcer la restauration immédiatement
+    setTimeout(forceRestoreHeaderFooter, 100);
   };
 
   // Fonction pour calculer le prix d'une option avec réduction automatique
   const calculateOptionPrice = (option) => {
-    const { quantity, prix_unitaire, prix_x4 } = option;
-    if (quantity === 0) return 0;
-    if (quantity >= 4 && prix_x4) {
-      return prix_x4;
+    if (!option) return 0;
+    const { quantity = 0, prix_unitaire = 0, prix_x4 = 0 } = option;
+    const qty = parseFloat(quantity) || 0;
+    const priceUnit = parseFloat(prix_unitaire) || 0;
+    const priceX4 = parseFloat(prix_x4) || 0;
+    
+    if (qty === 0) return 0;
+    if (qty >= 4 && priceX4 > 0) {
+      return priceX4;
     }
-    return quantity * prix_unitaire;
+    return qty * priceUnit;
   };
 
   // Fonction pour calculer le prix total des options
@@ -97,27 +186,38 @@ function FormuleSelectionModal({
 
     // Options à prix fixe avec quantité (masquées si lavage premium)
     if (!(options.lavage_premium && options.lavage_premium.selected)) {
-      total += options.pressing_coffre_plafonnier.quantity * options.pressing_coffre_plafonnier.prix_unitaire;
+      const quantity = parseFloat(options.pressing_coffre_plafonnier?.quantity) || 0;
+      const unitPrice = parseFloat(options.pressing_coffre_plafonnier?.prix_unitaire) || 0;
+      total += quantity * unitPrice;
     }
 
     // Options à prix fixe simple
-    if (options.assaisonnement_ozone.selected) {
-      total += options.assaisonnement_ozone.prix;
+    if (options.assaisonnement_ozone?.selected) {
+      const ozonePrice = parseFloat(options.assaisonnement_ozone?.prix) || 0;
+      total += ozonePrice;
     }
     
     // Option lavage premium
     if (options.lavage_premium && options.lavage_premium.selected) {
-      total += options.lavage_premium.prix;
+      const lavagePremiumPrice = parseFloat(selectedFormule?.lavage_premium_prix) || parseFloat(options.lavage_premium.prix) || 120;
+      total += lavagePremiumPrice;
     }
 
-    return total;
+    return isNaN(total) ? 0 : total;
   };
 
   const getTotalPrice = () => {
-    const basePrice = parseFloat(selectedFormule.prix);
-    const additionalFormulePrice = additionalFormules.reduce((sum, f) => sum + parseFloat(f.prix), 0);
-    const optionsPrice = calculateTotalOptionsPrice();
-    return (basePrice + additionalFormulePrice + optionsPrice).toFixed(2);
+    const basePrice = parseFloat(selectedFormule?.prix || 0) || 0;
+    const additionalFormulePrice = additionalFormules.reduce((sum, f) => sum + (parseFloat(f.prix) || 0), 0);
+    const optionsPrice = calculateTotalOptionsPrice() || 0;
+    const total = basePrice + additionalFormulePrice + optionsPrice;
+    
+    // S'assurer que total est un nombre valide avant d'appeler toFixed
+    if (typeof total !== 'number' || isNaN(total)) {
+      return '0.00';
+    }
+    
+    return total.toFixed(2);
   };
 
   const getVehicleTypeLabel = () => {
@@ -133,13 +233,13 @@ function FormuleSelectionModal({
   return (
     <>
       <AnimatePresence>
-        {showModal && (
+        {showModal && selectedFormule && (
           <motion.div
-            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-1 sm:p-4"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-start sm:items-center justify-center p-1 sm:p-4 pt-4 sm:pt-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onCloseModal}
+            onClick={handleCloseModal}
             style={{ 
               zIndex: 99999999, 
               position: 'fixed', 
@@ -147,9 +247,13 @@ function FormuleSelectionModal({
               left: 0, 
               right: 0, 
               bottom: 0,
+              width: '100vw',
+              height: '100vh',
               transform: 'translateZ(0)',
               WebkitTransform: 'translateZ(0)',
-              willChange: 'transform'
+              willChange: 'transform',
+              overflowY: 'auto',
+              overflowX: 'hidden'
             }}
           >
           <motion.div
@@ -169,18 +273,18 @@ function FormuleSelectionModal({
           >
             {/* Header du modal */}
             <div className="bg-gradient-to-r from-[#FF0000] to-[#FF4500] p-4 sm:p-4   text-white relative" style={{ zIndex: 99999999 }}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0 mt-8 sm:mt-0">
-                  <h2 className="text-sm sm:text-base md:text-lg font-bold mb-1 leading-tight">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold mb-1 leading-tight">
                     🎯 Personnalisez votre réservation
                   </h2>
-                  <p className="text-red-100 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-red-100 text-sm sm:text-base leading-relaxed">
                     💡 Ajoutez d'autres formules pour économiser !
                   </p>
                 </div>
                 <motion.button
-                  onClick={onCloseModal}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors flex-shrink-0 mt-8 sm:mt-1 relative"
+                  onClick={handleCloseModal}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors flex-shrink-0"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -223,8 +327,8 @@ function FormuleSelectionModal({
                   </p>
                 </div>
                 <div className="space-y-2">
-                  {formules
-                    .filter(formule => formule.id !== selectedFormule.id)
+                                            {formules
+                    .filter(formule => formule.id !== selectedFormule?.id)
                     .map((formule) => {
                       const isSelected = additionalFormules.find(f => f.id === formule.id);
                       return (
@@ -282,23 +386,44 @@ function FormuleSelectionModal({
 
               {/* Options supplémentaires */}
               <div className="mb-4">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-dashed border-blue-300 mb-3 shadow-sm">
-                  <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-                    <i className="bx bx-cog text-blue-600 animate-spin" style={{ animationDuration: '3s' }}></i>
-                    <span>⭐ Options supplémentaires</span>
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-700 leading-tight">
-                    🔧 <span className="font-bold text-blue-600">Personnalisez votre service !</span>
-                  </p>
-                </div>
+                {/* Lavage Premium - Uniquement si cette formule l'inclut */}
+                {selectedFormule?.lavage_premium && (
+                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:border-purple-300 transition-all shadow-sm mb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💎 Lavage Premium</span>
+                        <div className="text-xs text-purple-700">
+                          ce service inclus les prestations prenium pressing des sieges des plastiques des tapis + pressing coffre/plafonnier
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <motion.button
+                          onClick={() => onOptionToggle && onOptionToggle('lavage_premium')}
+                          className={`w-10 h-5 sm:w-12 sm:h-6 rounded-full transition-colors flex items-center ${
+                            options.lavage_premium.selected ? 'bg-purple-500' : 'bg-gray-300'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <div className={`w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full transition-transform ${
+                            options.lavage_premium.selected ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0.5'
+                          }`} />
+                        </motion.button>
+                        <div className={`font-bold text-xs sm:text-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md ${
+                          options.lavage_premium.selected 
+                            ? 'bg-purple-50 text-purple-600' 
+                            : 'bg-gray-50 text-gray-400'
+                        }`}>
+                          {options.lavage_premium.selected ? `+${selectedFormule?.lavage_premium_prix || 120}€` : '0€'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Options avec quantité */}
                 <div className="space-y-2 mb-3">
-                  <h4 className="font-bold text-gray-800 text-xs sm:text-sm flex items-center gap-2 bg-gray-50 p-1.5 sm:p-2 rounded-lg">
-                    <i className="bx bx-wrench text-blue-600"></i>
-                    <span>🔢 Services avec quantité</span>
-                    <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-1 py-0.5 sm:px-1.5 rounded-full font-medium">Réduction x4</span>
-                  </h4>
+
 
                   {/* Baume sièges */}
                   <div className="bg-white rounded-lg p-1.5 sm:p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
@@ -526,40 +651,7 @@ function FormuleSelectionModal({
                   </div>
                 </div>
 
-                {/* Lavage Premium - Uniquement si cette formule l'inclut */}
-                {selectedFormule.lavage_premium && (
-                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:border-purple-300 transition-all shadow-sm mb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💎 Lavage Premium</span>
-                        <div className="text-xs text-purple-700">
-                          ce service inclus les prestations prenium pressing des sieges des plastiques des tapis + pressing coffre/plafonnier | +120€ ⭐
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <motion.button
-                          onClick={() => onOptionToggle && onOptionToggle('lavage_premium')}
-                          className={`w-10 h-5 sm:w-12 sm:h-6 rounded-full transition-colors flex items-center ${
-                            options.lavage_premium.selected ? 'bg-purple-500' : 'bg-gray-300'
-                          }`}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <div className={`w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full transition-transform ${
-                            options.lavage_premium.selected ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0.5'
-                          }`} />
-                        </motion.button>
-                        <div className={`font-bold text-xs sm:text-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md ${
-                          options.lavage_premium.selected 
-                            ? 'bg-purple-50 text-purple-600' 
-                            : 'bg-gray-50 text-gray-400'
-                        }`}>
-                          {options.lavage_premium.selected ? '+120€' : '0€'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+
 
                 {/* Options on/off */}
                 <div className="space-y-2 sm:space-y-3">
@@ -775,7 +867,7 @@ function FormuleSelectionModal({
                   {options.lavage_premium && options.lavage_premium.selected && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 text-xs sm:text-sm pr-2 flex-1">💎 Lavage Premium</span>
-                      <span className="font-medium text-xs sm:text-sm flex-shrink-0 text-purple-600">+{options.lavage_premium.prix}€</span>
+                      <span className="font-medium text-xs sm:text-sm flex-shrink-0 text-purple-600">+{selectedFormule?.lavage_premium_prix || options.lavage_premium.prix}€</span>
                     </div>
                   )}
                   {options.renov_chrome.selected && (
@@ -873,7 +965,19 @@ function FormuleSelectionModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleCancelConfirmation}
-            style={{ zIndex: 999999999 }}
+            style={{ 
+              zIndex: 999999999,
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100vw',
+              height: '100vh',
+              transform: 'translateZ(0)',
+              WebkitTransform: 'translateZ(0)',
+              willChange: 'transform'
+            }}
           >
             <motion.div
               className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden"

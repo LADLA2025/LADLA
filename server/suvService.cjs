@@ -17,6 +17,7 @@ class SuvService {
           icone VARCHAR(50) NOT NULL,
           services TEXT[] NOT NULL,
           lavage_premium BOOLEAN DEFAULT FALSE,
+          lavage_premium_prix DECIMAL(10,2),
           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -30,6 +31,17 @@ class SuvService {
       } catch (alterErr) {
         // Ignorer l'erreur si la colonne existe déjà
         console.log('Note: Colonne lavage_premium déjà existante ou erreur lors de l\'ajout');
+      }
+
+      // Ajouter la colonne lavage_premium_prix si elle n'existe pas déjà
+      try {
+        await this.pool.query(`
+          ALTER TABLE formules_suv 
+          ADD COLUMN IF NOT EXISTS lavage_premium_prix DECIMAL(10,2);
+        `);
+      } catch (alterErr) {
+        // Ignorer l'erreur si la colonne existe déjà
+        console.log('Note: Colonne lavage_premium_prix déjà existante ou erreur lors de l\'ajout');
       }
       console.log('✅ Table formules_suv créée avec succès');
     } catch (err) {
@@ -52,7 +64,7 @@ class SuvService {
   // Ajouter une nouvelle formule SUV
   async addFormule(formuleData) {
     try {
-      const { nom, prix, duree, icone, services, lavage_premium = false } = formuleData;
+      const { nom, prix, duree, icone, services, lavage_premium = false, lavage_premium_prix } = formuleData;
 
       // Validation des données
       if (!nom || !prix || !duree || !icone || !services || !Array.isArray(services)) {
@@ -60,8 +72,8 @@ class SuvService {
       }
 
       const result = await this.pool.query(
-        'INSERT INTO formules_suv (nom, prix, duree, icone, services, lavage_premium) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [nom, prix, duree, icone, services, lavage_premium]
+        'INSERT INTO formules_suv (nom, prix, duree, icone, services, lavage_premium, lavage_premium_prix) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [nom, prix, duree, icone, services, lavage_premium, lavage_premium_prix]
       );
 
       console.log(`✅ Formule "${nom}" ajoutée avec succès`);
@@ -92,7 +104,7 @@ class SuvService {
   // Mettre à jour une formule SUV
   async updateFormule(id, formuleData) {
     try {
-      const { nom, prix, duree, icone, services, lavage_premium = false } = formuleData;
+      const { nom, prix, duree, icone, services, lavage_premium = false, lavage_premium_prix } = formuleData;
 
       // Validation des données
       if (!nom || !prix || !duree || !icone || !services || !Array.isArray(services)) {
@@ -100,8 +112,8 @@ class SuvService {
       }
 
       const result = await this.pool.query(
-        'UPDATE formules_suv SET nom = $1, prix = $2, duree = $3, icone = $4, services = $5, lavage_premium = $6 WHERE id = $7 RETURNING *',
-        [nom, prix, duree, icone, services, lavage_premium, id]
+        'UPDATE formules_suv SET nom = $1, prix = $2, duree = $3, icone = $4, services = $5, lavage_premium = $6, lavage_premium_prix = $7 WHERE id = $8 RETURNING *',
+        [nom, prix, duree, icone, services, lavage_premium, lavage_premium_prix, id]
       );
 
       if (result.rows.length === 0) {
@@ -112,6 +124,26 @@ class SuvService {
       return result.rows[0];
     } catch (err) {
       console.error('❌ Erreur lors de la mise à jour de la formule:', err);
+      throw err;
+    }
+  }
+
+  // Mettre à jour uniquement le prix du lavage premium
+  async updateLavagePremiumPrice(id, lavage_premium_prix) {
+    try {
+      const result = await this.pool.query(
+        'UPDATE formules_suv SET lavage_premium_prix = $1 WHERE id = $2 RETURNING *',
+        [lavage_premium_prix, id]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error('Formule non trouvée');
+      }
+
+      console.log(`✅ Prix du lavage premium pour formule ID ${id} mis à jour avec succès`);
+      return result.rows[0];
+    } catch (err) {
+      console.error('❌ Erreur lors de la mise à jour du prix du lavage premium:', err);
       throw err;
     }
   }

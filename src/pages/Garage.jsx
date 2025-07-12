@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 // Import des images
 import img2428 from './imgg/IMG_2428.jpeg';
 import img1069 from './imgg/IMG_1069.jpeg';
@@ -95,10 +96,13 @@ function Garage() {
                   <i className='bx bxl-whatsapp mr-2'></i>
                   Contactez-nous
                 </a>
-                <div className="bg-[#FF0000] text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                <Link 
+                  to="/"
+                  className="bg-[#FF0000] text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                >
                   <i className='bx bx-car mr-2'></i>
                   Services Auto
-                </div>
+                </Link>
               </div>
             </div>
           </div>

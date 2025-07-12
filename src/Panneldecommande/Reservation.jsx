@@ -515,8 +515,11 @@ function Reservation() {
     }
 
     if (options.lavage_premium?.selected) {
-      selectedOptions.push(`• 💎 Lavage Premium : ${options.lavage_premium.prix}€`);
-      totalOptionsPrice += options.lavage_premium.prix;
+      // Récupérer le prix personnalisé de la formule sélectionnée
+      const selectedFormule = formules.find(f => f.nom === formData.formule);
+      const lavagePremiumPrice = selectedFormule?.lavage_premium_prix || options.lavage_premium.prix || 120;
+      selectedOptions.push(`• 💎 Lavage Premium : ${lavagePremiumPrice}€`);
+      totalOptionsPrice += lavagePremiumPrice;
     }
 
     // Options sur devis
@@ -898,7 +901,8 @@ function Reservation() {
                           name="typeVoiture"
                           value={formData.typeVoiture}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 sm:py-3 rounded-xl border-2 border-gray-100 focus:border-[#FF0000] focus:outline-none transition-colors text-base"
+                          className="w-full px-4 py-3 sm:py-3 rounded-xl border-2 border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed transition-colors text-base appearance-none"
+                          disabled={true}
                           required
                         >
                           <option value="">Sélectionner le type de véhicule</option>
@@ -906,6 +910,12 @@ function Reservation() {
                             <option key={type.id} value={type.name}>{type.label}</option>
                           ))}
                         </select>
+                        {formData.typeVoiture && (
+                          <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                            <i className="bx bx-lock-alt"></i>
+                            <span>Type de véhicule verrouillé</span>
+                          </div>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-2 text-gray-700">
@@ -950,28 +960,36 @@ function Reservation() {
                             </div>
                           </div>
                         ) : (
-                          <select
-                            name="formule"
-                            value={formData.formule}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 sm:py-3 rounded-xl border-2 border-gray-100 focus:border-[#FF0000] focus:outline-none transition-colors text-base"
-                            disabled={!formData.typeVoiture || loadingFormules}
-                            required
-                          >
-                            <option value="">
-                              {!formData.typeVoiture 
-                                ? "Sélectionnez d'abord un type de véhicule" 
-                                : loadingFormules 
-                                  ? "Chargement des formules..." 
-                                  : "Sélectionner une formule"
-                              }
-                            </option>
-                            {formules.map(formule => (
-                              <option key={formule.id} value={formule.nom}>
-                                {formule.nom} - {formule.prix}€
+                          <div className="relative">
+                            <select
+                              name="formule"
+                              value={formData.formule}
+                              onChange={handleInputChange}
+                              className="w-full px-4 py-3 sm:py-3 rounded-xl border-2 border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed transition-colors text-base appearance-none"
+                              disabled={true}
+                              required
+                            >
+                              <option value="">
+                                {!formData.typeVoiture 
+                                  ? "Sélectionnez d'abord un type de véhicule" 
+                                  : loadingFormules 
+                                    ? "Chargement des formules..." 
+                                    : "Sélectionner une formule"
+                                }
                               </option>
-                            ))}
-                          </select>
+                              {formules.map(formule => (
+                                <option key={formule.id} value={formule.nom}>
+                                  {formule.nom} - {formule.prix}€
+                                </option>
+                              ))}
+                            </select>
+                            {formData.formule && (
+                              <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                                <i className="bx bx-lock-alt"></i>
+                                <span>Formule verrouillée</span>
+                              </div>
+                            )}
+                          </div>
                         )}
                         {formData.formule && getFormulePrice() && (
                           <div className="mt-2 p-3 bg-[#FF0000]/10 rounded-lg border border-[#FF0000]/20">
@@ -1092,7 +1110,10 @@ function Reservation() {
                                     <i className="bx bx-check-circle text-green-600 mr-1"></i>
                                     💎 Lavage Premium
                                   </span>
-                                  <span className="font-medium text-purple-600">{formData.options.lavage_premium.prix}€</span>
+                                  <span className="font-medium text-purple-600">{(() => {
+                                    const selectedFormule = formules.find(f => f.nom === formData.formule);
+                                    return selectedFormule?.lavage_premium_prix || formData.options.lavage_premium.prix || 120;
+                                  })()}€</span>
                                 </div>
                               )}
                               {formData.options.renov_chrome?.selected && (
@@ -1435,7 +1456,10 @@ function Reservation() {
                                     <i className="bx bx-chevron-right text-[#FF0000] text-sm"></i>
                                     <span>💎 Lavage Premium</span>
                                   </div>
-                                  <span className="text-purple-600 font-medium">{formData.options.lavage_premium.prix}€</span>
+                                  <span className="text-purple-600 font-medium">{(() => {
+                                    const selectedFormule = formules.find(f => f.nom === formData.formule);
+                                    return selectedFormule?.lavage_premium_prix || formData.options.lavage_premium.prix || 120;
+                                  })()}€</span>
                                 </div>
                               )}
                               {/* Options sur devis */}

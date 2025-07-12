@@ -52,6 +52,17 @@ function createPetiteCitadineRoutes(petiteCitadineService) {
     try {
       const { id } = req.params;
       const formuleData = req.body;
+      
+      // Si on ne met à jour que le prix lavage premium
+      if (Object.keys(formuleData).length === 1 && 'lavage_premium_prix' in formuleData) {
+        const formuleMiseAJour = await petiteCitadineService.updateLavagePremiumPrice(id, formuleData.lavage_premium_prix);
+        return res.json({
+          message: 'Prix lavage premium mis à jour avec succès',
+          formule: formuleMiseAJour
+        });
+      }
+      
+      // Sinon, mise à jour complète
       const formuleMiseAJour = await petiteCitadineService.updateFormule(id, formuleData);
       res.json({
         message: 'Formule mise à jour avec succès',

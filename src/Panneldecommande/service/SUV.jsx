@@ -10,9 +10,12 @@ function SUV() {
     duree: '',
     icone: '',
     services: '',
-    lavage_premium: false
+    lavage_premium: false,
+    lavage_premium_prix: ''
   });
   const [message, setMessage] = useState({ type: '', content: '' });
+  const [editingFormule, setEditingFormule] = useState(null);
+  const [editPrice, setEditPrice] = useState('');
 
   // Charger les formules au chargement du composant
   useEffect(() => {
@@ -70,7 +73,8 @@ function SUV() {
         duree: '',
         icone: '',
         services: '',
-        lavage_premium: false
+        lavage_premium: false,
+        lavage_premium_prix: ''
       });
       setMessage({ type: 'success', content: 'Formule ajoutée avec succès!' });
       
@@ -93,6 +97,42 @@ function SUV() {
       if (!response.ok) throw new Error('Erreur lors de la suppression de la formule');
       
       setMessage({ type: 'success', content: 'Formule supprimée avec succès!' });
+      fetchFormules();
+    } catch (error) {
+      setMessage({ type: 'error', content: error.message });
+    }
+  };
+
+  // Commencer l'édition du prix lavage premium
+  const startEditPrice = (formule) => {
+    setEditingFormule(formule.id);
+    setEditPrice(formule.lavage_premium_prix || '');
+  };
+
+  // Annuler l'édition
+  const cancelEdit = () => {
+    setEditingFormule(null);
+    setEditPrice('');
+  };
+
+  // Sauvegarder le nouveau prix
+  const savePrice = async (id) => {
+    try {
+      const response = await fetch(buildAPIUrl(`${API_ENDPOINTS.SUV}/${id}`), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lavage_premium_prix: editPrice
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erreur lors de la mise à jour du prix');
+      
+      setMessage({ type: 'success', content: 'Prix du Lavage Premium mis à jour avec succès!' });
+      setEditingFormule(null);
+      setEditPrice('');
       fetchFormules();
     } catch (error) {
       setMessage({ type: 'error', content: error.message });
@@ -203,21 +243,39 @@ function SUV() {
             </div>
             
             {/* Option Lavage Premium */}
-            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
-              <input
-                type="checkbox"
-                name="lavage_premium"
-                id="lavage_premium"
-                checked={formData.lavage_premium}
-                onChange={handleChange}
-                className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
-              />
-              <label htmlFor="lavage_premium" className="flex-1 cursor-pointer">
-                <div className="text-sm font-semibold text-gray-800">💎 Lavage Premium</div>
-                <div className="text-xs text-gray-600">
-                  Cette formule inclut automatiquement l'option "Lavage Premium" (+120€) qui remplace les services de pressing
+            <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  type="checkbox"
+                  name="lavage_premium"
+                  id="lavage_premium"
+                  checked={formData.lavage_premium}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <label htmlFor="lavage_premium" className="flex-1 cursor-pointer">
+                  <div className="text-sm font-semibold text-gray-800">💎 Lavage Premium</div>
+                  <div className="text-xs text-gray-600">
+                    Cette formule inclut automatiquement l'option "Lavage Premium" qui remplace les services de pressing
+                  </div>
+                </label>
+              </div>
+              {formData.lavage_premium && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Prix du Lavage Premium (€)
+                  </label>
+                  <input
+                    type="number"
+                    name="lavage_premium_prix"
+                    value={formData.lavage_premium_prix}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Ex: 120"
+                    required={formData.lavage_premium}
+                  />
                 </div>
-              </label>
+              )}
             </div>
             
             <div className="flex justify-end">
@@ -244,7 +302,7 @@ function SUV() {
                     <h2 className="text-xl font-bold text-white">{formule.nom}</h2>
                     {formule.lavage_premium && (
                       <div className="text-xs text-purple-200 bg-purple-500/30 px-2 py-1 rounded-full inline-block mt-1">
-                        💎 Lavage Premium
+                        💎 Lavage Premium {formule.lavage_premium_prix ? `(+${formule.lavage_premium_prix}€)` : ''}
                       </div>
                     )}
                   </div>
@@ -263,6 +321,51 @@ function SUV() {
                   <div className="text-2xl font-bold text-[#FFA600]">{formule.prix}€</div>
                   <p className="text-sm text-gray-600">{formule.duree}</p>
                 </div>
+                
+                {/* Édition du prix Lavage Premium */}
+                {formule.lavage_premium && (
+                  <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="text-sm font-medium text-gray-700 mb-2">💎 Prix Lavage Premium</div>
+                    {editingFormule === formule.id ? (
+                      <div className="space-y-2">
+                        <input
+                          type="number"
+                          value={editPrice}
+                          onChange={(e) => setEditPrice(e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          placeholder="Prix en €"
+                        />
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => savePrice(formule.id)}
+                            className="flex-1 px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
+                          >
+                            ✓ Sauver
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="flex-1 px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600 transition-colors"
+                          >
+                            ✗ Annuler
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-purple-600">
+                          {formule.lavage_premium_prix ? `${formule.lavage_premium_prix}€` : 'Non défini'}
+                        </span>
+                        <button
+                          onClick={() => startEditPrice(formule)}
+                          className="px-2 py-1 bg-purple-500 text-white text-xs rounded hover:bg-purple-600 transition-colors"
+                        >
+                          ✏️ Modifier
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <button
                   onClick={() => handleDelete(formule.id)}
                   className="mt-4 w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"

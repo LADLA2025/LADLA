@@ -39,7 +39,19 @@ function createSuvRoutes(suvService) {
   // PUT /api/formules/suv/:id - Mettre à jour une formule
   router.put('/:id', async (req, res) => {
     try {
-      const formule = await suvService.updateFormule(req.params.id, req.body);
+      // Vérifier si c'est une mise à jour uniquement du prix du lavage premium
+      const isLavagePremiumPriceUpdate = Object.keys(req.body).length === 1 && 
+                                         req.body.hasOwnProperty('lavage_premium_prix');
+      
+      let formule;
+      if (isLavagePremiumPriceUpdate) {
+        // Utiliser la méthode spécialisée pour mettre à jour uniquement le prix du lavage premium
+        formule = await suvService.updateLavagePremiumPrice(req.params.id, req.body.lavage_premium_prix);
+      } else {
+        // Utiliser la méthode normale pour mettre à jour tous les champs
+        formule = await suvService.updateFormule(req.params.id, req.body);
+      }
+      
       res.json(formule);
     } catch (error) {
       console.error(`Erreur PUT /api/formules/suv/${req.params.id}:`, error);

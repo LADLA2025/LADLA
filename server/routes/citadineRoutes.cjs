@@ -39,7 +39,20 @@ function createCitadineRoutes(citadineService) {
   // PUT /api/formules/citadine/:id - Mettre à jour une formule
   router.put('/:id', async (req, res) => {
     try {
-      const formule = await citadineService.updateFormule(req.params.id, req.body);
+      const { id } = req.params;
+      const formuleData = req.body;
+      
+      // Si on ne met à jour que le prix lavage premium
+      if (Object.keys(formuleData).length === 1 && 'lavage_premium_prix' in formuleData) {
+        const formule = await citadineService.updateLavagePremiumPrice(id, formuleData.lavage_premium_prix);
+        return res.json({
+          message: 'Prix lavage premium mis à jour avec succès',
+          formule: formule
+        });
+      }
+      
+      // Sinon, mise à jour complète
+      const formule = await citadineService.updateFormule(id, formuleData);
       res.json(formule);
     } catch (error) {
       console.error(`Erreur PUT /api/formules/citadine/${req.params.id}:`, error);

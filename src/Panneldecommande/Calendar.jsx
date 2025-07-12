@@ -19,6 +19,10 @@ const Calendar = () => {
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
 
+  // État pour les formules
+  const [formules, setFormules] = useState([]);
+  const [loadingFormules, setLoadingFormules] = useState(false);
+
   // État pour le modal de nouvelle réservation
   const [showNewReservationModal, setShowNewReservationModal] = useState(false);
   const [newReservationData, setNewReservationData] = useState({
@@ -44,7 +48,7 @@ const Calendar = () => {
       renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
       renov_chrome: { selected: false },
       assaisonnement_ozone: { selected: false, prix: 30 },
-      lavage_premium: { selected: false, prix: 120 },
+      lavage_premium: { selected: false, prix: 120, prix_personnalise: 120 },
       polissage: { selected: false },
       lustrage: { selected: false }
     }
@@ -87,6 +91,7 @@ const Calendar = () => {
             client: `${reservation.prenom} ${reservation.nom}`,
             service: reservation.formule,
             vehicle: `${reservation.marque_voiture} ${reservation.type_voiture}`,
+            vehicleType: reservation.type_voiture, // Ajouter le type de véhicule séparément
             phone: reservation.telephone,
             status: reservation.status,
             email: reservation.email,
@@ -109,7 +114,10 @@ const Calendar = () => {
         
         // Debug détaillé pour chaque réservation
         formattedReservations.forEach(res => {
-          console.log(`🔍 Réservation: ${res.client} - Date: ${res.date} - Heure: ${res.time} - Type: ${res.vehicle}`);
+          console.log(`🔍 Réservation: ${res.client} - Date: ${res.date} - Heure: ${res.time} - Type: ${res.vehicle} (${res.vehicleType})`);
+          if (res.options && res.options.lavage_premium && res.options.lavage_premium.selected) {
+            console.log(`    💎 Lavage premium activé pour ${res.client} (type véhicule: ${res.vehicleType})`);
+          }
         });
       } else {
         throw new Error(result.error || 'Erreur lors de la récupération des réservations');
@@ -124,10 +132,69 @@ const Calendar = () => {
     }
   };
 
+  // Fonction pour récupérer toutes les formules
+  const fetchAllFormules = async () => {
+    try {
+      setLoadingFormules(true);
+      const endpoints = [
+        { url: API_ENDPOINTS.PETITE_CITADINE, type: 'petite-citadine' },
+        { url: API_ENDPOINTS.CITADINE, type: 'citadine' },
+        { url: API_ENDPOINTS.BERLINE, type: 'berline' },
+        { url: API_ENDPOINTS.SUV, type: 'suv' }
+      ];
+      
+      const promises = endpoints.map(({ url, type }) => 
+        fetch(buildAPIUrl(url))
+          .then(res => res.json())
+          .then(formules => formules.map(formule => ({ ...formule, vehicleType: type })))
+      );
+      
+      const results = await Promise.all(promises);
+      const allFormules = results.flat();
+      
+      // Debug : vérifier les formules récupérées avec leur type
+      const formulesWithLavagePremium = allFormules.filter(f => f.lavage_premium && f.lavage_premium_prix);
+      console.log('🔍 Formules avec lavage premium configuré:', 
+        formulesWithLavagePremium.map(f => ({ nom: f.nom, prix: f.lavage_premium_prix, type: f.vehicleType }))
+      );
+      
+      setFormules(allFormules);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des formules:', error);
+    } finally {
+      setLoadingFormules(false);
+    }
+  };
+
   // Charger les réservations lors du changement de date
   useEffect(() => {
     fetchWeekReservations(currentDate);
   }, [currentDate]);
+
+  // Charger les formules au démarrage
+  useEffect(() => {
+    fetchAllFormules();
+  }, []);
+
+  // Mettre à jour le prix du lavage premium quand les formules sont chargées
+  useEffect(() => {
+    if (formules.length > 0) {
+      const formuleWithLavagePremium = formules.find(f => f.lavage_premium && f.lavage_premium_prix);
+      if (formuleWithLavagePremium) {
+        setNewReservationData(prev => ({
+          ...prev,
+          options: {
+            ...prev.options,
+            lavage_premium: {
+              ...prev.options.lavage_premium,
+              prix: formuleWithLavagePremium.lavage_premium_prix,
+              prix_personnalise: formuleWithLavagePremium.lavage_premium_prix
+            }
+          }
+        }));
+      }
+    }
+  }, [formules]);
 
   // Synchroniser la date mobile sélectionnée avec la semaine courante
   useEffect(() => {
@@ -336,6 +403,16 @@ const Calendar = () => {
 
   // Fonction pour réinitialiser le formulaire de nouvelle réservation
   const resetNewReservationForm = () => {
+    const defaultLavagePremiumPrice = (() => {
+      if (formules && formules.length > 0) {
+        const formuleWithLavagePremium = formules.find(f => f.lavage_premium && f.lavage_premium_prix);
+        if (formuleWithLavagePremium) {
+          return formuleWithLavagePremium.lavage_premium_prix;
+        }
+      }
+      return 120;
+    })();
+    
     setNewReservationData({
       prenom: '',
       nom: '',
@@ -359,7 +436,7 @@ const Calendar = () => {
         renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
         renov_chrome: { selected: false },
         assaisonnement_ozone: { selected: false, prix: 30 },
-        lavage_premium: { selected: false, prix: 120 },
+        lavage_premium: { selected: false, prix: defaultLavagePremiumPrice, prix_personnalise: defaultLavagePremiumPrice },
         polissage: { selected: false },
         lustrage: { selected: false }
       }
@@ -406,7 +483,10 @@ const Calendar = () => {
     }
 
     if (options.lavage_premium.selected) {
-      total += options.lavage_premium.prix;
+      // Chercher la formule sélectionnée pour récupérer son prix lavage premium
+      const selectedFormule = formules.find(f => f.nom === newReservationData.formule);
+      const lavagePremiumPrice = selectedFormule?.lavage_premium_prix || options.lavage_premium.prix_personnalise || options.lavage_premium.prix;
+      total += lavagePremiumPrice;
     }
 
     return total;
@@ -435,6 +515,31 @@ const Calendar = () => {
         [optionName]: {
           ...prev.options[optionName],
           selected: !prev.options[optionName].selected
+        }
+      }
+    }));
+  };
+
+  // Fonction pour gérer le changement de prix personnalisé du lavage premium
+  const handleLavagePremiumPriceChange = (price) => {
+    const defaultPrice = (() => {
+      // Chercher le prix depuis les formules si disponible
+      if (formules && formules.length > 0) {
+        const formuleWithLavagePremium = formules.find(f => f.lavage_premium && f.lavage_premium_prix);
+        if (formuleWithLavagePremium) {
+          return formuleWithLavagePremium.lavage_premium_prix;
+        }
+      }
+      return 120; // Fallback
+    })();
+    
+    setNewReservationData(prev => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        lavage_premium: {
+          ...prev.options.lavage_premium,
+          prix_personnalise: parseFloat(price) || defaultPrice
         }
       }
     }));
@@ -550,7 +655,82 @@ const Calendar = () => {
   };
 
   // Fonction pour afficher les options de manière formatée
-  const renderOptions = (options) => {
+  // Fonction pour trouver le prix personnalisé du lavage premium selon le type de véhicule
+  const findLavagePremiumPrice = (vehicleType) => {
+    console.log('🔍 findLavagePremiumPrice appelé avec:', vehicleType);
+    console.log('🔍 Formules disponibles:', formules.length);
+    
+    if (!formules || formules.length === 0) {
+      console.log('❌ Aucune formule disponible');
+      return 120;
+    }
+    
+    // Afficher toutes les formules avec lavage premium pour debug
+    const formulesWithLavagePremium = formules.filter(f => f.lavage_premium && f.lavage_premium_prix);
+    console.log('🔍 Formules avec lavage premium disponibles:', formulesWithLavagePremium.map(f => ({ nom: f.nom, prix: f.lavage_premium_prix })));
+    
+    // Mapping des types de véhicules vers les formules
+    const vehicleTypeMap = {
+      'petite-citadine': ['petite-citadine', 'petite citadine', 'petite_citadine'],
+      'citadine': ['citadine'],
+      'berline': ['berline'],
+      'suv': ['suv', 'suv 4x4', '4x4', 'suv_4x4']
+    };
+    
+    // Identifier le type de véhicule
+    let targetVehicleType = null;
+    if (vehicleType) {
+      const lowerVehicleType = vehicleType.toLowerCase();
+      console.log('🔍 Type de véhicule en lowercase:', lowerVehicleType);
+      
+      for (const [key, values] of Object.entries(vehicleTypeMap)) {
+        console.log(`🔍 Vérification ${key}:`, values, '→', values.some(v => lowerVehicleType.includes(v)));
+        if (values.some(v => lowerVehicleType.includes(v))) {
+          targetVehicleType = key;
+          break;
+        }
+      }
+    }
+    
+    console.log('🔍 Type de véhicule détecté:', vehicleType, '→', targetVehicleType);
+    
+    // Chercher la formule correspondante avec lavage premium
+    const matchingFormules = formules.filter(f => {
+      if (!f.lavage_premium || !f.lavage_premium_prix) return false;
+      
+      // Vérifier si la formule correspond au type de véhicule
+      const formuleName = f.nom.toLowerCase();
+      console.log('🔍 Vérification formule:', f.nom, 'avec prix:', f.lavage_premium_prix);
+      
+      if (targetVehicleType) {
+        const matches = vehicleTypeMap[targetVehicleType].some(v => formuleName.includes(v));
+        console.log(`🔍 Formule "${f.nom}" correspond au type "${targetVehicleType}" ?`, matches);
+        return matches;
+      }
+      return false;
+    });
+    
+    console.log('🔍 Formules correspondantes trouvées:', matchingFormules);
+    
+    if (matchingFormules.length > 0) {
+      // Prendre la première formule correspondante
+      const selectedFormule = matchingFormules[0];
+      console.log('✅ Prix personnalisé trouvé:', selectedFormule.lavage_premium_prix, 'pour', selectedFormule.nom);
+      return selectedFormule.lavage_premium_prix;
+    }
+    
+    // Fallback: chercher n'importe quelle formule avec lavage premium
+    const anyFormuleWithLavagePremium = formules.find(f => f.lavage_premium && f.lavage_premium_prix);
+    if (anyFormuleWithLavagePremium) {
+      console.log('🔍 Prix de fallback trouvé:', anyFormuleWithLavagePremium.lavage_premium_prix, 'depuis', anyFormuleWithLavagePremium.nom);
+      return anyFormuleWithLavagePremium.lavage_premium_prix;
+    }
+    
+    console.log('❌ Aucun prix personnalisé trouvé, utilisation du prix par défaut: 120');
+    return 120;
+  };
+
+  const renderOptions = (options, vehicleType = null) => {
     if (!options || typeof options !== 'object') return null;
 
     const optionsToShow = [];
@@ -626,9 +806,26 @@ const Calendar = () => {
     }
 
     if (options.lavage_premium?.selected) {
+      // PRIORITÉ 1: Prix personnalisé des formules (toujours le plus récent)
+      let lavagePremiumPrice = findLavagePremiumPrice(vehicleType);
+      
+      // PRIORITÉ 2: Prix de la réservation seulement si aucun prix personnalisé n'est trouvé
+      if (lavagePremiumPrice === 120) {
+        // Seulement si on n'a pas trouvé de prix personnalisé, utiliser le prix de la réservation
+        if (options.lavage_premium.prix_personnalise && options.lavage_premium.prix_personnalise > 0) {
+          lavagePremiumPrice = options.lavage_premium.prix_personnalise;
+          console.log('🔍 Utilisation du prix de la réservation (prix_personnalise):', lavagePremiumPrice);
+        } else if (options.lavage_premium.prix && options.lavage_premium.prix > 0) {
+          lavagePremiumPrice = options.lavage_premium.prix;
+          console.log('🔍 Utilisation du prix de la réservation (prix):', lavagePremiumPrice);
+        }
+      }
+      
+      console.log('🔍 Prix final utilisé pour', vehicleType, ':', lavagePremiumPrice);
+      
       optionsToShow.push({
         name: '💎 Lavage Premium',
-        price: `${options.lavage_premium.prix}€`,
+        price: `${lavagePremiumPrice}€`,
         hasReduction: false
       });
     }
@@ -1698,13 +1895,13 @@ const Calendar = () => {
                                 <span className="font-medium text-gray-900">{reservation.service}</span>
                                 
                                 {/* Affichage des options supplémentaires */}
-                                {renderOptions(reservation.options)?.length > 0 && (
+                                {renderOptions(reservation.options, reservation.vehicleType)?.length > 0 && (
                                   <div className="mt-2 space-y-1">
                                     <div className="text-xs font-medium text-blue-600 flex items-center">
                                       <i className="bx bx-wrench mr-1"></i>
                                       Options:
                                     </div>
-                                    {renderOptions(reservation.options).map((option, idx) => (
+                                    {renderOptions(reservation.options, reservation.vehicleType).map((option, idx) => (
                                       <div key={idx} className="flex items-center justify-between text-xs bg-blue-50 rounded px-2 py-1 max-w-[250px]">
                                         <div className="flex items-center">
                                           <i className="bx bx-check-circle text-blue-600 mr-1"></i>
@@ -1905,7 +2102,7 @@ const Calendar = () => {
                       </div>
 
                       {/* Affichage des options supplémentaires pour mobile */}
-                      {renderOptions(reservation.options)?.length > 0 && (
+                      {renderOptions(reservation.options, reservation.vehicleType)?.length > 0 && (
                         <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                           <div className="mb-2">
                             <div className="text-sm font-medium text-blue-800 flex items-center">
@@ -1914,7 +2111,7 @@ const Calendar = () => {
                             </div>
                           </div>
                           <div className="grid grid-cols-1 gap-2">
-                            {renderOptions(reservation.options).map((option, idx) => (
+                            {renderOptions(reservation.options, reservation.vehicleType).map((option, idx) => (
                               <div key={idx} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-blue-100">
                                 <div className="flex items-center">
                                   <i className="bx bx-check-circle text-green-600 mr-2"></i>
@@ -2649,13 +2846,13 @@ const Calendar = () => {
 
                         {/* Lavage Premium */}
                         <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between mb-3">
                             <div>
                               <label className="font-medium text-gray-700 flex items-center gap-2">
                                 💎 Lavage Premium
                                 <span className="inline-block animate-pulse">✨</span>
                               </label>
-                              <div className="text-sm text-gray-600">Service haut de gamme - 120€</div>
+                              <div className="text-sm text-gray-600">Service haut de gamme</div>
                             </div>
                             <div className="flex items-center gap-3">
                               <input
@@ -2665,10 +2862,32 @@ const Calendar = () => {
                                 className="w-5 h-5 text-purple-600 rounded focus:ring-purple-600"
                               />
                               <div className="font-bold text-purple-600">
-                                {newReservationData.options.lavage_premium.selected ? '120€' : '0€'}
+                                {newReservationData.options.lavage_premium.selected ? `${(() => {
+                                  const selectedFormule = formules.find(f => f.nom === newReservationData.formule);
+                                  return selectedFormule?.lavage_premium_prix || newReservationData.options.lavage_premium.prix_personnalise || 120;
+                                })()}€` : '0€'}
                               </div>
                             </div>
                           </div>
+                          {newReservationData.options.lavage_premium.selected && (
+                            <div className="mt-3 pt-3 border-t border-purple-200">
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Prix personnalisé (€)
+                              </label>
+                              <input
+                                type="number"
+                                value={newReservationData.options.lavage_premium.prix_personnalise}
+                                onChange={(e) => handleLavagePremiumPriceChange(e.target.value)}
+                                className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                placeholder={(() => {
+                                  const selectedFormule = formules.find(f => f.nom === newReservationData.formule);
+                                  return selectedFormule?.lavage_premium_prix || "120";
+                                })()}
+                                min="0"
+                                step="0.01"
+                              />
+                            </div>
+                          )}
                         </div>
 
                         {/* Services sur devis */}

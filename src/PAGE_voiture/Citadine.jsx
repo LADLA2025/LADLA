@@ -154,10 +154,10 @@ function Citadine() {
     
     // Option lavage premium
     if (options.lavage_premium.selected) {
-      total += options.lavage_premium.prix;
+      total += selectedFormule?.lavage_premium_prix || options.lavage_premium.prix;
     }
 
-    return total;
+    return isNaN(total) ? 0 : total;
   };
 
   // Fonction pour ajouter/retirer une formule supplémentaire
@@ -176,14 +176,17 @@ function Citadine() {
   const proceedToReservation = () => {
     const allFormules = [selectedFormule, ...additionalFormules];
     const formulesParam = allFormules.map(f => f.nom).join(',');
-    const formulesPrice = allFormules.reduce((sum, f) => sum + parseFloat(f.prix), 0);
-    const optionsPrice = calculateTotalOptionsPrice();
+    const formulesPrice = allFormules.reduce((sum, f) => sum + (parseFloat(f.prix) || 0), 0);
+    const optionsPrice = calculateTotalOptionsPrice() || 0;
     const totalPrice = formulesPrice + optionsPrice;
+    
+    // S'assurer que totalPrice est un nombre valide
+    const safeTotalPrice = isNaN(totalPrice) || typeof totalPrice !== 'number' ? 0 : totalPrice;
     
     const params = new URLSearchParams({
       formule: formulesParam,
       type: 'citadine',
-      prix_total: totalPrice.toFixed(2),
+      prix_total: safeTotalPrice.toFixed(2),
       options: JSON.stringify(options)
     });
     
