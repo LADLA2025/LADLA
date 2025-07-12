@@ -34,7 +34,7 @@ function Header() {
         
         {/* Menu mobile à droite */}
         <button 
-          className="lg:hidden absolute right-2 z-50"
+          className="lg:hidden absolute right-2 z-40"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <motion.div

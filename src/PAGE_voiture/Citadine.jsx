@@ -64,7 +64,7 @@ function Citadine() {
       assaisonnement_ozone: { selected: false, prix: 30 },
       polissage: { selected: false },
       lustrage: { selected: false },
-      lavage_premium: { selected: formule.lavage_premium || false, prix: 120 }
+      lavage_premium: { selected: false, prix: 120 }
     });
   };
 

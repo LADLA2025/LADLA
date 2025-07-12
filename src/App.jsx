@@ -4,7 +4,7 @@ import './App.css'
 import "aos/dist/aos.css"; 
 import 'boxicons'
 import AOS from 'aos';
-import mainVideo from './video/0624.mp4';
+import backgroundImg from './IMG/background.jpg';
 import cercle1Video from './video/cercle1.mp4';
 
 import cercle3Video from './video/cercle3.mp4';
@@ -150,7 +150,7 @@ function App() {
     {
       question: "Où êtes-vous situés et quels sont vos horaires d'ouverture ?",
       icon: 'bx-map',
-      answer: "Nous sommes situés au 102 avenue Saint Lambert, 06100 Nice. Nos horaires d'ouverture sont du lundi au samedi, de 9h à 18h."
+      answer: "Nous sommes situés au 102 avenue Saint Lambert, 06100 Nice. Nos horaires d'ouverture sont du lundi au samedi, de 9h30 à 12h30 et de 13h30 à 18h30."
     },
     {
       question: "Puis-je vous confier ma voiture pour une réparation de carrosserie ?",
@@ -168,24 +168,12 @@ function App() {
     <div>
       {/* Hero Section */}
       <section className="relative bg-gray-900 text-white h-[85vh] flex items-center justify-center pt-15 overflow-hidden">
-         {/* Vidéo d'arrière-plan */}
-         <OptimizedVideo
-           src={mainVideo}
+         {/* Image d'arrière-plan */}
+         <img
+           src={backgroundImg}
+           alt="Les AS de L'Auto - Votre partenaire automobile de confiance"
            className="absolute inset-0 w-full h-full object-cover"
-           autoPlay 
-           loop 
-           muted 
-           playsInline
-           preload="metadata"
-           controls={false}
-           webkit-playsinline="true"
-           x5-playsinline="true"
-           x5-video-player-type="h5"
-           x5-video-player-fullscreen="true"
-           x5-video-orientation="portraint"
-         >
-           Votre navigateur ne supporte pas la vidéo HTML5.
-         </OptimizedVideo>
+         />
          
          {/* Cercles d'ambiance animés - AVANT l'overlay */}
          <div className="light-circle circle1" style={{zIndex: 5}}></div>
@@ -196,7 +184,7 @@ function App() {
          <div className="light-circle circle6" style={{zIndex: 5}}></div>
          
          {/* Overlay sombre pour la lisibilité */}
-         <div className="absolute inset-0 bg-black/40" style={{zIndex: 6}}></div>
+         <div className="absolute inset-0 bg-black/60" style={{zIndex: 6}}></div>
          
          <div className="container mx-auto px-4 relative z-10">
            <div className="max-w-[1000px] mx-auto text-left md:text-center">
@@ -210,7 +198,7 @@ function App() {
              </p>
              <div className="flex flex-col sm:flex-row gap-4 justify-start md:justify-center items-start md:items-center">
                <a 
-                 href="https://wa.me/33625138033?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" 
+                 href="https://wa.me/33650304417?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" 
                  target="_blank" 
                  rel="noopener noreferrer"
                  className="bg-gradient-to-r from-[#FF0000] to-[#FF4500] hover:from-[#CC0000] hover:to-[#FF6600] text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 font-medium group"
@@ -219,11 +207,11 @@ function App() {
                  <span>WhatsApp</span>
                </a>
                <div className="flex items-center gap-2">
-                 <a href="https://instagram.com/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
+                 <a href="https://www.instagram.com/les_as_de_lauto_06/" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
                    <i className='bx bxl-instagram text-3xl'></i>
                  </a>
-                 <a href="https://facebook.com/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
-                   <i className='bx bxl-facebook text-4xl'></i>
+                 <a href="https://www.snapchat.com/explore/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-110">
+                   <i className='bx bxl-snapchat text-4xl'></i>
                  </a>
                </div>
              </div>
@@ -543,7 +531,7 @@ function App() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
               <i className='bx bx-time text-white text-2xl mb-2'></i>
-              <div className="text-white text-xl font-bold mb-1">9h30-18h30</div>
+              <div className="text-white text-xl font-bold mb-1">9h30-12h30 / 13h30-18h30</div>
               <p className="text-white/80 text-sm">Horaires d'ouverture</p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
@@ -607,9 +595,9 @@ function App() {
               Notre équipe est là pour vous aider.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <a href="tel:0625138033" className="bg-white text-[#FF0000] px-6 py-2 rounded-full font-semibold hover:bg-white/90 transition-colors flex items-center gap-2 text-sm">
+              <a href="tel:0650304417" className="bg-white text-[#FF0000] px-6 py-2 rounded-full font-semibold hover:bg-white/90 transition-colors flex items-center gap-2 text-sm">
                 <i className='bx bx-phone'></i>
-                06 25 13 80 33
+                06 50 30 44 17
               </a>
               <a href="mailto:lesasdelauto06@gmail.com" className="bg-white/20 text-white px-6 py-2 rounded-full font-semibold hover:bg-white/30 transition-colors flex items-center gap-2 text-sm">
                 <i className='bx bx-envelope'></i>

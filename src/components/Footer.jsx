@@ -68,9 +68,9 @@ function Footer() {
           <div>
             <h3 className="font-bold mb-4">Nous suivre</h3>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><a href="#" className="hover:text-[#FF0000]">Instagram</a></li>
-              <li><a href="#" className="hover:text-[#FF0000]">Facebook</a></li>
-              <li><a href="#" className="hover:text-[#FF0000]">Download</a></li>
+              <li><a href="https://www.instagram.com/les_as_de_lauto_06/" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF0000]">Instagram</a></li>
+              <li><a href="https://www.snapchat.com/explore/lesasdelauto06" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF0000]">Snapchat</a></li>
+              <li><a href="https://wa.me/33650304417?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF0000]">WhatsApp</a></li>
             </ul>
           </div>
           <div>

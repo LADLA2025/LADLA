@@ -64,7 +64,7 @@ function PetiteCitadine() {
       assaisonnement_ozone: { selected: false, prix: 30 },
       polissage: { selected: false },
       lustrage: { selected: false },
-      lavage_premium: { selected: formule.lavage_premium || false, prix: 120 }
+      lavage_premium: { selected: false, prix: 120 }
     });
   };
 
@@ -223,7 +223,7 @@ function PetiteCitadine() {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+    <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden z-1">
       {/* Cercles d'ambiance */}
       <div className="light-circle circle1"></div>
       <div className="light-circle circle2"></div>

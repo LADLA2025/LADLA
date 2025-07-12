@@ -298,7 +298,7 @@ function MentionsLegales() {
                 <p><strong>Email :</strong> lesasdelauto06@gmail.com</p>
                 <p><strong>Téléphone :</strong> 06.50.30.44.17 / 06.25.13.80.33</p>
                 <p><strong>Adresse :</strong> LE SANSEVERIA 102 AVENUE SAINT-LAMBERT, 06000 NICE</p>
-                <p><strong>Horaires :</strong> Du lundi au samedi, 9h30 - 18h30</p>
+                <p><strong>Horaires :</strong> Du lundi au samedi, 9h30-12h30 / 13h30-18h30</p>
               </div>
             </section>
 

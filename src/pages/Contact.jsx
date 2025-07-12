@@ -260,14 +260,10 @@ function Contact() {
                 </div>
                 <h3 className="font-bold text-gray-800">Nos horaires</h3>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 rounded-xl bg-gray-50">
-                  <p className="font-medium text-gray-800">Lun - Ven</p>
-                  <p className="text-gray-600">8h00 - 19h00</p>
-                </div>
-                <div className="text-center p-3 rounded-xl bg-gray-50">
-                  <p className="font-medium text-gray-800">Samedi</p>
-                  <p className="text-gray-600">9h00 - 18h00</p>
+                  <p className="font-medium text-gray-800">Lun - Sam</p>
+                  <p className="text-gray-600">9h30-12h30 / 13h30-18h30</p>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-gray-50">
                   <p className="font-medium text-gray-800">Dimanche</p>

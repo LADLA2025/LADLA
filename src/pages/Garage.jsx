@@ -56,8 +56,8 @@ function Garage() {
                           <i className='bx bx-time text-[#FF0000] text-2xl'></i>
                         </div>
                         <div>
-                          <p className="text-gray-900 font-medium">Horaires d'ouverture</p>
-                          <p className="text-gray-600">Lun-Sam: 9h30-18h30</p>
+                                          <p className="text-gray-900 font-medium">Horaires d'ouverture</p>
+                <p className="text-gray-600">Lun-Sam: 9h30-12h30 / 13h30-18h30</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
@@ -87,7 +87,7 @@ function Garage() {
               {/* Badges flottants */}
               <div className="flex justify-center gap-4 -mt-6">
                 <a 
-                  href="https://wa.me/33625138033?text=Bonjour,%20je%20souhaite%20vous%20contacter%20concernant%20vos%20services%20automobiles"
+                  href="https://wa.me/33650304417?text=Bonjour,%20je%20souhaite%20vous%20contacter%20concernant%20vos%20services%20automobiles"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-black text-white z-10 px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 cursor-pointer"
