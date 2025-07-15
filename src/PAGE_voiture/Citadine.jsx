@@ -330,7 +330,7 @@ function Citadine() {
                           <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
           <div>
-                          <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
+                          <h2 className="text-sm sm:text-sm md:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
                           <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>
                       </div>

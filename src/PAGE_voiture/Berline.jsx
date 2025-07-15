@@ -244,10 +244,10 @@ function Berline() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]">
             Formules Berline
         </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-lg sm:text-xl text-gray-600 mb-8">
             Découvrez nos formules spécialement conçues pour les berlines
           </p>
           <Link 
@@ -330,7 +330,7 @@ function Berline() {
                           <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
           <div>
-                          <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
+                          <h2 className="text-sm sm:text-sm md:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
                           <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>
                       </div>

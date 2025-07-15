@@ -84,7 +84,8 @@ function PetiteCitadine() {
       renov_chrome: { selected: false },
       assaisonnement_ozone: { selected: false, prix: 30 },
       polissage: { selected: false },
-      lustrage: { selected: false }
+      lustrage: { selected: false },
+      lavage_premium: { selected: false, prix: 120 }
     });
   };
 
@@ -243,10 +244,10 @@ function PetiteCitadine() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-                                <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#FF0000] to-[#FF4500]">
             Formules Petite Citadine
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-lg sm:text-xl text-gray-600 mb-8">
             Découvrez nos formules spécialement conçues pour les petites citadines
           </p>
           <Link 
@@ -324,13 +325,13 @@ function PetiteCitadine() {
                     
                     {/* Header de la carte - Hauteur fixe */}
                     <div className="p-4 sm:p-6 bg-gradient-to-r from-[#FF0000] to-[#FF4500] flex-shrink-0">
-                                              <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                            <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                          <i className={`${formule.icone} text-lg sm:text-2xl text-[#FF0000]`}></i>
                         </div>
                         <div>
-                            <h2 className="text-lg sm:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
-                            <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
+                          <h2 className="text-base sm:text-sm md:text-xl font-bold text-white line-clamp-2">{formule.nom}</h2>
+                          <p className="text-red-100 text-xs sm:text-sm">{formule.duree}</p>
                         </div>
                       </div>
                     </div>

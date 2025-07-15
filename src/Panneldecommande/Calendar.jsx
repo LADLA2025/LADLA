@@ -741,7 +741,7 @@ const Calendar = () => {
       const price = qty >= 4 ? options.baume_sieges.prix_x4 : qty * options.baume_sieges.prix_unitaire;
       optionsToShow.push({
         name: `Baume sièges (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: qty >= 4
       });
     }
@@ -751,7 +751,7 @@ const Calendar = () => {
       const price = qty >= 4 ? options.pressing_sieges.prix_x4 : qty * options.pressing_sieges.prix_unitaire;
       optionsToShow.push({
         name: `Pressing sièges (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: qty >= 4
       });
     }
@@ -761,7 +761,7 @@ const Calendar = () => {
       const price = qty >= 4 ? options.pressing_tapis.prix_x4 : qty * options.pressing_tapis.prix_unitaire;
       optionsToShow.push({
         name: `Pressing tapis (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: qty >= 4
       });
     }
@@ -771,7 +771,7 @@ const Calendar = () => {
       const price = qty >= 4 ? options.pressing_panneau_porte.prix_x4 : qty * options.pressing_panneau_porte.prix_unitaire;
       optionsToShow.push({
         name: `Pressing panneaux (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: qty >= 4
       });
     }
@@ -781,7 +781,7 @@ const Calendar = () => {
       const price = qty >= 4 ? options.renov_phare.prix_x4 : qty * options.renov_phare.prix_unitaire;
       optionsToShow.push({
         name: `Renov phare (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: qty >= 4
       });
     }
@@ -791,7 +791,7 @@ const Calendar = () => {
       const price = qty * options.pressing_coffre_plafonnier.prix_unitaire;
       optionsToShow.push({
         name: `Pressing coffre/plafonnier (x${qty})`,
-        price: `${price}€`,
+        price: `${parseFloat(price).toFixed(0)}€`,
         hasReduction: false
       });
     }
@@ -800,7 +800,7 @@ const Calendar = () => {
     if (options.assaisonnement_ozone?.selected) {
       optionsToShow.push({
         name: 'Assaisonnement ozone',
-        price: `${options.assaisonnement_ozone.prix}€`,
+        price: `${parseFloat(options.assaisonnement_ozone.prix).toFixed(0)}€`,
         hasReduction: false
       });
     }
@@ -825,7 +825,7 @@ const Calendar = () => {
       
       optionsToShow.push({
         name: '💎 Lavage Premium',
-        price: `${lavagePremiumPrice}€`,
+        price: `${parseFloat(lavagePremiumPrice).toFixed(0)}€`,
         hasReduction: false
       });
     }
@@ -1913,7 +1913,7 @@ const Calendar = () => {
                                           )}
                                         </div>
                                         <span className={`font-medium ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
-                                          {option.price}
+                                          {option.price === 'Sur devis' ? option.price : `${parseFloat(option.price.replace('€', '')).toFixed(0)}€`}
                                         </span>
                                       </div>
                                     ))}
@@ -2123,7 +2123,7 @@ const Calendar = () => {
                                   )}
                                 </div>
                                 <span className={`font-medium text-sm ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
-                                  {option.price}
+                                  {option.price === 'Sur devis' ? option.price : `${parseFloat(option.price.replace('€', '')).toFixed(0)}€`}
                                 </span>
                               </div>
                             ))}
@@ -2510,13 +2510,9 @@ const Calendar = () => {
                         required
                       >
                         <option value="">Sélectionner une formule...</option>
-                        <option value="Lavage Express">Lavage Express</option>
-                        <option value="Lavage Standard">Lavage Standard</option>
-                        <option value="Lavage Premium">Lavage Premium</option>
-                        <option value="Lavage Complet">Lavage Complet</option>
-                        <option value="Détailling Intérieur">Détailling Intérieur</option>
-                        <option value="Détailling Extérieur">Détailling Extérieur</option>
-                        <option value="Détailling Complet">Détailling Complet</option>
+                        <option value="Beauté extérieur">Beauté extérieur</option>
+                        <option value="Beauté intérieure">Beauté intérieure</option>
+                        <option value="Beauté intégrale">Beauté intégrale (premium en option)</option>
                       </select>
                     </div>
 
@@ -2849,7 +2845,7 @@ const Calendar = () => {
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <label className="font-medium text-gray-700 flex items-center gap-2">
-                                💎 Lavage Premium
+                                💎 Beauté Premium
                                 <span className="inline-block animate-pulse">✨</span>
                               </label>
                               <div className="text-sm text-gray-600">Service haut de gamme</div>
@@ -2864,7 +2860,8 @@ const Calendar = () => {
                               <div className="font-bold text-purple-600">
                                 {newReservationData.options.lavage_premium.selected ? `${(() => {
                                   const selectedFormule = formules.find(f => f.nom === newReservationData.formule);
-                                  return selectedFormule?.lavage_premium_prix || newReservationData.options.lavage_premium.prix_personnalise || 120;
+                                  const price = selectedFormule?.lavage_premium_prix || newReservationData.options.lavage_premium.prix_personnalise || 120;
+                                  return parseFloat(price).toFixed(0);
                                 })()}€` : '0€'}
                               </div>
                             </div>
@@ -2942,17 +2939,17 @@ const Calendar = () => {
                        <div className="space-y-2">
                          <div className="flex justify-between">
                            <span className="text-gray-600">Prix de base :</span>
-                           <span className="font-medium">{newReservationData.prix || 0}€</span>
+                           <span className="font-medium">{parseFloat(newReservationData.prix || 0).toFixed(0)}€</span>
                          </div>
                          <div className="flex justify-between">
                            <span className="text-gray-600">Options :</span>
-                           <span className="font-medium">{calculateTotalOptionsPrice()}€</span>
+                           <span className="font-medium">{parseFloat(calculateTotalOptionsPrice()).toFixed(0)}€</span>
                          </div>
                          <hr className="border-gray-300" />
                          <div className="flex justify-between text-lg font-bold">
                            <span className="text-gray-800">Total :</span>
                            <span className="text-[#FF0000]">
-                             {(parseFloat(newReservationData.prix) || 0) + calculateTotalOptionsPrice()}€
+                             {parseFloat((parseFloat(newReservationData.prix) || 0) + calculateTotalOptionsPrice()).toFixed(0)}€
                            </span>
                          </div>
                        </div>

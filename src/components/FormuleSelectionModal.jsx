@@ -391,7 +391,7 @@ function FormuleSelectionModal({
                   <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:border-purple-300 transition-all shadow-sm mb-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💎 Lavage Premium</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💎Option Lavage Premium</span>
                         <div className="text-xs text-purple-700">
                           ce service inclus les prestations prenium pressing des sieges des plastiques des tapis + pressing coffre/plafonnier
                         </div>
@@ -400,21 +400,21 @@ function FormuleSelectionModal({
                         <motion.button
                           onClick={() => onOptionToggle && onOptionToggle('lavage_premium')}
                           className={`w-10 h-5 sm:w-12 sm:h-6 rounded-full transition-colors flex items-center ${
-                            options.lavage_premium.selected ? 'bg-purple-500' : 'bg-gray-300'
+                            options.lavage_premium?.selected ? 'bg-purple-500' : 'bg-gray-300'
                           }`}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
                           <div className={`w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-full transition-transform ${
-                            options.lavage_premium.selected ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0.5'
+                            options.lavage_premium?.selected ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0.5'
                           }`} />
                         </motion.button>
                         <div className={`font-bold text-xs sm:text-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md ${
-                          options.lavage_premium.selected 
+                          options.lavage_premium?.selected 
                             ? 'bg-purple-50 text-purple-600' 
                             : 'bg-gray-50 text-gray-400'
                         }`}>
-                          {options.lavage_premium.selected ? `+${selectedFormule?.lavage_premium_prix || 120}€` : '0€'}
+                          {options.lavage_premium?.selected ? `+${selectedFormule?.lavage_premium_prix || 120}€` : '0€'}
                         </div>
                       </div>
                     </div>
