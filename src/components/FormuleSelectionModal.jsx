@@ -429,7 +429,7 @@ function FormuleSelectionModal({
                   <div className="bg-white rounded-lg p-1.5 sm:p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💺 Baume sièges</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💺 Baume sièges  20 €/unité </span>
                         <div className="text-xs text-gray-600">x1: 20€ | x4: 60€ ⚡</div>
                       </div>
                       {options.baume_sieges.quantity >= 4 && (
@@ -468,7 +468,7 @@ function FormuleSelectionModal({
                   }`}>
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🧽 Pressing des sièges</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🧽 Pressing des sièges  30€/unité</span>
                         <div className="text-xs text-gray-600">x1: 30€ | x4: 75€ ⚡</div>
                       </div>
                       {options.pressing_sieges.quantity >= 4 && (
@@ -507,7 +507,7 @@ function FormuleSelectionModal({
                   }`}>
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🏠 Pressing des tapis</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🏠 Pressing des tapis 30€/unité</span>
                         <div className="text-xs text-gray-600">x1: 30€ | x4: 75€ ⚡</div>
                       </div>
                       {options.pressing_tapis.quantity >= 4 && (
@@ -546,7 +546,7 @@ function FormuleSelectionModal({
                   }`}>
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🚪 Pressing panneau de porte</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">🚪 Pressing panneau de porte 30€/unité</span>
                         <div className="text-xs text-gray-600">x1: 30€ | x4: 75€ ⚡</div>
                       </div>
                       {options.pressing_panneau_porte.quantity >= 4 && (
@@ -583,7 +583,7 @@ function FormuleSelectionModal({
                   <div className="bg-white rounded-lg p-1.5 sm:p-3 border border-gray-200 hover:border-blue-300 transition-all shadow-sm">
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💡 Renov phare</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">💡 Renov phare 30€/unité</span>
                         <div className="text-xs text-gray-600">x1: 30€ | x4: 100€ ⚡</div>
                       </div>
                       {options.renov_phare.quantity >= 4 && (
@@ -622,7 +622,7 @@ function FormuleSelectionModal({
                   }`}>
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div>
-                        <span className="font-bold text-gray-800 text-xs sm:text-sm">📦 Pressing coffre/plafonnier</span>
+                        <span className="font-bold text-gray-800 text-xs sm:text-sm">📦 Pressing coffre/plafonnier 30€/unité</span>
                         <div className="text-xs text-gray-600">Prix fixe: 30€/unité 💼</div>
                       </div>
                     </div>

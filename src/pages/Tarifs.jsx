@@ -115,13 +115,13 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
           ))}
         </div>
         <div className="space-y-3 mt-auto">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onMoreInfo}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onMoreInfo}
             className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-medium hover:from-gray-200 hover:to-gray-300 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-          >
-            <i className="bx bx-info-circle"></i>
+        >
+          <i className="bx bx-info-circle"></i>
             Plus d'infos
           </motion.button>
           
@@ -162,7 +162,7 @@ function ServiceCard({ title, icon, description, items, prices, onMoreInfo }) {
                   className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white font-medium hover:from-[#FF4500] hover:to-[#FF6600] transition-all shadow-lg hover:shadow-xl text-sm"
                 >
                   SUV / 4x4
-                </motion.button>
+        </motion.button>
               </Link>
             </div>
           </div>

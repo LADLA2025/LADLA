@@ -961,28 +961,28 @@ function Reservation() {
                           </div>
                         ) : (
                           <div className="relative">
-                            <select
-                              name="formule"
-                              value={formData.formule}
-                              onChange={handleInputChange}
+                          <select
+                            name="formule"
+                            value={formData.formule}
+                            onChange={handleInputChange}
                               className="w-full px-4 py-3 sm:py-3 rounded-xl border-2 border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed transition-colors text-base appearance-none"
                               disabled={true}
-                              required
-                            >
-                              <option value="">
-                                {!formData.typeVoiture 
-                                  ? "Sélectionnez d'abord un type de véhicule" 
-                                  : loadingFormules 
-                                    ? "Chargement des formules..." 
-                                    : "Sélectionner une formule"
-                                }
+                            required
+                          >
+                            <option value="">
+                              {!formData.typeVoiture 
+                                ? "Sélectionnez d'abord un type de véhicule" 
+                                : loadingFormules 
+                                  ? "Chargement des formules..." 
+                                  : "Sélectionner une formule"
+                              }
+                            </option>
+                            {formules.map(formule => (
+                              <option key={formule.id} value={formule.nom}>
+                                {formule.nom} - {formule.prix}€
                               </option>
-                              {formules.map(formule => (
-                                <option key={formule.id} value={formule.nom}>
-                                  {formule.nom} - {formule.prix}€
-                                </option>
-                              ))}
-                            </select>
+                            ))}
+                          </select>
                             {formData.formule && (
                               <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
                                 <i className="bx bx-lock-alt"></i>

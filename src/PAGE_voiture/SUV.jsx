@@ -399,17 +399,10 @@ function SUV() {
                 Nos experts sont là pour vous conseiller et vous aider à choisir la formule 
                 la plus adaptée à votre SUV ou 4x4. N'hésitez pas à nous contacter !
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/reservation"
-                  className="px-6 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:shadow-lg transition-shadow inline-flex items-center justify-center gap-2 font-medium"
-                >
-                  <i className="bx bx-calendar-plus"></i>
-                  Faire une réservation
-                </Link>
+              <div className="flex justify-center">
                 <Link
                   to="/contact"
-                  className="px-6 py-3 bg-transparent border-2 border-[#FF0000] text-[#FF0000] rounded-xl hover:bg-[#FF0000] hover:text-white transition-colors inline-flex items-center justify-center gap-2 font-medium"
+                  className="px-6 py-3 bg-gradient-to-r from-[#FF0000] to-[#FF4500] text-white rounded-xl hover:shadow-lg transition-shadow inline-flex items-center justify-center gap-2 font-medium"
                 >
                   <i className="bx bx-phone"></i>
                   Nous contacter

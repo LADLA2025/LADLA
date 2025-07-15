@@ -52,15 +52,19 @@ function Citadine() {
       // Convertir les services en tableau
       const servicesArray = formData.services.split('\n').filter(service => service.trim() !== '');
       
+      // Préparer les données en gérant lavage_premium_prix
+      const dataToSend = {
+        ...formData,
+        services: servicesArray,
+        lavage_premium_prix: formData.lavage_premium_prix === '' ? null : parseFloat(formData.lavage_premium_prix) || null
+      };
+      
       const response = await fetch(buildAPIUrl(API_ENDPOINTS.CITADINE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          services: servicesArray
-        }),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!response.ok) {
@@ -247,17 +251,17 @@ function Citadine() {
             {/* Option Lavage Premium */}
             <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
               <div className="flex items-center gap-3 mb-3">
-                <input
-                  type="checkbox"
-                  name="lavage_premium"
-                  id="lavage_premium"
-                  checked={formData.lavage_premium}
-                  onChange={handleChange}
-                  className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
-                />
-                <label htmlFor="lavage_premium" className="flex-1 cursor-pointer">
-                  <div className="text-sm font-semibold text-gray-800">💎 Lavage Premium</div>
-                  <div className="text-xs text-gray-600">
+              <input
+                type="checkbox"
+                name="lavage_premium"
+                id="lavage_premium"
+                checked={formData.lavage_premium}
+                onChange={handleChange}
+                className="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+              />
+              <label htmlFor="lavage_premium" className="flex-1 cursor-pointer">
+                <div className="text-sm font-semibold text-gray-800">💎 Lavage Premium</div>
+                <div className="text-xs text-gray-600">
                     Cette formule inclut automatiquement l'option "Lavage Premium" qui remplace les services de pressing
                   </div>
                 </label>
