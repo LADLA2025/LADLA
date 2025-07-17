@@ -21,11 +21,11 @@ class ReservationTableService {
       await client.query(`
         CREATE TABLE IF NOT EXISTS reservations (
           id SERIAL PRIMARY KEY,
-          prenom VARCHAR(100) NOT NULL,
-          nom VARCHAR(100) NOT NULL,
-          email VARCHAR(255) NOT NULL,
-          telephone VARCHAR(20) NOT NULL,
-          adresse TEXT NOT NULL,
+          prenom VARCHAR(100),
+          nom VARCHAR(100),
+          email VARCHAR(255),
+          telephone VARCHAR(20),
+          adresse TEXT,
           type_voiture VARCHAR(50) NOT NULL,
           marque_voiture VARCHAR(100) NOT NULL,
           formule VARCHAR(255) NOT NULL,

@@ -16,11 +16,11 @@ const createReservationsTable = async () => {
       CREATE TABLE IF NOT EXISTS reservations (
         id SERIAL PRIMARY KEY,
         -- Informations client
-        prenom VARCHAR(100) NOT NULL,
-        nom VARCHAR(100) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        telephone VARCHAR(20) NOT NULL,
-        adresse TEXT NOT NULL,
+        prenom VARCHAR(100),
+        nom VARCHAR(100),
+        email VARCHAR(255),
+        telephone VARCHAR(20),
+        adresse TEXT,
         
         -- Informations véhicule et service
         type_voiture VARCHAR(50) NOT NULL,
@@ -85,6 +85,23 @@ class ReservationService {
         };
       }
 
+      // Vérifier si la table a besoin d'être modifiée pour permettre des valeurs NULL
+      try {
+        // Modifier la structure de la table pour permettre des valeurs NULL pour les champs client
+        await pool.query(`
+          ALTER TABLE reservations 
+          ALTER COLUMN prenom DROP NOT NULL,
+          ALTER COLUMN nom DROP NOT NULL,
+          ALTER COLUMN email DROP NOT NULL,
+          ALTER COLUMN telephone DROP NOT NULL,
+          ALTER COLUMN adresse DROP NOT NULL;
+        `);
+        console.log('✅ Structure de la table mise à jour pour permettre des valeurs NULL');
+      } catch (alterError) {
+        // Si l'erreur est due au fait que les colonnes sont déjà nullables, on ignore
+        console.log('ℹ️ La table est déjà configurée correctement ou erreur de modification:', alterError.message);
+      }
+
       const query = `
         INSERT INTO reservations (
           prenom, nom, email, telephone, adresse,
@@ -95,7 +112,7 @@ class ReservationService {
       `;
 
       const values = [
-        prenom, nom, email, telephone, adresse,
+        prenom || null, nom || null, email || null, telephone || null, adresse || null,
         typeVoiture, marqueVoiture, formule, prix || 0,
         date, heure, commentaires || '', newsletter || false, 
         options ? JSON.stringify(options) : null, 'pending'

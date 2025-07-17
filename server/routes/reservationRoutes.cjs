@@ -19,8 +19,7 @@ router.post('/', async (req, res) => {
     });
 
     // Validation des données requises
-    if (!prenom || !nom || !email || !telephone || !adresse || 
-        !typeVoiture || !marqueVoiture || !formule || !date || !heure) {
+    if (!typeVoiture || !marqueVoiture || !formule || !date || !heure) {
       return res.status(400).json({ 
         success: false,
         error: 'Tous les champs obligatoires doivent être remplis' 
@@ -28,7 +27,11 @@ router.post('/', async (req, res) => {
     }
 
     const result = await ReservationService.createReservation({
-      prenom, nom, email, telephone, adresse,
+      prenom: prenom || '',
+      nom: nom || '',
+      email: email || '',
+      telephone: telephone || '',
+      adresse: adresse || '',
       typeVoiture, marqueVoiture, formule, prix,
       date, heure, commentaires, newsletter, options
     });

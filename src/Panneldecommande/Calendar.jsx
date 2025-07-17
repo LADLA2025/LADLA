@@ -25,6 +25,7 @@ const Calendar = () => {
 
   // État pour le modal de nouvelle réservation
   const [showNewReservationModal, setShowNewReservationModal] = useState(false);
+  const [lavagePremiumInputValue, setLavagePremiumInputValue] = useState('');
   const [newReservationData, setNewReservationData] = useState({
     prenom: '',
     nom: '',
@@ -277,10 +278,8 @@ const Calendar = () => {
     e.preventDefault();
     
     // Validation des champs requis
-    if (!newReservationData.prenom || !newReservationData.nom || !newReservationData.email || 
-        !newReservationData.telephone || !newReservationData.adresse || !newReservationData.type_voiture || 
-        !newReservationData.marque_voiture || !newReservationData.formule || !newReservationData.date_rdv || 
-        !newReservationData.heure_rdv) {
+    if (!newReservationData.type_voiture || !newReservationData.marque_voiture || 
+        !newReservationData.formule || !newReservationData.date_rdv || !newReservationData.heure_rdv) {
       alert('Veuillez remplir tous les champs obligatoires (marqués d\'un *)');
       return;
     }
@@ -413,6 +412,7 @@ const Calendar = () => {
       return 120;
     })();
     
+    setLavagePremiumInputValue(''); // Réinitialiser l'input
     setNewReservationData({
       prenom: '',
       nom: '',
@@ -522,6 +522,8 @@ const Calendar = () => {
 
   // Fonction pour gérer le changement de prix personnalisé du lavage premium
   const handleLavagePremiumPriceChange = (price) => {
+    setLavagePremiumInputValue(price);
+    
     const defaultPrice = (() => {
       // Chercher le prix depuis les formules si disponible
       if (formules && formules.length > 0) {
@@ -539,7 +541,7 @@ const Calendar = () => {
         ...prev.options,
         lavage_premium: {
           ...prev.options.lavage_premium,
-          prix_personnalise: parseFloat(price) || defaultPrice
+          prix_personnalise: price ? parseFloat(price) : defaultPrice
         }
       }
     }));
@@ -547,6 +549,7 @@ const Calendar = () => {
 
   // Fonction pour ouvrir le modal avec une date/heure pré-remplie
   const openNewReservationModal = (prefilledDate = null, prefilledTime = null) => {
+    setLavagePremiumInputValue(''); // Réinitialiser l'input à l'ouverture
     if (prefilledDate) {
       setNewReservationData(prev => ({
         ...prev,
@@ -739,68 +742,68 @@ const Calendar = () => {
     if (options.baume_sieges?.quantity > 0) {
       const qty = options.baume_sieges.quantity;
       const price = qty >= 4 ? options.baume_sieges.prix_x4 : qty * options.baume_sieges.prix_unitaire;
-      optionsToShow.push({
-        name: `Baume sièges (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: qty >= 4
-      });
+              optionsToShow.push({
+          name: `Baume sièges (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: qty >= 4
+        });
     }
 
     if (options.pressing_sieges?.quantity > 0) {
       const qty = options.pressing_sieges.quantity;
       const price = qty >= 4 ? options.pressing_sieges.prix_x4 : qty * options.pressing_sieges.prix_unitaire;
-      optionsToShow.push({
-        name: `Pressing sièges (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: qty >= 4
-      });
+              optionsToShow.push({
+          name: `Pressing sièges (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: qty >= 4
+        });
     }
 
     if (options.pressing_tapis?.quantity > 0) {
       const qty = options.pressing_tapis.quantity;
       const price = qty >= 4 ? options.pressing_tapis.prix_x4 : qty * options.pressing_tapis.prix_unitaire;
-      optionsToShow.push({
-        name: `Pressing tapis (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: qty >= 4
-      });
+              optionsToShow.push({
+          name: `Pressing tapis (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: qty >= 4
+        });
     }
 
     if (options.pressing_panneau_porte?.quantity > 0) {
       const qty = options.pressing_panneau_porte.quantity;
       const price = qty >= 4 ? options.pressing_panneau_porte.prix_x4 : qty * options.pressing_panneau_porte.prix_unitaire;
-      optionsToShow.push({
-        name: `Pressing panneaux (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: qty >= 4
-      });
+              optionsToShow.push({
+          name: `Pressing panneaux (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: qty >= 4
+        });
     }
 
     if (options.renov_phare?.quantity > 0) {
       const qty = options.renov_phare.quantity;
       const price = qty >= 4 ? options.renov_phare.prix_x4 : qty * options.renov_phare.prix_unitaire;
-      optionsToShow.push({
-        name: `Renov phare (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: qty >= 4
-      });
+              optionsToShow.push({
+          name: `Renov phare (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: qty >= 4
+        });
     }
 
     if (options.pressing_coffre_plafonnier?.quantity > 0) {
       const qty = options.pressing_coffre_plafonnier.quantity;
       const price = qty * options.pressing_coffre_plafonnier.prix_unitaire;
-      optionsToShow.push({
-        name: `Pressing coffre/plafonnier (x${qty})`,
-        price: `${parseFloat(price).toFixed(0)}€`,
-        hasReduction: false
-      });
+              optionsToShow.push({
+          name: `Pressing coffre/plafonnier (x${qty})`,
+          price: `${Math.round(parseFloat(price))}€`,
+          hasReduction: false
+        });
     }
 
     // Options à prix fixe
     if (options.assaisonnement_ozone?.selected) {
       optionsToShow.push({
         name: 'Assaisonnement ozone',
-        price: `${parseFloat(options.assaisonnement_ozone.prix).toFixed(0)}€`,
+        price: `${Math.round(parseFloat(options.assaisonnement_ozone.prix))}€`,
         hasReduction: false
       });
     }
@@ -825,7 +828,7 @@ const Calendar = () => {
       
       optionsToShow.push({
         name: '💎 Lavage Premium',
-        price: `${parseFloat(lavagePremiumPrice).toFixed(0)}€`,
+        price: `${Math.round(parseFloat(lavagePremiumPrice))}€`,
         hasReduction: false
       });
     }
@@ -1493,9 +1496,9 @@ const Calendar = () => {
                     <div className="text-xs text-orange-700">En attente</div>
                   </div>
                   <div className="text-center p-3 bg-purple-50 rounded-xl">
-                    <div className="text-xl font-bold text-purple-600">
-                      {realReservations.reduce((total, r) => total + (parseFloat(r.prix) || 0), 0).toFixed(0)}€
-                    </div>
+                                          <div className="text-xl font-bold text-purple-600">
+                        {Math.round(realReservations.reduce((total, r) => total + (parseFloat(r.prix) || 0), 0))}€
+                      </div>
                     <div className="text-xs text-purple-700">CA</div>
                   </div>
                 </div>
@@ -1913,7 +1916,7 @@ const Calendar = () => {
                                           )}
                                         </div>
                                         <span className={`font-medium ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
-                                          {option.price === 'Sur devis' ? option.price : `${parseFloat(option.price.replace('€', '')).toFixed(0)}€`}
+                                          {option.price === 'Sur devis' ? option.price : `${Math.round(parseFloat(option.price.replace('€', '')))}€`}
                                         </span>
                                       </div>
                                     ))}
@@ -2123,7 +2126,7 @@ const Calendar = () => {
                                   )}
                                 </div>
                                 <span className={`font-medium text-sm ${option.price === 'Sur devis' ? 'text-orange-600' : 'text-blue-600'}`}>
-                                  {option.price === 'Sur devis' ? option.price : `${parseFloat(option.price.replace('€', '')).toFixed(0)}€`}
+                                  {option.price === 'Sur devis' ? option.price : `${Math.round(parseFloat(option.price.replace('€', '')))}€`}
                                 </span>
                               </div>
                             ))}
@@ -2382,7 +2385,7 @@ const Calendar = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Prénom *
+                          Prénom
                         </label>
                         <input
                           type="text"
@@ -2391,12 +2394,11 @@ const Calendar = () => {
                           onChange={handleNewReservationChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors"
                           placeholder="Prénom du client"
-                          required
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nom *
+                          Nom
                         </label>
                         <input
                           type="text"
@@ -2405,14 +2407,13 @@ const Calendar = () => {
                           onChange={handleNewReservationChange}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors"
                           placeholder="Nom du client"
-                          required
                         />
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Téléphone *
+                        Téléphone
                       </label>
                       <input
                         type="tel"
@@ -2421,13 +2422,12 @@ const Calendar = () => {
                         onChange={handleNewReservationChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors"
                         placeholder="06 12 34 56 78"
-                        required
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
+                        Email
                       </label>
                       <input
                         type="email"
@@ -2436,13 +2436,12 @@ const Calendar = () => {
                         onChange={handleNewReservationChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors"
                         placeholder="client@email.com"
-                        required
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Adresse *
+                        Adresse
                       </label>
                       <textarea
                         name="adresse"
@@ -2451,7 +2450,6 @@ const Calendar = () => {
                         rows="3"
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors resize-none"
                         placeholder="Adresse complète du client"
-                        required
                       />
                     </div>
                   </div>
@@ -2466,7 +2464,7 @@ const Calendar = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Type de véhicule *
+                          Type de véhicule <span className="text-red-500">*</span>
                         </label>
                         <select
                           name="type_voiture"
@@ -2484,7 +2482,7 @@ const Calendar = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Marque *
+                          Marque <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -2500,7 +2498,7 @@ const Calendar = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Formule de service *
+                        Formule de service <span className="text-red-500">*</span>
                       </label>
                       <select
                         name="formule"
@@ -2535,7 +2533,7 @@ const Calendar = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Date *
+                          Date <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="date"
@@ -2549,7 +2547,7 @@ const Calendar = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Heure *
+                          Heure <span className="text-red-500">*</span>
                         </label>
                         <select
                           name="heure_rdv"
@@ -2861,7 +2859,7 @@ const Calendar = () => {
                                 {newReservationData.options.lavage_premium.selected ? `${(() => {
                                   const selectedFormule = formules.find(f => f.nom === newReservationData.formule);
                                   const price = selectedFormule?.lavage_premium_prix || newReservationData.options.lavage_premium.prix_personnalise || 120;
-                                  return parseFloat(price).toFixed(0);
+                                  return Math.round(parseFloat(price));
                                 })()}€` : '0€'}
                               </div>
                             </div>
@@ -2873,7 +2871,7 @@ const Calendar = () => {
                               </label>
                               <input
                                 type="number"
-                                value={newReservationData.options.lavage_premium.prix_personnalise}
+                                value={lavagePremiumInputValue}
                                 onChange={(e) => handleLavagePremiumPriceChange(e.target.value)}
                                 className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 placeholder={(() => {
@@ -2939,17 +2937,17 @@ const Calendar = () => {
                        <div className="space-y-2">
                          <div className="flex justify-between">
                            <span className="text-gray-600">Prix de base :</span>
-                           <span className="font-medium">{parseFloat(newReservationData.prix || 0).toFixed(0)}€</span>
+                           <span className="font-medium">{Math.round(parseFloat(newReservationData.prix || 0))}€</span>
                          </div>
                          <div className="flex justify-between">
                            <span className="text-gray-600">Options :</span>
-                           <span className="font-medium">{parseFloat(calculateTotalOptionsPrice()).toFixed(0)}€</span>
+                           <span className="font-medium">{Math.round(parseFloat(calculateTotalOptionsPrice()))}€</span>
                          </div>
                          <hr className="border-gray-300" />
                          <div className="flex justify-between text-lg font-bold">
                            <span className="text-gray-800">Total :</span>
                            <span className="text-[#FF0000]">
-                             {parseFloat((parseFloat(newReservationData.prix) || 0) + calculateTotalOptionsPrice()).toFixed(0)}€
+                             {Math.round(parseFloat((parseFloat(newReservationData.prix) || 0) + calculateTotalOptionsPrice()))}€
                            </span>
                          </div>
                        </div>

@@ -1,0 +1,9 @@
+{
+  "nom": "Test Formule Fixed",
+  "prix": 50,
+  "duree": "1h30",
+  "icone": "bx-car",
+  "services": ["Lavage carrosserie", "Nettoyage intérieur"],
+  "lavage_premium": false,
+  "lavage_premium_prix": null
+} 
