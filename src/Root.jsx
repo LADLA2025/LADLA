@@ -8,6 +8,7 @@ import Services from "./pages/Services";
 import Tarifs from "./pages/Tarifs";
 import MentionsLegales from "./pages/MentionsLegales";
 import CGVPolitique from "./pages/CGVPolitique";
+import PareBrise from "./pages/PareBrise";
 
 // Import des pages voitures
 import VoituresRoot from "./PAGE_voiture/VoituresRoot";
@@ -44,6 +45,7 @@ function Root() {
             <Route path="/garage" element={<Garage />} />
             <Route path="/services" element={<Services />} />
             <Route path="/tarifs" element={<Tarifs />} />
+            <Route path="/pare-brise" element={<PareBrise />} />
             <Route path="/reservation" element={<Reservation />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/cgv-politique" element={<CGVPolitique />} />

@@ -524,7 +524,7 @@ function Tarifs() {
               <span className="text-lg font-medium text-gray-700">Lavage Premium (Option Beauté intégrale)</span>
               <span className="text-2xl font-bold text-purple-600">Prix personnalisé</span>
             </div>
-                                    <p className="text-gray-600 mt-2">ce service inclus les prestations prenium pressing des sieges des plastiques des tapis</p>
+                                    <p className="text-gray-600 mt-2">ce service inclus les prestations premium pressing des sieges des plastiques des tapis</p>
           </div>
         </div>
       )

@@ -56,6 +56,10 @@ const Calendar = () => {
   });
   const [submittingReservation, setSubmittingReservation] = useState(false);
 
+  // État pour savoir si on est en mode édition
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingReservationId, setEditingReservationId] = useState(null);
+
   // État pour le modal de suppression par mois
   const [showDeleteMonthModal, setShowDeleteMonthModal] = useState(false);
   const [deleteMonthData, setDeleteMonthData] = useState({
@@ -273,6 +277,43 @@ const Calendar = () => {
     }
   };
 
+  // Fonction pour ouvrir le modal en mode édition
+  const openEditModal = (reservation) => {
+    // Pré-remplir le formulaire avec les données de la réservation
+    const clientNames = reservation.client?.split(' ') || [];
+    setNewReservationData({
+      prenom: clientNames[0] || '',
+      nom: clientNames.slice(1).join(' ') || '',
+      email: reservation.email || '',
+      telephone: reservation.phone || '',
+      adresse: reservation.adresse || '',
+      type_voiture: reservation.vehicleType || '',
+      marque_voiture: reservation.vehicle || '',
+      formule: reservation.service || '',
+      prix: reservation.prix || '',
+      date_rdv: reservation.date || '',
+      heure_rdv: reservation.time || '',
+      commentaires: reservation.commentaires || '',
+      options: reservation.options || {
+        baume_sieges: { quantity: 0, prix_unitaire: 20, prix_x4: 60 },
+        pressing_sieges: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        pressing_tapis: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        pressing_coffre_plafonnier: { quantity: 0, prix_unitaire: 30 },
+        pressing_panneau_porte: { quantity: 0, prix_unitaire: 30, prix_x4: 75 },
+        renov_phare: { quantity: 0, prix_unitaire: 30, prix_x4: 100 },
+        renov_chrome: { selected: false },
+        assaisonnement_ozone: { selected: false, prix: 30 },
+        lavage_premium: { selected: false, prix: 120, prix_personnalise: 120 },
+        polissage: { selected: false },
+        lustrage: { selected: false }
+      }
+    });
+    
+    setIsEditMode(true);
+    setEditingReservationId(reservation.id);
+    setShowNewReservationModal(true);
+  };
+
   // Fonction pour créer une nouvelle réservation
   const createNewReservation = async (e) => {
     e.preventDefault();
@@ -351,8 +392,12 @@ const Calendar = () => {
 
       console.log('📤 Envoi des données au serveur:', serverData);
 
-      const response = await fetch(buildAPIUrl(API_ENDPOINTS.RESERVATIONS), {
-        method: 'POST',
+      const url = isEditMode 
+        ? buildAPIUrl(`${API_ENDPOINTS.RESERVATIONS}/${editingReservationId}`)
+        : buildAPIUrl(API_ENDPOINTS.RESERVATIONS);
+      
+      const response = await fetch(url, {
+        method: isEditMode ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -362,24 +407,30 @@ const Calendar = () => {
       const result = await response.json();
 
       if (result.success) {
-        console.log('✅ Réservation créée avec succès, envoi des emails...');
+        const wasEditMode = isEditMode; // Sauvegarder le mode avant réinitialisation
         
-        // Préparer les données complètes pour l'envoi d'emails
-        const reservationDataForEmail = {
-          ...serverData,
-          options: newReservationData.options
-        };
-        
-        // Envoyer les emails via EmailJS côté client
-        try {
-          const emailResult = await emailClientService.sendReservationEmails(reservationDataForEmail);
-          if (emailResult.success) {
-            console.log('📧 Emails envoyés avec succès via EmailJS !');
-          } else {
-            console.warn('⚠️ Erreur lors de l\'envoi des emails:', emailResult.error);
+        if (isEditMode) {
+          console.log('✅ Réservation modifiée avec succès');
+        } else {
+          console.log('✅ Réservation créée avec succès, envoi des emails...');
+          
+          // Préparer les données complètes pour l'envoi d'emails
+          const reservationDataForEmail = {
+            ...serverData,
+            options: newReservationData.options
+          };
+          
+          // Envoyer les emails via EmailJS côté client
+          try {
+            const emailResult = await emailClientService.sendReservationEmails(reservationDataForEmail);
+            if (emailResult.success) {
+              console.log('📧 Emails envoyés avec succès via EmailJS !');
+            } else {
+              console.warn('⚠️ Erreur lors de l\'envoi des emails:', emailResult.error);
+            }
+          } catch (emailError) {
+            console.error('❌ Erreur lors de l\'envoi des emails:', emailError);
           }
-        } catch (emailError) {
-          console.error('❌ Erreur lors de l\'envoi des emails:', emailError);
         }
         
         // Recharger les réservations
@@ -387,9 +438,16 @@ const Calendar = () => {
         // Réinitialiser le formulaire et fermer le modal
         resetNewReservationForm();
         setShowNewReservationModal(false);
-        alert('Réservation créée avec succès ! Les emails de confirmation ont été envoyés.');
+        
+        const successMessage = wasEditMode 
+          ? '✅ Réservation modifiée avec succès !' 
+          : 'Réservation créée avec succès ! Les emails de confirmation ont été envoyés.';
+        alert(successMessage);
       } else {
-        alert('Erreur lors de la création : ' + (result.error || 'Erreur inconnue'));
+        const errorMessage = isEditMode 
+          ? 'Erreur lors de la modification : ' 
+          : 'Erreur lors de la création : ';
+        alert(errorMessage + (result.error || 'Erreur inconnue'));
       }
 
     } catch (error) {
@@ -413,6 +471,8 @@ const Calendar = () => {
     })();
     
     setLavagePremiumInputValue(''); // Réinitialiser l'input
+    setIsEditMode(false);
+    setEditingReservationId(null);
     setNewReservationData({
       prenom: '',
       nom: '',
@@ -577,18 +637,14 @@ const Calendar = () => {
         slots.push(`${hour.toString().padStart(2, '0')}:00`);
       }
       
-      // Ajouter la demi-heure, sauf pendant la pause déjeuner (12h30, 13h00, 13h30)
+      // Ajouter la demi-heure
       if (hour <= 18) {
         const halfHour = `${hour.toString().padStart(2, '0')}:30`;
-        // Exclure 12:30 et 13:30 (pause déjeuner)
-        if (halfHour !== '12:30' && halfHour !== '13:30') {
-          slots.push(halfHour);
-        }
+        slots.push(halfHour);
       }
     }
     
-    // Exclure également 13:00 (pause déjeuner)
-    return slots.filter(slot => slot !== '13:00');
+    return slots;
   };
 
   const getWeekDates = (date) => {
@@ -2009,6 +2065,13 @@ const Calendar = () => {
                                       )}
                                       <hr className="my-2" />
                                       <button 
+                                        onClick={() => openEditModal(reservation)}
+                                        className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 transition-colors flex items-center"
+                                      >
+                                        <i className="bx bx-edit mr-2"></i>
+                                        Modifier
+                                      </button>
+                                      <button
                                         onClick={() => deleteReservation(reservation.id)}
                                         className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center"
                                       >
@@ -2181,6 +2244,13 @@ const Calendar = () => {
                           </button>
                         )}
                         <button 
+                          onClick={() => openEditModal(reservation)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors flex items-center"
+                        >
+                          <i className="bx bx-edit mr-1"></i>
+                          Modifier
+                        </button>
+                        <button
                           onClick={() => deleteReservation(reservation.id)}
                           className="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors flex items-center"
                         >
@@ -2360,12 +2430,20 @@ const Calendar = () => {
                       <i className="bx bx-calendar-plus text-white text-2xl"></i>
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-800">Nouveau Rendez-vous</h2>
-                      <p className="text-gray-600">Créer une nouvelle réservation pour un client</p>
+                      <h2 className="text-2xl font-bold text-gray-800">
+                        {isEditMode ? 'Modifier la réservation' : 'Nouveau Rendez-vous'}
+                      </h2>
+                      <p className="text-gray-600">
+                        {isEditMode ? `Modification de la réservation #${editingReservationId}` : 'Créer une nouvelle réservation pour un client'}
+                      </p>
                     </div>
                   </div>
                   <button 
-                    onClick={() => setShowNewReservationModal(false)}
+                    onClick={() => {
+                      setShowNewReservationModal(false);
+                      setIsEditMode(false);
+                      setEditingReservationId(null);
+                    }}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <i className="bx bx-x text-2xl text-gray-600"></i>
@@ -2540,7 +2618,7 @@ const Calendar = () => {
                           name="date_rdv"
                           value={newReservationData.date_rdv}
                           onChange={handleNewReservationChange}
-                          min={new Date().toISOString().split('T')[0]}
+                          min={isEditMode ? undefined : new Date().toISOString().split('T')[0]}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#FFA600] focus:outline-none transition-colors"
                           required
                         />
@@ -2986,12 +3064,12 @@ const Calendar = () => {
                     {submittingReservation ? (
                       <>
                         <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
-                        Création en cours...
+                        {isEditMode ? 'Modification en cours...' : 'Création en cours...'}
                       </>
                     ) : (
                       <>
-                        <i className="bx bx-check"></i>
-                        Créer le Rendez-vous
+                        <i className={`bx ${isEditMode ? 'bx-save' : 'bx-check'}`}></i>
+                        {isEditMode ? 'Enregistrer les modifications' : 'Créer le Rendez-vous'}
                       </>
                     )}
                   </button>

@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 
 // Configuration de la base de données (utilise la même config que le serveur principal)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.mmzywkqwiwdrdtkocrtj:Edward2002%40%40@aws-0-eu-west-3.pooler.supabase.com:5432/postgres',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.sgcpymrobdjbcpzjmaos:Les_As_De_Auto_2025@aws-0-eu-west-3.pooler.supabase.com:5432/postgres',
   ssl: {
     rejectUnauthorized: false
   }

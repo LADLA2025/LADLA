@@ -393,7 +393,7 @@ function FormuleSelectionModal({
                       <div>
                         <span className="font-bold text-gray-800 text-xs sm:text-sm">💎Option Lavage Premium</span>
                         <div className="text-xs text-purple-700">
-                          ce service inclus les prestations prenium pressing des sieges des plastiques des tapis + pressing coffre/plafonnier
+                          ce service inclus les prestations premium pressing des sieges des plastiques des tapis + pressing coffre/plafonnier
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3">

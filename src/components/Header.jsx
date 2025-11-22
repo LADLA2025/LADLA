@@ -9,6 +9,7 @@ function Header() {
     { to: "/", icon: "bx-home", text: "ACCUEIL" },
     { to: "/services", icon: "bx-cog", text: "NOS SERVICES" },
     { to: "/tarifs", icon: "bx-euro", text: "NOS TARIFS" },
+    { to: "/pare-brise", icon: "bx-window", text: "PARE-BRISE" },
     { to: "/garage", icon: "bx-wrench", text: "NOTRE GARAGE" },
     { to: "/contact", icon: "bx-phone", text: "CONTACT" }
   ];

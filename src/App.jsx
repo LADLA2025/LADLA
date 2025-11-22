@@ -191,11 +191,22 @@ function App() {
              <h1 className="text-2xl md:text-6xl font-bold mb-6">
              VOTRE PARTENAIRE AUTOMOBILE DE CONFIANCE
              </h1>
-             <p className="text-sm md:text-xl mb-8 opacity-90">
+             <p className="text-sm md:text-xl mb-4 opacity-90">
                Notre équipe assure l'entretien esthétique complet et professionnel 
                de votre véhicule avec des outils performants dans un centre 
                équipé et moderne
              </p>
+             <div className="flex flex-col md:flex-row items-start md:items-center md:justify-center gap-4 mb-8 text-base md:text-xl text-white font-bold">
+               <div className="flex items-center gap-2">
+                 <i className='bx bx-map text-2xl md:text-3xl'></i>
+                 <span>102 avenue Saint Lambert, 06100 Nice</span>
+               </div>
+               <span className="hidden md:inline text-2xl">•</span>
+               <div className="flex items-center gap-2">
+                 <i className='bx bx-phone text-2xl md:text-3xl'></i>
+                 <span>06 50 30 44 17 / 06 25 13 80 33</span>
+               </div>
+             </div>
              <div className="flex flex-col sm:flex-row gap-4 justify-start md:justify-center items-start md:items-center">
                <a 
                  href="https://wa.me/33650304417?text=Bonjour,%20je%20souhaite%20réserver%20un%20service%20de%20nettoyage%20automobile" 
@@ -218,6 +229,21 @@ function App() {
            </div>
          </div>
        </section>
+
+      {/* Bandeau Nouvelle Offre Pare-Brise */}
+      <div className="bg-gradient-to-r from-[#FF0000] to-[#FF4500] py-6 relative overflow-hidden shadow-lg">
+        <div className="container mx-auto px-4">
+          <Link to="/pare-brise" className="flex flex-col md:flex-row items-center justify-center gap-4 text-white hover:opacity-90 transition-all hover:scale-[1.02] duration-300">
+            <span className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-bold animate-pulse">
+              🎉 NOUVEAU
+            </span>
+            <span className="font-bold text-lg md:text-xl text-center md:text-left">
+              Remplacement de Pare-Brise : 100€ + franchise offerte OU 200€ au choix
+            </span>
+            <i className='bx bx-right-arrow-alt text-3xl'></i>
+          </Link>
+        </div>
+      </div>
 
       {/* Services Section */}
       <section className="py-46 bg-white relative overflow-hidden w-full">

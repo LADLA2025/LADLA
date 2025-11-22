@@ -411,22 +411,18 @@ function Reservation() {
         });
       }
       
-      // Ajouter la demi-heure, sauf pendant la pause déjeuner (12h30, 13h00, 13h30)
+      // Ajouter la demi-heure
       if (hour <= 18) {
         const halfHour = `${hour.toString().padStart(2, '0')}:30`;
-        // Exclure 12:30 et 13:30 (pause déjeuner)
-        if (halfHour !== '12:30' && halfHour !== '13:30') {
-          slots.push({
-            time: halfHour,
-            available: isSlotAvailable(halfHour),
-            label: halfHour
-          });
-        }
+        slots.push({
+          time: halfHour,
+          available: isSlotAvailable(halfHour),
+          label: halfHour
+        });
       }
     }
     
-    // Exclure également 13:00 (pause déjeuner) et retourner les créneaux avec disponibilité
-    return slots.filter(slot => slot.time !== '13:00');
+    return slots;
   };
 
   // Fonction pour obtenir le label du type de véhicule
